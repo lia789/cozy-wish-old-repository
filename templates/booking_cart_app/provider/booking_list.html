@@ -1,0 +1,223 @@
+{% extends 'base.html' %}
+
+{% block title %}Provider Bookings - CozyWish{% endblock %}
+
+{% block extra_css %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/booking_cart_app/booking_cart_app.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-5 radial-gradient-bg">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="page-header text-center mb-5">
+                    <h1 class="page-title">Manage Bookings</h1>
+                    <p class="text-muted">View and manage bookings for your services</p>
+                </div>
+
+                {% if messages %}
+                <div class="row justify-content-center mb-4">
+                    <div class="col-md-10">
+                        {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            <div class="d-flex align-items-center">
+                                {% if message.tags == 'success' %}
+                                <i class="fas fa-check-circle me-2"></i>
+                                {% elif message.tags == 'error' or message.tags == 'danger' %}
+                                <i class="fas fa-exclamation-circle me-2"></i>
+                                {% elif message.tags == 'warning' %}
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                {% elif message.tags == 'info' %}
+                                <i class="fas fa-info-circle me-2"></i>
+                                {% endif %}
+                                {{ message }}
+                            </div>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <div class="row">
+                    <div class="col-md-3 mb-4">
+                        <div class="card shadow mb-4">
+                            <div class="card-header bg-primary-brand">
+                                <h5 class="mb-0"><i class="fas fa-filter me-2"></i>Filter</h5>
+                            </div>
+                            <div class="card-body">
+                                <form method="get" action=".">
+                                    <div class="mb-3">
+                                        <label class="form-label">Status</label>
+                                        <div class="d-grid gap-2">
+                                            <a href="{% url 'booking_cart_app:provider_booking_list' %}" class="btn btn-sm {% if not status_filter %}btn-primary{% else %}btn-outline-primary{% endif %} w-100">All</a>
+                                            <a href="{% url 'booking_cart_app:provider_booking_list' %}?status=pending" class="btn btn-sm {% if status_filter == 'pending' %}btn-warning{% else %}btn-outline-warning{% endif %} w-100">Pending</a>
+                                            <a href="{% url 'booking_cart_app:provider_booking_list' %}?status=confirmed" class="btn btn-sm {% if status_filter == 'confirmed' %}btn-success{% else %}btn-outline-success{% endif %} w-100">Confirmed</a>
+                                            <a href="{% url 'booking_cart_app:provider_booking_list' %}?status=completed" class="btn btn-sm {% if status_filter == 'completed' %}btn-info{% else %}btn-outline-info{% endif %} w-100">Completed</a>
+                                            <a href="{% url 'booking_cart_app:provider_booking_list' %}?status=cancelled" class="btn btn-sm {% if status_filter == 'cancelled' %}btn-danger{% else %}btn-outline-danger{% endif %} w-100">Cancelled</a>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Date Range</label>
+                                        <div class="d-grid gap-2">
+                                            <a href="{% url 'booking_cart_app:provider_booking_list' %}{% if status_filter %}?status={{ status_filter }}{% endif %}" class="btn btn-sm {% if not date_filter %}btn-primary{% else %}btn-outline-primary{% endif %} w-100">All</a>
+                                            <a href="{% url 'booking_cart_app:provider_booking_list' %}?{% if status_filter %}status={{ status_filter }}&{% endif %}date=today" class="btn btn-sm {% if date_filter == 'today' %}btn-primary{% else %}btn-outline-primary{% endif %} w-100">Today</a>
+                                            <a href="{% url 'booking_cart_app:provider_booking_list' %}?{% if status_filter %}status={{ status_filter }}&{% endif %}date=tomorrow" class="btn btn-sm {% if date_filter == 'tomorrow' %}btn-primary{% else %}btn-outline-primary{% endif %} w-100">Tomorrow</a>
+                                            <a href="{% url 'booking_cart_app:provider_booking_list' %}?{% if status_filter %}status={{ status_filter }}&{% endif %}date=week" class="btn btn-sm {% if date_filter == 'week' %}btn-primary{% else %}btn-outline-primary{% endif %} w-100">This Week</a>
+                                            <a href="{% url 'booking_cart_app:provider_booking_list' %}?{% if status_filter %}status={{ status_filter }}&{% endif %}date=month" class="btn btn-sm {% if date_filter == 'month' %}btn-primary{% else %}btn-outline-primary{% endif %} w-100">This Month</a>
+                                        </div>
+                                    </div>
+                                </form>
+
+                                <hr>
+
+                                <div class="d-grid">
+                                    <a href="{% url 'venues_app:service_list' %}" class="btn btn-primary">
+                                        <i class="fas fa-spa me-2"></i>Manage Services
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card shadow mb-4">
+                            <div class="card-header bg-primary-brand">
+                                <h5 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Summary</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span>Total Bookings:</span>
+                                        <span class="fw-bold">{{ bookings|length }}</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span>Pending:</span>
+                                        <span class="fw-bold">{{ pending_count|default:0 }}</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span>Confirmed:</span>
+                                        <span class="fw-bold">{{ confirmed_count|default:0 }}</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span>Completed:</span>
+                                        <span class="fw-bold">{{ completed_count|default:0 }}</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <span>Cancelled:</span>
+                                        <span class="fw-bold">{{ cancelled_count|default:0 }}</span>
+                                    </div>
+                                </div>
+
+                                <hr>
+
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span>Today's Bookings:</span>
+                                    <span class="fw-bold">{{ today_count|default:0 }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span>Tomorrow's Bookings:</span>
+                                    <span class="fw-bold">{{ tomorrow_count|default:0 }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-9">
+                        {% if bookings %}
+                        <div class="card shadow mb-4">
+                            <div class="card-header bg-primary-brand d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0"><i class="fas fa-calendar-check me-2"></i>Bookings</h5>
+                                <span class="badge bg-light text-dark">{{ bookings|length }} booking(s)</span>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover mb-0">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Booking ID</th>
+                                                <th>Customer</th>
+                                                <th>Service</th>
+                                                <th>Date & Time</th>
+                                                <th>Status</th>
+                                                <th>Total</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for booking in bookings %}
+                                            <tr>
+                                                <td>{{ booking.booking_id|truncatechars:8 }}</td>
+                                                <td>{{ booking.user.get_full_name|default:booking.user.username }}</td>
+                                                <td>
+                                                    {% for item in booking.bookingitem_set.all %}
+                                                    <div>{{ item.service_title }}</div>
+                                                    {% endfor %}
+                                                </td>
+                                                <td class="booking-date">
+                                                    {% for item in booking.bookingitem_set.all %}
+                                                    <div><i class="far fa-calendar-alt me-1"></i>{{ item.date|date:"M d, Y" }} <i class="far fa-clock ms-1 me-1"></i>{{ item.time_slot|time:"g:i A" }}</div>
+                                                    {% endfor %}
+                                                </td>
+                                                <td>
+                                                    {% if booking.status == 'pending' %}
+                                                    <span class="booking-status booking-status-pending">Pending</span>
+                                                    {% elif booking.status == 'confirmed' %}
+                                                    <span class="booking-status booking-status-confirmed">Confirmed</span>
+                                                    {% elif booking.status == 'cancelled' %}
+                                                    <span class="booking-status booking-status-cancelled">Cancelled</span>
+                                                    {% elif booking.status == 'completed' %}
+                                                    <span class="booking-status booking-status-completed">Completed</span>
+                                                    {% elif booking.status == 'disputed' %}
+                                                    <span class="booking-status booking-status-disputed">Disputed</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td class="booking-price">${{ booking.total_price }}</td>
+                                                <td>
+                                                    <div class="btn-group btn-group-sm" role="group">
+                                                        <a href="{% url 'booking_cart_app:provider_booking_detail' booking_id=booking.booking_id %}" class="btn btn-outline-primary" title="View Details">
+                                                            <i class="fas fa-eye"></i>
+                                                        </a>
+                                                        {% if booking.status == 'pending' %}
+                                                        <a href="{% url 'booking_cart_app:provider_update_booking_status' booking_id=booking.booking_id %}?status=confirmed" class="btn btn-outline-success" title="Confirm Booking" onclick="return confirm('Are you sure you want to confirm this booking?')">
+                                                            <i class="fas fa-check"></i>
+                                                        </a>
+                                                        {% endif %}
+                                                        {% if booking.status == 'confirmed' %}
+                                                        <a href="{% url 'booking_cart_app:provider_update_booking_status' booking_id=booking.booking_id %}?status=completed" class="btn btn-outline-info" title="Mark as Completed" onclick="return confirm('Are you sure you want to mark this booking as completed?')">
+                                                            <i class="fas fa-check-double"></i>
+                                                        </a>
+                                                        {% endif %}
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="card shadow">
+                            <div class="card-body text-center py-5">
+                                <div class="mb-4">
+                                    <div class="d-inline-block p-4 bg-light rounded-circle">
+                                        <i class="fas fa-calendar-alt fa-4x text-primary-brand"></i>
+                                    </div>
+                                </div>
+                                <h3 class="mb-3">No bookings found</h3>
+                                <p class="text-muted mb-4">{% if status_filter %}No {{ status_filter }} bookings found.{% else %}You don't have any bookings yet.{% endif %}</p>
+                                <a href="{% url 'venues_app:service_list' %}" class="btn btn-primary">
+                                    <i class="fas fa-spa me-2"></i>Manage Services
+                                </a>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

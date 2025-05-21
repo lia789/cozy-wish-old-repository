@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Notification Detail{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/notifications_app/notifications_app.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-5 radial-gradient-bg">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'notifications_app:notification_list' %}">Notifications</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Notification Detail</li>
+                </ol>
+            </nav>
+
+            <div class="card notification-card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <span class="badge bg-{{ notification.notification.priority }} me-2">{{ notification.notification.priority|title }}</span>
+                        {{ notification.notification.title }}
+                    </h5>
+                    <span class="text-muted">{{ notification.notification.created_at|date:"M d, Y, g:i a" }}</span>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <h6 class="text-muted mb-2">Category</h6>
+                        <p>{{ notification.notification.category.name }}</p>
+                    </div>
+
+                    <div class="mb-4">
+                        <h6 class="text-muted mb-2">Message</h6>
+                        <p>{{ notification.notification.message }}</p>
+                    </div>
+
+                    {% if related_object %}
+                    <div class="mb-4">
+                        <h6 class="text-muted mb-2">Related Information</h6>
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                {% if notification.notification.content_type.model == 'booking' %}
+                                <h5 class="card-title">Booking #{{ related_object.booking_id }}</h5>
+                                <p class="card-text">
+                                    <strong>Status:</strong> {{ related_object.get_status_display }}<br>
+                                    <strong>Date:</strong> {{ related_object.booking_date|date:"M d, Y" }}<br>
+                                    <strong>Total:</strong> ${{ related_object.total_price }}
+                                </p>
+                                <a href="{% url 'booking_cart_app:booking_detail' related_object.booking_id %}" class="btn btn-primary">View Booking</a>
+
+                                {% elif notification.notification.content_type.model == 'review' %}
+                                <h5 class="card-title">Review for {{ related_object.venue.name }}</h5>
+                                <p class="card-text">
+                                    <strong>Rating:</strong> {{ related_object.rating }} stars<br>
+                                    <strong>Date:</strong> {{ related_object.created_at|date:"M d, Y" }}<br>
+                                    <strong>Comment:</strong> {{ related_object.comment }}
+                                </p>
+                                <a href="{% url 'review_app:review_detail' related_object.id %}" class="btn btn-primary">View Review</a>
+
+                                {% elif notification.notification.content_type.model == 'payment' %}
+                                <h5 class="card-title">Payment for Booking #{{ related_object.booking.booking_id }}</h5>
+                                <p class="card-text">
+                                    <strong>Amount:</strong> ${{ related_object.amount }}<br>
+                                    <strong>Date:</strong> {{ related_object.payment_date|date:"M d, Y" }}<br>
+                                    <strong>Status:</strong> {{ related_object.get_status_display }}
+                                </p>
+                                <a href="{% url 'payments_app:payment_detail' related_object.id %}" class="btn btn-primary">View Payment</a>
+
+                                {% else %}
+                                <p class="card-text">Related information is not available for display.</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if notification.notification.expires_at %}
+                    <div class="mb-4">
+                        <h6 class="text-muted mb-2">Expires</h6>
+                        <p>{{ notification.notification.expires_at|date:"M d, Y, g:i a" }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="card-footer d-flex justify-content-between">
+                    <div>
+                        {% if notification.is_read %}
+                        <span class="badge bg-success me-2"><i class="fas fa-check me-1"></i> Read</span>
+                        <small class="text-muted">Read on {{ notification.read_at|date:"M d, Y, g:i a" }}</small>
+                        {% else %}
+                        <span class="badge bg-warning text-dark"><i class="fas fa-exclamation-circle me-1"></i> Unread</span>
+                        {% endif %}
+                    </div>
+                    <div class="btn-group">
+                        {% if notification.is_read %}
+                        <form method="post" action="{% url 'notifications_app:mark_notification_unread' notification.notification.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-outline-secondary">
+                                <i class="fas fa-envelope"></i> Mark as Unread
+                            </button>
+                        </form>
+                        {% else %}
+                        <form method="post" action="{% url 'notifications_app:mark_notification_read' notification.notification.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-outline-secondary">
+                                <i class="fas fa-envelope-open"></i> Mark as Read
+                            </button>
+                        </form>
+                        {% endif %}
+                        <form method="post" action="{% url 'notifications_app:delete_notification' notification.notification.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between">
+                <a href="{% url 'notifications_app:notification_list' %}" class="btn btn-outline-primary">
+                    <i class="fas fa-arrow-left"></i> Back to Notifications
+                </a>
+                <a href="{% url 'notifications_app:notification_preferences' %}" class="btn btn-primary">
+                    <i class="fas fa-cog"></i> Notification Preferences
+                </a>
+            </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+

@@ -1,0 +1,199 @@
+{% extends 'base.html' %}
+
+{% block title %}Checkout - CozyWish{% endblock %}
+
+{% block extra_css %}
+{% load static %}
+{% load widget_tweaks %}
+<link rel="stylesheet" href="{% static 'css/booking_cart_app/booking_cart_app.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-5 radial-gradient-bg">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="page-header text-center mb-5">
+                    <h1 class="page-title">Checkout</h1>
+                    <p class="text-muted">Complete your booking</p>
+                </div>
+            </div>
+
+            {% if messages %}
+            <div class="col-12 mb-4">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    <div class="d-flex align-items-center">
+                        {% if message.tags == 'success' %}
+                        <i class="fas fa-check-circle me-2"></i>
+                        {% elif message.tags == 'error' or message.tags == 'danger' %}
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        {% elif message.tags == 'warning' %}
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        {% elif message.tags == 'info' %}
+                        <i class="fas fa-info-circle me-2"></i>
+                        {% endif %}
+                        {{ message }}
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="col-lg-8">
+                <!-- Breadcrumb -->
+                <nav aria-label="breadcrumb" class="mb-4">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{% url 'venues_app:home' %}" class="text-primary-brand">Home</a></li>
+                        <li class="breadcrumb-item"><a href="{% url 'booking_cart_app:cart' %}" class="text-primary-brand">Cart</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Checkout</li>
+                    </ol>
+                </nav>
+
+                <form method="post">
+                    {% csrf_token %}
+
+                    {% for venue in venues %}
+                    <div class="card shadow mb-4">
+                        <div class="card-header bg-primary-brand d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0"><i class="fas fa-spa me-2"></i>{{ venue.venue.name }}</h5>
+                            <span class="badge bg-light text-dark">{{ venue.items|length }} service(s)</span>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Service</th>
+                                            <th>Date</th>
+                                            <th>Time</th>
+                                            <th>Quantity</th>
+                                            <th>Price</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for item in venue.items %}
+                                        <tr>
+                                            <td class="cart-item-title">{{ item.service.title }}</td>
+                                            <td><i class="far fa-calendar-alt me-1"></i>{{ item.date|date:"M d, Y" }}</td>
+                                            <td><i class="far fa-clock me-1"></i>{{ item.time_slot|time:"g:i A" }}</td>
+                                            <td>{{ item.quantity }}</td>
+                                            <td>
+                                                {% if item.service.discounted_price %}
+                                                <div class="d-flex flex-column">
+                                                    <span class="cart-item-original-price">${{ item.service.price }}</span>
+                                                    <span class="cart-item-discounted-price">${{ item.service.discounted_price }}</span>
+                                                    <span class="badge bg-danger">{{ item.service.get_discount_percentage }}% OFF</span>
+                                                    {% with discount_info=item.get_discount_info %}
+                                                    {% if discount_info %}
+                                                    <small class="text-muted mt-1">{{ discount_info.name }}</small>
+                                                    {% endif %}
+                                                    {% endwith %}
+                                                </div>
+                                                {% else %}
+                                                <span class="cart-item-price">${{ item.service.price }}</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                    <tfoot class="table-light">
+                                        <tr>
+                                            <td colspan="4" class="text-end fw-bold">Subtotal:</td>
+                                            <td class="fw-bold cart-item-price">${{ venue.total }}</td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                    <div class="card shadow mb-4">
+                        <div class="card-header bg-primary-brand">
+                            <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Additional Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label for="{{ form.notes.id_for_label }}" class="form-label">Notes</label>
+                                {% render_field form.notes class="form-control" rows="4" placeholder="Any special requests or notes for the service provider?" %}
+                                <div class="form-text">This information will be shared with the service provider.</div>
+                                {% if form.notes.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.notes.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        {{ form.non_field_errors }}
+                    </div>
+                    {% endif %}
+
+                    <div class="d-flex justify-content-between mb-4">
+                        <a href="{% url 'booking_cart_app:cart' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Back to Cart
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-check me-2"></i>Confirm Booking
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card shadow mb-4 sticky-top" style="top: 20px;">
+                    <div class="card-header bg-primary-brand">
+                        <h5 class="mb-0"><i class="fas fa-receipt me-2"></i>Order Summary</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-3">
+                            <span>Subtotal</span>
+                            <span>${{ total_price }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span>Service Fee</span>
+                            <span>$0.00</span>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between mb-4">
+                            <span class="fw-bold">Total</span>
+                            <span class="cart-total">${{ total_price }}</span>
+                        </div>
+
+                        <div class="alert alert-info mb-4">
+                            <div class="d-flex">
+                                <i class="fas fa-info-circle me-2 mt-1"></i>
+                                <small>For this MVP version, no actual payment will be processed. Bookings will be automatically confirmed.</small>
+                            </div>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="button" class="btn btn-primary" onclick="document.querySelector('form').submit();">
+                                <i class="fas fa-check-circle me-2"></i>Complete Booking
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow">
+                    <div class="card-body">
+                        <div class="d-flex align-items-start">
+                            <i class="fas fa-shield-alt text-primary-brand me-3 mt-1"></i>
+                            <div>
+                                <h6 class="mb-2">Secure Booking</h6>
+                                <p class="mb-0 small">Your booking is protected by our secure booking policy. You can cancel up to 6 hours before your scheduled appointment.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

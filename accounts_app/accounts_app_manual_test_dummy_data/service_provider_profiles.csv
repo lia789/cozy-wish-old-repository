@@ -1,0 +1,6 @@
+user_email,business_name,venue_name,phone_number,address,city,state,zip_code,contact_person_name,contact_person_phone,approval_status,rejection_reason
+provider1@example.com,Spa Paradise LLC,Spa Paradise,+1111222333,123 Main St,New York,NY,10001,Robert Johnson,+1111222333,approved,No issues
+provider2@example.com,Beauty Haven Inc,Beauty Haven,+1444555666,456 Oak Ave,Los Angeles,CA,90001,Sarah Miller,+1444555666,approved,No issues
+provider3@example.com,Wellness Group,Wellness Center,+1777888999,789 Pine Rd,Chicago,IL,60601,Thomas Wilson,+1777888999,pending,No issues
+provider4@example.com,Massage Therapy LLC,Massage Studio,+1222333444,101 Maple Dr,Houston,TX,77001,Jessica Davis,+1222333444,approved,No issues
+provider5@example.com,Yoga Wellness Inc,Yoga Place,+1666777888,202 Cedar Ln,Phoenix,AZ,85001,Daniel Taylor,+1666777888,pending,No issues

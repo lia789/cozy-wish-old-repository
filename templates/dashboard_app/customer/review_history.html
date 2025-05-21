@@ -1,0 +1,285 @@
+{% extends 'dashboard_app/base_dashboard.html' %}
+{% load static %}
+{% load dashboard_tags %}
+
+{% block title %}Review History - CozyWish{% endblock %}
+
+{% block dashboard_title %}Review History{% endblock %}
+
+{% block sidebar_content %}
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'dashboard_app:customer_dashboard' %}">
+        <i class="fas fa-tachometer-alt"></i> Dashboard
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'dashboard_app:customer_booking_history' %}">
+        <i class="fas fa-history"></i> Booking History
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'dashboard_app:customer_active_bookings' %}">
+        <i class="fas fa-calendar-check"></i> Active Bookings
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'dashboard_app:customer_favorite_venues' %}">
+        <i class="fas fa-heart"></i> Favorite Venues
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'dashboard_app:customer_profile_management' %}">
+        <i class="fas fa-user-cog"></i> Profile Management
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link active" href="{% url 'dashboard_app:customer_review_history' %}">
+        <i class="fas fa-star"></i> Review History
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'dashboard_app:dashboard_preferences' %}">
+        <i class="fas fa-cog"></i> Dashboard Preferences
+    </a>
+</li>
+{% endblock %}
+
+{% block dashboard_actions %}
+<div class="btn-group me-2">
+    <a href="{% url 'venues_app:venue_search' %}" class="btn btn-sm btn-primary">
+        <i class="fas fa-search"></i> Explore Venues
+    </a>
+    <a href="{% url 'booking_cart_app:cart' %}" class="btn btn-sm btn-outline-primary">
+        <i class="fas fa-shopping-cart"></i> View Cart
+    </a>
+</div>
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="card dashboard-card">
+    <div class="dashboard-card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Your Reviews</h5>
+        <span class="badge bg-primary">{{ reviews.count }} Reviews</span>
+    </div>
+    <div class="dashboard-card-body">
+        {% if reviews %}
+        <div class="row">
+            {% for review in reviews %}
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0">{{ review.venue.name }}</h6>
+                        <small class="text-muted">{{ review.created_at|date:"M d, Y" }}</small>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            {% for i in "12345" %}
+                            <i class="fas fa-star {% if forloop.counter <= review.rating %}text-warning{% else %}text-muted{% endif %}"></i>
+                            {% endfor %}
+                        </div>
+
+                        <p class="card-text">{{ review.comment }}</p>
+
+                        {% if review.response %}
+                        <div class="mt-3 p-3 bg-light rounded">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <strong>Response from {{ review.venue.name }}</strong>
+                                <small class="text-muted">{{ review.response.created_at|date:"M d, Y" }}</small>
+                            </div>
+                            <p class="mb-0">{{ review.response.response_text }}</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="card-footer bg-transparent">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                {% if review.is_approved %}
+                                <span class="badge bg-success">Published</span>
+                                {% elif review.is_flagged %}
+                                <span class="badge bg-warning">Flagged</span>
+                                {% else %}
+                                <span class="badge bg-secondary">Pending</span>
+                                {% endif %}
+                            </div>
+                            <div class="btn-group">
+                                <a href="{% url 'venues_app:venue_detail' review.venue.id %}" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-eye"></i> View Venue
+                                </a>
+                                <a href="{% url 'review_app:edit_review' review.id %}" class="btn btn-sm btn-outline-secondary">
+                                    <i class="fas fa-edit"></i> Edit
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="alert alert-info mb-0">
+            <i class="fas fa-info-circle me-2"></i>
+            You haven't written any reviews yet. After completing a service, you can share your experience by writing a review.
+        </div>
+        <div class="text-center mt-4">
+            <a href="{% url 'dashboard_app:customer_booking_history' %}" class="btn btn-primary">
+                <i class="fas fa-history me-1"></i> View Booking History
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% if reviews %}
+<div class="card dashboard-card mt-4">
+    <div class="dashboard-card-header">
+        <h5 class="mb-0">Review Statistics</h5>
+    </div>
+    <div class="dashboard-card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <h6>Your Rating Distribution</h6>
+                <div class="mb-3">
+                    <div class="d-flex align-items-center mb-2">
+                        <div style="width: 80px;">5 Stars</div>
+                        <div class="progress flex-grow-1" style="height: 20px;">
+                            {% with five_star_count=reviews|filter_by_rating:5|length %}
+                            {% with percentage=five_star_count|percentage:reviews.count %}
+                            <div class="progress-bar bg-success" role="progressbar" style="width: {{ percentage }}%;" aria-valuenow="{{ five_star_count }}" aria-valuemin="0" aria-valuemax="{{ reviews.count }}">{{ five_star_count }}</div>
+                            {% endwith %}
+                            {% endwith %}
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center mb-2">
+                        <div style="width: 80px;">4 Stars</div>
+                        <div class="progress flex-grow-1" style="height: 20px;">
+                            {% with four_star_count=reviews|filter_by_rating:4|length %}
+                            {% with percentage=four_star_count|percentage:reviews.count %}
+                            <div class="progress-bar bg-primary" role="progressbar" style="width: {{ percentage }}%;" aria-valuenow="{{ four_star_count }}" aria-valuemin="0" aria-valuemax="{{ reviews.count }}">{{ four_star_count }}</div>
+                            {% endwith %}
+                            {% endwith %}
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center mb-2">
+                        <div style="width: 80px;">3 Stars</div>
+                        <div class="progress flex-grow-1" style="height: 20px;">
+                            {% with three_star_count=reviews|filter_by_rating:3|length %}
+                            {% with percentage=three_star_count|percentage:reviews.count %}
+                            <div class="progress-bar bg-info" role="progressbar" style="width: {{ percentage }}%;" aria-valuenow="{{ three_star_count }}" aria-valuemin="0" aria-valuemax="{{ reviews.count }}">{{ three_star_count }}</div>
+                            {% endwith %}
+                            {% endwith %}
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center mb-2">
+                        <div style="width: 80px;">2 Stars</div>
+                        <div class="progress flex-grow-1" style="height: 20px;">
+                            {% with two_star_count=reviews|filter_by_rating:2|length %}
+                            {% with percentage=two_star_count|percentage:reviews.count %}
+                            <div class="progress-bar bg-warning" role="progressbar" style="width: {{ percentage }}%;" aria-valuenow="{{ two_star_count }}" aria-valuemin="0" aria-valuemax="{{ reviews.count }}">{{ two_star_count }}</div>
+                            {% endwith %}
+                            {% endwith %}
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <div style="width: 80px;">1 Star</div>
+                        <div class="progress flex-grow-1" style="height: 20px;">
+                            {% with one_star_count=reviews|filter_by_rating:1|length %}
+                            {% with percentage=one_star_count|percentage:reviews.count %}
+                            <div class="progress-bar bg-danger" role="progressbar" style="width: {{ percentage }}%;" aria-valuenow="{{ one_star_count }}" aria-valuemin="0" aria-valuemax="{{ reviews.count }}">{{ one_star_count }}</div>
+                            {% endwith %}
+                            {% endwith %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <h6>Review Status</h6>
+                <div class="mb-3">
+                    <div class="d-flex align-items-center mb-2">
+                        <div style="width: 100px;">Published</div>
+                        <div class="progress flex-grow-1" style="height: 20px;">
+                            {% with approved_count=reviews|filter_by_status:'approved'|length %}
+                            {% with percentage=approved_count|percentage:reviews.count %}
+                            <div class="progress-bar bg-success" role="progressbar" style="width: {{ percentage }}%;" aria-valuenow="{{ approved_count }}" aria-valuemin="0" aria-valuemax="{{ reviews.count }}">{{ approved_count }}</div>
+                            {% endwith %}
+                            {% endwith %}
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center mb-2">
+                        <div style="width: 100px;">Pending</div>
+                        <div class="progress flex-grow-1" style="height: 20px;">
+                            {% with pending_count=reviews|filter_by_status:'pending'|length %}
+                            {% with percentage=pending_count|percentage:reviews.count %}
+                            <div class="progress-bar bg-secondary" role="progressbar" style="width: {{ percentage }}%;" aria-valuenow="{{ pending_count }}" aria-valuemin="0" aria-valuemax="{{ reviews.count }}">{{ pending_count }}</div>
+                            {% endwith %}
+                            {% endwith %}
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <div style="width: 100px;">Flagged</div>
+                        <div class="progress flex-grow-1" style="height: 20px;">
+                            {% with flagged_count=reviews|filter_by_status:'flagged'|length %}
+                            {% with percentage=flagged_count|percentage:reviews.count %}
+                            <div class="progress-bar bg-warning" role="progressbar" style="width: {{ percentage }}%;" aria-valuenow="{{ flagged_count }}" aria-valuemin="0" aria-valuemax="{{ reviews.count }}">{{ flagged_count }}</div>
+                            {% endwith %}
+                            {% endwith %}
+                        </div>
+                    </div>
+                </div>
+
+                <h6 class="mt-4">Response Rate</h6>
+                <div class="mb-3">
+                    <div class="d-flex align-items-center">
+                        <div style="width: 100px;">Responses</div>
+                        <div class="progress flex-grow-1" style="height: 20px;">
+                            {% with response_count=reviews|filter_with_response|length %}
+                            {% with percentage=response_count|percentage:reviews.count %}
+                            <div class="progress-bar bg-info" role="progressbar" style="width: {{ percentage }}%;" aria-valuenow="{{ response_count }}" aria-valuemin="0" aria-valuemax="{{ reviews.count }}">{{ response_count }}</div>
+                            {% endwith %}
+                            {% endwith %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Custom template filters for statistics
+    if (!window.filterByRating) {
+        window.filterByRating = function(reviews, rating) {
+            return reviews.filter(function(review) {
+                return review.rating === rating;
+            });
+        };
+    }
+
+    if (!window.filterByStatus) {
+        window.filterByStatus = function(reviews, status) {
+            return reviews.filter(function(review) {
+                if (status === 'approved') return review.is_approved;
+                if (status === 'flagged') return review.is_flagged;
+                if (status === 'pending') return !review.is_approved && !review.is_flagged;
+                return false;
+            });
+        };
+    }
+
+    if (!window.filterWithResponse) {
+        window.filterWithResponse = function(reviews) {
+            return reviews.filter(function(review) {
+                return review.response !== null;
+            });
+        };
+    }
+
+    if (!window.percentage) {
+        window.percentage = function(count, total) {
+            return total > 0 ? (count / total * 100) : 0;
+        };
+    }
+</script>
+{% endblock %}

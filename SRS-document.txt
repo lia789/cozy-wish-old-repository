@@ -1,0 +1,505 @@
+🟩️🟩️ BUSINESS OVERVIEW
+CozyWish is USA based local consumer focused e-commerce marketplace for Spa and wellness services.
+It will known for dedicated marketplace for flush, off-peak, discount driven deals.
+
+
+
+
+🟩️🟩️ TECHNOLOGY OVERVIEW
+CozyWish is a modular beauty and wellness booking platform, inspired by Fresha, GoWabi, Fiverr, and Upwork. Built with Python/Django, PostgreSQL, Bootstrap 5, and hosted on AWS, it features separate Django apps for maintainability, organized by user roles: Customer, Service Provider, and Admin.
+
+
+
+
+🟩️🟩️ COMPETITOR ANALYSIS
+1. https://www.fresha.com
+2. https://www.gowabi.com/en
+
+◽️Gowabi:
+GoWabi is Thailand-based beauty and wellness marketplace
+known for its heavy focus on deals, off-peak discounts, and merchant tools.
+
+◽️ Fresha:
+Fresha is a global beauty platform that offers free SaaS to salons and spas
+while monetizing through commissions on new-client bookings and payment processing fees.
+
+
+How CozyWish Differs:
+1. Gowabi targets audience in Southeast Asia, CozyWish focuses on local USA market only.
+2. Fresha offers extensive back office features as SaaS, where CozyWish only marketplace.
+3. CozyWish is not SaaS tool, it is discounted off-peak e-commerce marketplace.
+
+
+
+
+🟩️🟩️ Revenue Model
+1. CozyWish charges small commission for every successful booking made through the platform.
+2. Service providers advertising and promotions
+
+
+
+
+🟩️🟩️ APPLICATION BUILDING TECHNOLOGY
+1. Python
+2. Django Framework
+3. postgresql Database (SQLite for local development)
+4. Bootstrap5
+5. AWS Cloud
+
+
+
+
+🟩️🟩️ COMMON-TERMS
+◽️Customer: Individuals who purchase services are typically referred to as customers.
+◽️Service Providers: Businesses offering services are commonly referred to as service providers.
+◽️Venues: This term refers to the physical location or establishment where beauty and wellness treatments are provided.
+◽️Service: This term pertains to the specific treatments or offerings provided by these venues
+
+
+
+
+🟩️🟩️ DJANGO APPS DESCRIPTIONS 
+
+
+
+✅️✅️ accounts_app
+📜️ Customer Features:
+✔️ Sign Up with Email & Password
+✔️ Secure Password Hashing (Django handles this via PBKDF2 by default)
+✔️ Login & Logout (Session-based)
+✔️ Password Recovery / Reset / Change (via email token link)
+✔️ View and edit personal profile information
+
+📜️ Service Provider Features:
+✔️ Sign up with email|password and business details
+✔️ Email Verification
+✔️ Secure Password Hashing (Django handles this via PBKDF2 by default)
+✔️ Login & Logout (Session-based)
+✔️ Password Recovery / Reset / Change (via email token link)
+✔️ View and edit personal business information
+✔️ Team|Staff managment (Add, deactive, remove team members)
+
+📜️ Admin Features:
+✔️ User Management (CRUD) View, activate, deactivate, delete and Reset passwords
+✔️ Service provider Approval Panel. View pending providers, Approve / Reject with optional comments
+✔️ User Impersonation (for support) via (django-hijack)
+✔️ Use django-user-activity-log
+✔️ Alerts on multiple failed logins
+
+
+🛢️ DATA STRUCTURE
+◻️ Customer personal profile information:
+- profile picture
+- first name
+- last name
+- gender
+- date of birth (month and year only)
+- phone number
+- email
+- address
+- zip
+- area
+- city
+- Other system metadata
+
+◻️ Service provider business information:
+- user name
+- venue name
+- email
+- password
+- phone
+- address
+- city
+- state
+- zip
+- contact person name
+- contact person email
+- contact person phone
+
+◻️ Team|Staff information:
+- name
+- profile image
+- designation|title
+
+
+
+📂️ HTML FILE DESIGN MATERIALS
+◻️ customer_sign_up
+- Title: "Log in to CozyWish"
+- Email
+- Password
+- Login Butto
+- Forgot Your Password
+- Sign Up
+- Google|Apple logo for login in
+
+◻️ customer_sign_up
+- Title: "Sign Up with CozyWish"
+- Email
+- Password
+- Signup button
+- Google|Apple logo for signup
+- Login
+- Become a CozyWish partner
+
+◻️ customer_profile
+- Profile Picture
+- First name
+- Last name
+- Gender as radio button
+- Date of birth (Month and Year only)
+- Phone number
+- email
+- change password
+- address
+- zip
+- area
+- city
+- Delete My Account button
+
+◻️ service_provider_sign_up
+- user name
+- venue name
+- email
+- password
+- phone
+- address
+- city
+- state
+- zip
+- contact person name
+- contact person email
+- contact person phone
+- submit button
+
+◻️ service_provider_login
+- Email|User name
+- Password
+- Login Button
+- Create Account Button
+
+◻️ service_provider_profile
+- venue name
+- email
+- password
+- phone
+- address
+- city
+- state
+- zip
+- contact person name
+- contact person email
+- contact person phone
+
+Team|Staff profile display max 10
+- name
+- profile image
+- designation|title
+
+
+📝️ IMPLEMENTION NOTE
+1. Super user will create with email and password (not username)
+2. Create account test data generate script.
+   The test data will be 5 customer and 15 service_provider with all fields. You don't need image for test data.
+3. All logout will redirect on website home page
+4. We are in production use EmailBackend console
+5. Create separe directory of every service provider about images, use their user name as directory. And also save customer profile images in a single folder. Make the directory profasionals.
+6. Using the messages framework profasional away
+7. Preventing users from using an existing email or user name
+
+📝️ APP MATERIALS
+- Super User email "pse.coliahabib@gmail.com" and password: 123
+
+
+
+
+
+✅️✅️ venues_app
+📜️ Customer Features:
+✔️ Search venues by keyword like venue name, category, and location (USA state, county and city name)
+✔️ Filter search result with promotions, discount high to low, pricing low to high, area, venue type (male|female only)
+✔️ View comprehensive venue information
+✔️ Access list of service offered by the venues
+
+📜️ Service Provider Features:
+✔️ Create and manage venue information and media
+✔️ Add, delete, edit and modify service information
+✔️ Apply discount on service pricing
+
+📜️ Admin Features:
+✔️ Review newly created or update venues before publishing
+✔️ Create and manage categories
+✔️ Assign or reassign venues to categories for better user search and filtering
+✔️ Remove or flag inappropriate offers
+✔️ Active or deactivate venues and Services
+
+
+🛢️ DATA STRUCTURE
+◻️ Venues information:
+- venues name
+- state
+- county
+- city
+- street number
+- street name
+- lat, long
+- 3 images for venues
+- about|short venues description
+- opening times 
+- tags
+- 5 faq
+
+◻️ Service information:
+- service_title
+- service_short_description
+- service_price
+- service_duration
+
+
+◻️ Review information:
+- ratings
+- review_number
+- reviewer_name
+- reviewer_profile_image
+- reviewer_ratings
+- reviewer_short_review
+- review_time_stamp
+
+
+📂️ HTML FILE DESIGN MATERIALS
+◻️ home_page
+- logo
+- Login|Signup
+- For business
+- venues search box
+- title
+- shrot descriptions
+- Categories (For quick access)
+- hot deals card
+- top picks card
+- treanding card
+
+◻️ venues_list_page
+- logo
+- Login|Signup
+- For business
+- venues search box
+- Filter Search Box
+- Display venues information as card; venue name, ratings, review number, address, first 3 service details like service name, price, duration and see more button
+- next page pagination
+
+◻️ venues_information_page
+- logo
+- Login|Signup
+- For business
+- venues search box
+- venues_name
+- location
+- ratings, review
+- venues images
+- add to favourites love button
+- First 5 services with their information
+- see all service button
+- teams; name, profile image, short title
+- venues description
+- Opening times section
+
+◻️ service_information_page
+- logo
+- Login|Signup
+- For business
+- venues search box
+- service name
+- duraction
+- price
+- About this service
+- Add to CART
+- Left side box will display venues information; venue name, image 1, location, opening time section
+
+
+
+📝️ IMPLEMENTION NOTE
+- venues_app will have home page of the application
+- In home page every card will display 3 venues informaion. And each venues information will have: primary image, venues name, ratings, review number, location, tags
+- Use USA state, County, and City name as search keyword. If user input State name or county name or city name. The application will filter all of the venues related to the location.
+- Venues list page will have filter search box left side, it will have Search City box that will display list of shop based on the city.
+- Service can add to cart from venue page as well as service details page too.
+- Service provider can apply discount as venues all service or indivisual service. That discount price should display on service pricing.
+
+
+📝️ APP MATERIALS
+1. USA city data base: "us_cities.csv"
+
+
+
+
+
+✅️✅️ booking_cart_app:
+📜️ Customer Features:
+✔️ Add multiple services to cart
+✔️ 24-hour cart item expiration
+✔️ Real-time service availability checking
+✔️ Booking cancellation (within 6 hours of booking)
+✔️ Booking confirmation notifications
+✔️ View booking history and status
+📜️ Service Provider Features:
+✔️ Manage service availability
+✔️ View incoming bookings
+✔️ Accept/decline bookings
+✔️ Set maximum concurrent bookings (up to 10)
+✔️ Booking notification system
+📜️ Admin Features:
+✔️ Monitor booking activities
+✔️ Handle booking disputes
+✔️ View booking analytics
+✔️ Manage booking configurations
+
+
+
+✅️✅️ payments_app (MVP Version):
+📜️ Basic Features:
+✔️ Booking confirmation without actual payment
+✔️ Order confirmation messaging
+✔️ Basic transaction logging
+✔️ Dashboard booking status updates
+
+
+
+
+✅️✅️ dashboard_app:
+📜️ Customer Dashboard:
+✔️ Booking history in table format
+✔️ Active bookings status
+✔️ Favorite venues list
+✔️ Personal profile management
+✔️ Review history
+📜️ Service Provider Dashboard:
+✔️ Today's bookings overview
+✔️ Revenue reports (simple table format)
+✔️ Service performance metrics
+✔️ Discount campaign performance
+✔️ Team management interface
+📜️ Admin Dashboard:
+✔️ Platform overview metrics
+✔️ User statistics
+✔️ Booking analytics
+✔️ Revenue tracking
+✔️ System health monitoring
+
+
+
+✅️✅️ cms_app:
+📜️ Content Management:
+✔️ Static pages (About, Contact, Terms, Privacy Policy, FAQ)
+✔️ Blog system with categories
+✔️ SEO management tools
+✔️ Media library
+✔️ URL management
+📜️ Service Provider Features:
+✔️ Create and manage blog posts
+✔️ Content approval workflow
+✔️ Media upload system
+📜️ Admin Features:
+✔️ Content moderation
+✔️ SEO optimization tools
+✔️ Content analytics
+✔️ Site-wide announcement system
+
+
+✅️✅️ review_app
+📜️ Customer Features:
+✔️ After a service is completed, customers can rate the provider (typically 1-5 stars) and leave a written review.
+✔️ Customers can read reviews on each provider’s profile page
+✔️ Reviews are usually sorted by most recent
+
+📜️ Service Provider Features:
+✔️ Providers can read all reviews left for their services
+✔️ A summary (average rating and count) is displayed on their profile automatically.
+✔️ Providers have the option to publicly respond to reviews, This response will be shown below the original review.
+✔️ If a customer sees a fake or inappropriate review on a provider’s page, they can flag/report it for admin attention.
+
+📜️ Admin Features:
+✔️ Admin can edit or remove reviews that violate terms
+✔️ Admin can also investigate flagged reviews and decide outcomes (remove or let stand or disable).
+✔️ If a provider is new or has few reviews, admin might highlight “New on CozyWish” instead of showing no reviews to encourage first customers
+
+
+🛢️ DATA STRUCTURE
+◻️ Review information:
+- ratings
+- review_number
+- reviewer_name
+- reviewer_profile_image
+- reviewer_ratings
+- reviewer_short_review
+- review_time_stamp
+
+
+📂️ HTML FILE DESIGN MATERIALS
+◻️ review_page
+- venues name with title
+- number of reviews
+- reviews
+- pagination
+
+📝️ IMPLEMENTION NOTE
+- If there is more then 10 reviews, they will display on review page
+- The review page will have pagination, and every page will have 20 reviews at a time
+
+
+
+✅️✅️ admin_app:
+📜️ Super Admin Features:
+✔️ Complete user management
+✔️ Platform configuration
+✔️ System monitoring dashboard
+✔️ Technical performance metrics
+✔️ Audit logs for all actions
+✔️ Bulk operations (user management, content management)
+✔️ Analytics and reporting
+✔️ Security monitoring
+
+
+
+
+✅️✅️ discount_app:
+📜️ Service Provider Features:
+✔️ Create venue-wide discounts
+✔️ Set individual service discounts
+✔️ Time-based discount management
+✔️ Quantity-based discount management
+✔️ Discount performance tracking
+📜️ Customer Features:
+✔️ View active discounts
+✔️ Filter services by discount
+✔️ Sort by discount percentage
+✔️ Discount expiration notifications
+📜️ Admin Features:
+✔️ Create platform-wide promotions
+✔️ Monitor discount performance
+✔️ Manage discount categories
+✔️ Set discount rules and limitations
+✔️ Discount analytics
+
+
+
+
+✅️✅️ notifications_app:
+📜️ Service Provider Notifications:
+✔️ New booking alerts
+✔️ Cancellation notices
+✔️ Customer review notifications
+✔️ Payment received updates
+✔️ System announcements
+✔️ Unread notifications counter
+✔️ View notification history
+
+
+📜️ Customer Notifications:
+✔️ Booking confirmation alerts
+✔️ Service status updates
+✔️ Provider response notifications
+✔️ Payment confirmation alerts
+✔️ Platform announcements
+✔️ Unread notifications counter
+✔️ View notification history

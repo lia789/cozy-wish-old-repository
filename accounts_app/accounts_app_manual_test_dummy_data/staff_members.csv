@@ -1,0 +1,7 @@
+service_provider_email,name,designation,is_active
+provider1@example.com,Alex Johnson,Massage Therapist,True
+provider1@example.com,Olivia Smith,Spa Specialist,True
+provider2@example.com,Michael Brown,Beauty Consultant,True
+provider3@example.com,Emma Davis,Wellness Coach,True
+provider4@example.com,James Wilson,Massage Therapist,True
+provider5@example.com,Sophia Miller,Yoga Instructor,True

@@ -1,0 +1,212 @@
+{% extends 'base.html' %}
+
+{% block title %}Update Availability - CozyWish{% endblock %}
+
+{% block extra_css %}
+{% load static %}
+{% load widget_tweaks %}
+<link rel="stylesheet" href="{% static 'css/booking_cart_app/booking_cart_app.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-5 radial-gradient-bg">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <!-- Breadcrumb -->
+                <nav aria-label="breadcrumb" class="mb-4">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{% url 'venues_app:home' %}" class="text-primary-brand">Home</a></li>
+                        <li class="breadcrumb-item"><a href="{% url 'dashboard_app:provider_dashboard' %}" class="text-primary-brand">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="{% url 'venues_app:provider_venue_detail' slug=availability.service.venue.slug %}" class="text-primary-brand">{{ availability.service.venue.name }}</a></li>
+                        <li class="breadcrumb-item"><a href="{% url 'booking_cart_app:provider_service_availability' service_id=availability.service.id %}" class="text-primary-brand">Service Availability</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Update Availability</li>
+                    </ol>
+                </nav>
+
+                {% if messages %}
+                <div class="mb-4">
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        <div class="d-flex align-items-center">
+                            {% if message.tags == 'success' %}
+                            <i class="fas fa-check-circle me-2"></i>
+                            {% elif message.tags == 'error' or message.tags == 'danger' %}
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            {% elif message.tags == 'warning' %}
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            {% elif message.tags == 'info' %}
+                            <i class="fas fa-info-circle me-2"></i>
+                            {% endif %}
+                            {{ message }}
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <div class="card shadow mb-4">
+                    <div class="card-header bg-primary-brand">
+                        <h4 class="mb-0"><i class="fas fa-edit me-2"></i>Update Availability</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-4">
+                            <h5 class="border-bottom pb-2 mb-3">Service Information</h5>
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="flex-shrink-0">
+                                    <img src="{{ availability.service.get_primary_image|default:'https://via.placeholder.com/60x60' }}" class="rounded" alt="{{ availability.service.title }}" width="60" height="60">
+                                </div>
+                                <div class="ms-3">
+                                    <h5 class="mb-1">{{ availability.service.title }}</h5>
+                                    <p class="text-muted mb-0">{{ availability.service.venue.name }}</p>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <h6 class="text-muted mb-1">Current Date</h6>
+                                        <p class="mb-0"><i class="far fa-calendar-alt me-1"></i>{{ availability.date|date:"M d, Y" }}</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <h6 class="text-muted mb-1">Current Time</h6>
+                                        <p class="mb-0"><i class="far fa-clock me-1"></i>{{ availability.time_slot|time:"g:i A" }}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="alert alert-info mb-0">
+                                <div class="d-flex">
+                                    <i class="fas fa-info-circle me-2 mt-1"></i>
+                                    <div>
+                                        <strong>Note:</strong> This time slot currently has {{ availability.current_bookings }} booking(s). You can update the maximum bookings and availability status, but cannot change the date or time if there are existing bookings.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <form method="post">
+                            {% csrf_token %}
+
+                            {% if availability.current_bookings == 0 %}
+                            <div class="mb-3">
+                                <label for="{{ form.date.id_for_label }}" class="form-label"><i class="far fa-calendar-alt me-2"></i>Date</label>
+                                {% render_field form.date class="form-control" %}
+                                {% if form.date.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.date.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="{{ form.time_slot.id_for_label }}" class="form-label"><i class="far fa-clock me-2"></i>Time</label>
+                                {% render_field form.time_slot class="form-control" %}
+                                {% if form.time_slot.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.time_slot.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% else %}
+                            <input type="hidden" name="date" value="{{ availability.date|date:'Y-m-d' }}">
+                            <input type="hidden" name="time_slot" value="{{ availability.time_slot|time:'H:i' }}">
+                            {% endif %}
+
+                            <div class="mb-3">
+                                <label for="{{ form.max_bookings.id_for_label }}" class="form-label"><i class="fas fa-users me-2"></i>Max Bookings</label>
+                                {% render_field form.max_bookings class="form-control" %}
+                                <div class="form-text">Maximum number of concurrent bookings (1-10). Must be at least {{ availability.current_bookings }}.</div>
+                                {% if form.max_bookings.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.max_bookings.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    {% render_field form.is_available class="form-check-input" %}
+                                    <label class="form-check-label" for="{{ form.is_available.id_for_label }}">
+                                        Available for booking
+                                    </label>
+                                </div>
+                                {% if form.is_available.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.is_available.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            {% if form.non_field_errors %}
+                            <div class="alert alert-danger mt-3">
+                                <i class="fas fa-exclamation-circle me-2"></i>
+                                {{ form.non_field_errors }}
+                            </div>
+                            {% endif %}
+
+                            <div class="d-flex justify-content-between mt-4">
+                                <a href="{% url 'booking_cart_app:provider_service_availability' service_id=availability.service.id %}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-arrow-left me-2"></i>Back
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-2"></i>Update Availability
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                {% if availability.current_bookings > 0 %}
+                <div class="card shadow mb-4">
+                    <div class="card-header bg-primary-brand">
+                        <h5 class="mb-0"><i class="fas fa-calendar-check me-2"></i>Current Bookings</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Booking ID</th>
+                                        <th>Customer</th>
+                                        <th>Date</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for booking in bookings %}
+                                    <tr>
+                                        <td>
+                                            <a href="{% url 'booking_cart_app:provider_booking_detail' booking_id=booking.booking_id %}" class="text-primary-brand">
+                                                {{ booking.booking_id|truncatechars:8 }}
+                                            </a>
+                                        </td>
+                                        <td>{{ booking.user.get_full_name|default:booking.user.email }}</td>
+                                        <td><i class="far fa-calendar-alt me-1"></i>{{ booking.booking_date|date:"M d, Y" }}</td>
+                                        <td>
+                                            {% if booking.status == 'pending' %}
+                                            <span class="booking-status booking-status-pending">Pending</span>
+                                            {% elif booking.status == 'confirmed' %}
+                                            <span class="booking-status booking-status-confirmed">Confirmed</span>
+                                            {% elif booking.status == 'cancelled' %}
+                                            <span class="booking-status booking-status-cancelled">Cancelled</span>
+                                            {% elif booking.status == 'completed' %}
+                                            <span class="booking-status booking-status-completed">Completed</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

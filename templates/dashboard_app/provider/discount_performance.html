@@ -1,0 +1,334 @@
+{% extends 'dashboard_app/base_dashboard.html' %}
+{% load static %}
+{% load dashboard_tags %}
+
+{% block title %}Discount Performance - CozyWish{% endblock %}
+
+{% block dashboard_title %}Discount Performance{% endblock %}
+
+{% block sidebar_content %}
+<!-- Main Navigation -->
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'dashboard_app:provider_dashboard' %}">
+        <i class="fas fa-home"></i> Dashboard
+    </a>
+</li>
+
+<!-- Venue Management Section -->
+<div class="sidebar-section-header">Venue Management</div>
+{% if venues %}
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'venues_app:provider_venue_detail' slug=venues.0.slug %}">
+        <i class="fas fa-edit"></i> Manage Venue
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'venues_app:service_create' %}">
+        <i class="fas fa-plus"></i> Add Service
+    </a>
+</li>
+{% else %}
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'venues_app:create_venue' %}">
+        <i class="fas fa-plus"></i> Create Venue
+    </a>
+</li>
+{% endif %}
+
+<!-- Bookings Section -->
+<div class="sidebar-section-header">Bookings</div>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'dashboard_app:provider_todays_bookings' %}">
+        <i class="fas fa-calendar"></i> Today's Bookings
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'booking_cart_app:provider_booking_list' %}">
+        <i class="fas fa-list"></i> All Bookings
+    </a>
+</li>
+
+<!-- Analytics Section -->
+<div class="sidebar-section-header">Analytics</div>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'dashboard_app:provider_revenue_reports' %}">
+        <i class="fas fa-chart-line"></i> Revenue Reports
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'dashboard_app:provider_service_performance' %}">
+        <i class="fas fa-chart-bar"></i> Service Performance
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link active" href="{% url 'dashboard_app:provider_discount_performance' %}">
+        <i class="fas fa-percent"></i> Discount Performance
+    </a>
+</li>
+
+<!-- Team Section -->
+<div class="sidebar-section-header">Team</div>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'dashboard_app:provider_team_management' %}">
+        <i class="fas fa-users"></i> Team Management
+    </a>
+</li>
+{% endblock %}
+
+{% block dashboard_actions %}
+<div class="btn-group me-2">
+    <a href="{% url 'discount_app:discount_create' %}" class="btn btn-sm btn-primary">
+        <i class="fas fa-plus"></i> Create Discount
+    </a>
+    <button type="button" class="btn btn-sm btn-outline-secondary" id="exportCSV">
+        <i class="fas fa-download"></i> Export CSV
+    </button>
+    <button type="button" class="btn btn-sm btn-outline-secondary" id="printReport">
+        <i class="fas fa-print"></i> Print
+    </button>
+</div>
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card dashboard-card mb-4">
+            <div class="dashboard-card-header">
+                <h5 class="mb-0">Discount Performance Overview</h5>
+            </div>
+            <div class="dashboard-card-body">
+                {% if discounted_services %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Service</th>
+                                <th>Venue</th>
+                                <th>Discount</th>
+                                <th>Bookings</th>
+                                <th>Revenue</th>
+                                <th>Customer Savings</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for discount_data in sorted_discounts %}
+                            <tr>
+                                <td>{{ discount_data.service.name }}</td>
+                                <td>{{ discount_data.service.venue.name }}</td>
+                                <td>{{ discount_data.discount_percentage }}%</td>
+                                <td>{{ discount_data.total_bookings }}</td>
+                                <td>${{ discount_data.total_revenue|format_currency }}</td>
+                                <td>${{ discount_data.savings|format_currency }}</td>
+                                <td>
+                                    <div class="btn-group">
+                                        <a href="{% url 'venues_app:edit_service' venue_slug=discount_data.service.venue.slug service_slug=discount_data.service.slug %}" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="{% url 'venues_app:service_detail' venue_slug=discount_data.service.venue.slug service_slug=discount_data.service.slug %}" class="btn btn-sm btn-outline-secondary">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alert alert-info mb-0">
+                    <i class="fas fa-info-circle me-2"></i>
+                    You don't have any discounted services yet.
+                    <a href="{% url 'discount_app:discount_create' %}" class="alert-link">Create a discount</a> to start tracking performance.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if discounted_services %}
+<div class="row">
+    <div class="col-md-6">
+        <div class="card dashboard-card">
+            <div class="dashboard-card-header">
+                <h5 class="mb-0">Discount Revenue Impact</h5>
+            </div>
+            <div class="dashboard-card-body">
+                <canvas id="discountRevenueChart" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card dashboard-card">
+            <div class="dashboard-card-header">
+                <h5 class="mb-0">Discount Booking Impact</h5>
+            </div>
+            <div class="dashboard-card-body">
+                <canvas id="discountBookingsChart" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card dashboard-card">
+            <div class="dashboard-card-header">
+                <h5 class="mb-0">Discount Effectiveness</h5>
+            </div>
+            <div class="dashboard-card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Service</th>
+                                <th>Discount</th>
+                                <th>Revenue Generated</th>
+                                <th>Customer Savings</th>
+                                <th>ROI</th>
+                                <th>Effectiveness</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for discount_data in sorted_discounts %}
+                            <tr>
+                                <td>{{ discount_data.service.name }}</td>
+                                <td>{{ discount_data.discount_percentage }}%</td>
+                                <td>${{ discount_data.total_revenue|format_currency }}</td>
+                                <td>${{ discount_data.savings|format_currency }}</td>
+                                <td>
+                                    {% if discount_data.savings > 0 %}
+                                    {{ discount_data.total_revenue|divide:discount_data.savings|floatformat:2 }}x
+                                    {% else %}
+                                    N/A
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if discount_data.total_revenue > discount_data.savings %}
+                                    <span class="badge bg-success">High</span>
+                                    {% elif discount_data.total_revenue > discount_data.savings|divide:2 %}
+                                    <span class="badge bg-warning">Medium</span>
+                                    {% else %}
+                                    <span class="badge bg-danger">Low</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block dashboard_js %}
+{% if discounted_services %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Discount Revenue Chart
+        const revenueCtx = document.getElementById('discountRevenueChart').getContext('2d');
+
+        const revenueData = {
+            labels: [{% for discount_data in sorted_discounts|slice:":5" %}'{{ discount_data.service.name }}'{% if not forloop.last %}, {% endif %}{% endfor %}],
+            datasets: [{
+                label: 'Revenue',
+                data: [{% for discount_data in sorted_discounts|slice:":5" %}{{ discount_data.total_revenue }}{% if not forloop.last %}, {% endif %}{% endfor %}],
+                backgroundColor: 'rgba(47, 22, 15, 0.7)',
+                borderColor: 'rgba(47, 22, 15, 1)',
+                borderWidth: 1
+            }, {
+                label: 'Customer Savings',
+                data: [{% for discount_data in sorted_discounts|slice:":5" %}{{ discount_data.savings }}{% if not forloop.last %}, {% endif %}{% endfor %}],
+                backgroundColor: 'rgba(75, 192, 192, 0.7)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
+            }]
+        };
+
+        const revenueChart = new Chart(revenueCtx, {
+            type: 'bar',
+            data: revenueData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '$' + value;
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.dataset.label + ': $' + context.raw;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Discount Bookings Chart
+        const bookingsCtx = document.getElementById('discountBookingsChart').getContext('2d');
+
+        const bookingsData = {
+            labels: [{% for discount_data in sorted_discounts|slice:":5" %}'{{ discount_data.service.name }} ({{ discount_data.discount_percentage }}%)'{% if not forloop.last %}, {% endif %}{% endfor %}],
+            datasets: [{
+                label: 'Bookings',
+                data: [{% for discount_data in sorted_discounts|slice:":5" %}{{ discount_data.total_bookings }}{% if not forloop.last %}, {% endif %}{% endfor %}],
+                backgroundColor: [
+                    'rgba(47, 22, 15, 0.7)',
+                    'rgba(75, 192, 192, 0.7)',
+                    'rgba(153, 102, 255, 0.7)',
+                    'rgba(255, 159, 64, 0.7)',
+                    'rgba(54, 162, 235, 0.7)'
+                ],
+                borderColor: [
+                    'rgba(47, 22, 15, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)',
+                    'rgba(54, 162, 235, 1)'
+                ],
+                borderWidth: 1
+            }]
+        };
+
+        const bookingsChart = new Chart(bookingsCtx, {
+            type: 'pie',
+            data: bookingsData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                    }
+                }
+            }
+        });
+
+        // Export CSV functionality
+        document.getElementById('exportCSV').addEventListener('click', function() {
+            window.location.href = window.location.pathname + '?export=csv';
+        });
+
+        // Print functionality
+        document.getElementById('printReport').addEventListener('click', function() {
+            window.print();
+        });
+    });
+</script>
+{% endif %}
+{% endblock %}

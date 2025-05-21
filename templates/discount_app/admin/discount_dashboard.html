@@ -1,0 +1,353 @@
+{% extends 'base.html' %}
+
+{% block title %}Discount Management - Admin Dashboard - CozyWish{% endblock %}
+
+{% block extra_css %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/discount_app/discount_app.css' %}">
+<link rel="stylesheet" href="{% static 'css/admin_app/admin_app.css' %}">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-5 admin-bg">
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col-12">
+                <h1 class="page-title mb-3">
+                    <i class="fas fa-tags me-2"></i>Discount Management Dashboard
+                </h1>
+                <p class="lead">
+                    Manage and monitor all discounts across the CozyWish platform.
+                </p>
+            </div>
+        </div>
+
+        {% if messages %}
+        <div class="messages mb-4">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary-brand text-white">
+                        <h5 class="card-title mb-0">Quick Actions</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <a href="{% url 'discount_app:admin_create_platform_discount' %}" class="btn btn-primary w-100 mb-2">
+                                    <i class="fas fa-plus me-1"></i> Create Platform Discount
+                                </a>
+                            </div>
+                            <div class="col-md-3">
+                                <a href="{% url 'discount_app:admin_discount_list' discount_type='venue' %}" class="btn btn-success w-100 mb-2">
+                                    <i class="fas fa-store me-1"></i> Manage Venue Discounts
+                                </a>
+                            </div>
+                            <div class="col-md-3">
+                                <a href="{% url 'discount_app:admin_discount_list' discount_type='service' %}" class="btn btn-info w-100 mb-2 text-white">
+                                    <i class="fas fa-spa me-1"></i> Manage Service Discounts
+                                </a>
+                            </div>
+                            <div class="col-md-3">
+                                <a href="{% url 'discount_app:admin_discount_list' discount_type='platform' %}" class="btn btn-secondary w-100 mb-2">
+                                    <i class="fas fa-globe me-1"></i> Manage Platform Discounts
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <div class="display-4 fw-bold text-primary-brand mb-2">{{ total_venue_discounts }}</div>
+                        <h5 class="card-title">Venue Discounts</h5>
+                        <div class="d-flex justify-content-center">
+                            <span class="badge bg-success me-1">{{ active_venue_discounts }} Active</span>
+                            <span class="badge bg-warning text-dark me-1">{{ pending_venue_approvals }} Pending</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <div class="display-4 fw-bold text-info mb-2">{{ total_service_discounts }}</div>
+                        <h5 class="card-title">Service Discounts</h5>
+                        <div class="d-flex justify-content-center">
+                            <span class="badge bg-success me-1">{{ active_service_discounts }} Active</span>
+                            <span class="badge bg-warning text-dark me-1">{{ pending_service_approvals }} Pending</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <div class="display-4 fw-bold text-secondary mb-2">{{ total_platform_discounts }}</div>
+                        <h5 class="card-title">Platform Discounts</h5>
+                        <div class="d-flex justify-content-center">
+                            <span class="badge bg-success">{{ active_platform_discounts }} Active</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <div class="display-4 fw-bold text-success mb-2">{{ total_usages }}</div>
+                        <h5 class="card-title">Total Discount Uses</h5>
+                        <div class="progress mt-2" style="height: 10px;">
+                            <div class="progress-bar bg-success" role="progressbar" style="width: {{ venue_discount_usages_percentage }}%;" aria-valuenow="{{ venue_discount_usages_percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+                            <div class="progress-bar bg-info" role="progressbar" style="width: {{ service_discount_usages_percentage }}%;" aria-valuenow="{{ service_discount_usages_percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+                            <div class="progress-bar bg-secondary" role="progressbar" style="width: {{ platform_discount_usages_percentage }}%;" aria-valuenow="{{ platform_discount_usages_percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                        <div class="d-flex justify-content-between mt-2">
+                            <small class="text-muted">Venue: {{ venue_discount_usages }}</small>
+                            <small class="text-muted">Service: {{ service_discount_usages }}</small>
+                            <small class="text-muted">Platform: {{ platform_discount_usages }}</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card shadow-sm h-100">
+                    <div class="card-header bg-primary-brand text-white">
+                        <h5 class="card-title mb-0">Discount Usage Over Time</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="usageChart" height="250"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card shadow-sm h-100">
+                    <div class="card-header bg-primary-brand text-white">
+                        <h5 class="card-title mb-0">Discount Distribution</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="distributionChart" height="250"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card shadow-sm h-100">
+                    <div class="card-header bg-primary-brand text-white">
+                        <h5 class="card-title mb-0">Top Venue Discounts</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if top_venue_discounts %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Discount</th>
+                                        <th>Venue</th>
+                                        <th>Uses</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for discount in top_venue_discounts %}
+                                    <tr>
+                                        <td>
+                                            <a href="{% url 'discount_app:admin_discount_detail' discount_type='venue' discount_id=discount.discount_id %}">
+                                                {{ discount.discount_name }}
+                                            </a>
+                                        </td>
+                                        <td>{{ discount.venue_name }}</td>
+                                        <td>{{ discount.usage_count }}</td>
+                                        <td>
+                                            <a href="{% url 'discount_app:admin_discount_detail' discount_type='venue' discount_id=discount.discount_id %}" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="alert alert-info mb-0">
+                            <i class="fas fa-info-circle me-2"></i> No venue discounts have been used yet.
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card shadow-sm h-100">
+                    <div class="card-header bg-primary-brand text-white">
+                        <h5 class="card-title mb-0">Top Service Discounts</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if top_service_discounts %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Discount</th>
+                                        <th>Service</th>
+                                        <th>Uses</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for discount in top_service_discounts %}
+                                    <tr>
+                                        <td>
+                                            <a href="{% url 'discount_app:admin_discount_detail' discount_type='service' discount_id=discount.discount_id %}">
+                                                {{ discount.discount_name }}
+                                            </a>
+                                        </td>
+                                        <td>{{ discount.service_title }}</td>
+                                        <td>{{ discount.usage_count }}</td>
+                                        <td>
+                                            <a href="{% url 'discount_app:admin_discount_detail' discount_type='service' discount_id=discount.discount_id %}" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="alert alert-info mb-0">
+                            <i class="fas fa-info-circle me-2"></i> No service discounts have been used yet.
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Usage Chart
+        const usageCtx = document.getElementById('usageChart').getContext('2d');
+        const usageChart = new Chart(usageCtx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                datasets: [{
+                    label: 'Venue Discounts',
+                    data: [12, 19, 3, 5, 2, 3, 20, 33, 27, 15, 22, 30],
+                    backgroundColor: 'rgba(40, 167, 69, 0.2)',
+                    borderColor: 'rgba(40, 167, 69, 1)',
+                    borderWidth: 2,
+                    tension: 0.3
+                }, {
+                    label: 'Service Discounts',
+                    data: [7, 11, 5, 8, 3, 7, 15, 22, 18, 12, 17, 25],
+                    backgroundColor: 'rgba(23, 162, 184, 0.2)',
+                    borderColor: 'rgba(23, 162, 184, 1)',
+                    borderWidth: 2,
+                    tension: 0.3
+                }, {
+                    label: 'Platform Discounts',
+                    data: [5, 8, 2, 3, 1, 2, 10, 15, 12, 8, 10, 18],
+                    backgroundColor: 'rgba(108, 117, 125, 0.2)',
+                    borderColor: 'rgba(108, 117, 125, 1)',
+                    borderWidth: 2,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Number of Uses'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Month'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Distribution Chart
+        const distributionCtx = document.getElementById('distributionChart').getContext('2d');
+        const distributionChart = new Chart(distributionCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Venue Discounts', 'Service Discounts', 'Platform Discounts'],
+                datasets: [{
+                    data: [{{ venue_discount_usages }}, {{ service_discount_usages }}, {{ platform_discount_usages }}],
+                    backgroundColor: [
+                        'rgba(40, 167, 69, 0.8)',
+                        'rgba(23, 162, 184, 0.8)',
+                        'rgba(108, 117, 125, 0.8)'
+                    ],
+                    borderColor: [
+                        'rgba(40, 167, 69, 1)',
+                        'rgba(23, 162, 184, 1)',
+                        'rgba(108, 117, 125, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.label || '';
+                                const value = context.raw || 0;
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = Math.round((value / total) * 100);
+                                return `${label}: ${value} (${percentage}%)`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

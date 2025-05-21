@@ -1,0 +1,130 @@
+{% extends 'admin_app/base.html' %}
+
+{% block admin_content %}
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Admin Preferences</h1>
+</div>
+
+<div class="row">
+    <div class="col-lg-6 mx-auto">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Display Preferences</h6>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="theme" class="form-label">Theme</label>
+                        <select name="theme" id="theme" class="form-select">
+                            <option value="light" {% if preference.theme == 'light' %}selected{% endif %}>Light</option>
+                            <option value="dark" {% if preference.theme == 'dark' %}selected{% endif %}>Dark</option>
+                            <option value="auto" {% if preference.theme == 'auto' %}selected{% endif %}>Auto (System Preference)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="sidebar_collapsed" name="sidebar_collapsed" {% if preference.sidebar_collapsed %}checked{% endif %}>
+                            <label class="form-check-label" for="sidebar_collapsed">
+                                Collapse Sidebar by Default
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="show_quick_actions" name="show_quick_actions" {% if preference.show_quick_actions %}checked{% endif %}>
+                            <label class="form-check-label" for="show_quick_actions">
+                                Show Quick Actions
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="items_per_page" class="form-label">Items Per Page</label>
+                        <select name="items_per_page" id="items_per_page" class="form-select">
+                            <option value="10" {% if preference.items_per_page == 10 %}selected{% endif %}>10</option>
+                            <option value="20" {% if preference.items_per_page == 20 %}selected{% endif %}>20</option>
+                            <option value="50" {% if preference.items_per_page == 50 %}selected{% endif %}>50</option>
+                            <option value="100" {% if preference.items_per_page == 100 %}selected{% endif %}>100</option>
+                        </select>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <button type="submit" class="btn btn-primary">Save Preferences</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Preview</h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <h6 class="font-weight-bold">Theme</h6>
+                    <div class="row">
+                        <div class="col-md-4 mb-2">
+                            <div class="card {% if preference.theme == 'light' %}border-primary{% endif %}">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-sun fa-2x mb-2"></i>
+                                    <p class="mb-0">Light</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <div class="card {% if preference.theme == 'dark' %}border-primary{% endif %}">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-moon fa-2x mb-2"></i>
+                                    <p class="mb-0">Dark</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <div class="card {% if preference.theme == 'auto' %}border-primary{% endif %}">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-adjust fa-2x mb-2"></i>
+                                    <p class="mb-0">Auto</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <h6 class="font-weight-bold">Sidebar</h6>
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <div class="card {% if not preference.sidebar_collapsed %}border-primary{% endif %}">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-expand fa-2x mb-2"></i>
+                                    <p class="mb-0">Expanded</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <div class="card {% if preference.sidebar_collapsed %}border-primary{% endif %}">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-compress fa-2x mb-2"></i>
+                                    <p class="mb-0">Collapsed</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <h6 class="font-weight-bold">Items Per Page</h6>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Currently showing <strong>{{ preference.items_per_page }}</strong> items per page.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

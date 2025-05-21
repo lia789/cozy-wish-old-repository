@@ -1,0 +1,21 @@
+name,slug,description,icon_class,is_active
+Spa,spa,Relaxation and wellness services,fa-spa,True
+Massage,massage,Professional massage therapy services,fa-hands-holding,True
+Yoga,yoga,Yoga classes and wellness programs,fa-om,True
+Fitness,fitness,Fitness centers and gyms,fa-dumbbell,True
+Beauty Salon,beauty-salon,Hair and beauty services,fa-cut,True
+Nail Salon,nail-salon,Nail care and treatments,fa-hand-sparkles,True
+Barbershop,barbershop,Men's grooming and haircuts,fa-scissors,True
+Wellness Center,wellness-center,Holistic health and wellness services,fa-heartbeat,True
+Medical Spa,medical-spa,Medical-grade spa treatments,fa-clinic-medical,True
+Hair Salon,hair-salon,Hair styling and treatments,fa-cut,True
+Tanning Salon,tanning-salon,Tanning services and sunless options,fa-sun,True
+Waxing Studio,waxing-studio,Hair removal and waxing services,fa-female,True
+Meditation Center,meditation-center,Meditation and mindfulness practices,fa-brain,True
+Pilates Studio,pilates-studio,Pilates classes and equipment,fa-running,True
+Acupuncture Clinic,acupuncture-clinic,Traditional acupuncture treatments,fa-syringe,True
+Chiropractic Office,chiropractic-office,Chiropractic adjustments and therapies,fa-bone,True
+Physical Therapy,physical-therapy,Rehabilitation and physical therapy,fa-walking,True
+Dental Spa,dental-spa,Dental services with spa amenities,fa-tooth,True
+Float Center,float-center,Sensory deprivation and float therapy,fa-water,True
+Cryotherapy,cryotherapy,Cold therapy treatments,fa-snowflake,True

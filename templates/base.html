@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}CozyWish - Book Beauty & Wellness Services{% endblock %}</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&family=Yeseva+One&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    {% load static %}
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+{% if hero_section %}
+<div class="radial-gradient">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container px-4 fixed-top">
+            <a class="navbar-brand" href="{% url 'venues_app:home' %}">CozyWish</a>
+            <div class="nav-buttons ms-auto d-flex align-items-center">
+                {% if user.is_authenticated and user.is_customer %}
+                <a href="{% url 'booking_cart_app:cart' %}" class="btn btn-light me-3 position-relative">
+                    <i class="fas fa-shopping-cart"></i>
+                    {% if cart_count > 0 %}
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                        {{ cart_count }}
+                    </span>
+                    {% endif %}
+                </a>
+                {% endif %}
+
+                {% if user.is_service_provider %}
+                <a href="{% url 'dashboard_app:provider_dashboard' %}" class="btn btn-light me-3">Provider Dashboard</a>
+                {% elif not user.is_authenticated or not user.is_customer %}
+                <a href="{% url 'accounts_app:for_business' %}" class="btn btn-light me-3 for-business-btn">For business</a>
+                {% endif %}
+                <div class="dropdown">
+                    <button class="btn btn-light menu-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Menu
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        {% if user.is_authenticated %}
+                            <li><a class="dropdown-item d-flex align-items-center" href="{% url 'accounts_app:profile' %}">
+                                <i class="fas fa-user me-3"></i>
+                                My Profile
+                            </a></li>
+                            {% if user.is_customer %}
+                            <li><a class="dropdown-item d-flex align-items-center" href="{% url 'booking_cart_app:booking_list' %}">
+                                <i class="fas fa-calendar-check me-3"></i>
+                                My Bookings
+                            </a></li>
+                            <li><a class="dropdown-item d-flex align-items-center" href="{% url 'booking_cart_app:cart' %}">
+                                <i class="fas fa-shopping-cart me-3"></i>
+                                My Cart
+                            </a></li>
+                            <li><a class="dropdown-item d-flex align-items-center" href="{% url 'payments_app:payment_history' %}">
+                                <i class="fas fa-credit-card me-3"></i>
+                                Payment History
+                            </a></li>
+                            <li><a class="dropdown-item d-flex align-items-center" href="{% url 'payments_app:payment_methods' %}">
+                                <i class="fas fa-wallet me-3"></i>
+                                Payment Methods
+                            </a></li>
+                            {% endif %}
+                            {% if user.is_service_provider %}
+                            <li><a class="dropdown-item d-flex align-items-center" href="{% url 'booking_cart_app:provider_booking_list' %}">
+                                <i class="fas fa-calendar-check me-3"></i>
+                                Bookings
+                            </a></li>
+                            <li><a class="dropdown-item d-flex align-items-center" href="{% url 'payments_app:provider_payment_history' %}">
+                                <i class="fas fa-credit-card me-3"></i>
+                                Payment History
+                            </a></li>
+                            <li><a class="dropdown-item d-flex align-items-center" href="{% url 'accounts_app:staff_list' %}">
+                                <i class="fas fa-users me-3"></i>
+                                My Staff
+                            </a></li>
+                            {% endif %}
+                            {% if user.is_staff %}
+                            <li><a class="dropdown-item d-flex align-items-center" href="{% url 'booking_cart_app:admin_booking_list' %}">
+                                <i class="fas fa-calendar-check me-3"></i>
+                                Bookings Management
+                            </a></li>
+                            <li><a class="dropdown-item d-flex align-items-center" href="{% url 'booking_cart_app:admin_booking_analytics' %}">
+                                <i class="fas fa-chart-bar me-3"></i>
+                                Booking Analytics
+                            </a></li>
+                            <li><a class="dropdown-item d-flex align-items-center" href="{% url 'payments_app:admin_payment_list' %}">
+                                <i class="fas fa-credit-card me-3"></i>
+                                Payment Management
+                            </a></li>
+                            <li><a class="dropdown-item d-flex align-items-center" href="{% url 'payments_app:admin_invoice_list' %}">
+                                <i class="fas fa-file-invoice-dollar me-3"></i>
+                                Invoice Management
+                            </a></li>
+                            <li><a class="dropdown-item d-flex align-items-center" href="{% url 'accounts_app:service_provider_approval_list' %}">
+                                <i class="fas fa-check-circle me-3"></i>
+                                Provider Approvals
+                            </a></li>
+                            <li><a class="dropdown-item d-flex align-items-center" href="{% url 'accounts_app:user_management' %}">
+                                <i class="fas fa-users-cog me-3"></i>
+                                User Management
+                            </a></li>
+                            <li><a class="dropdown-item d-flex align-items-center" href="{% url 'admin:index' %}">
+                                <i class="fas fa-cog me-3"></i>
+                                Django Admin
+                            </a></li>
+                            {% endif %}
+                            <li><hr class="dropdown-divider"></li>
+
+                            <li><a class="dropdown-item d-flex align-items-center" href="{% url 'accounts_app:logout' %}">
+                                <i class="fas fa-sign-out-alt me-3"></i>
+                                Log out
+                            </a></li>
+                        {% else %}
+                            <li><a class="dropdown-item d-flex align-items-center" href="{% url 'accounts_app:login' %}">
+                                <i class="fas fa-sign-in-alt me-3"></i>
+                                Log in
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+
+                            <li><a class="dropdown-item" href="{% url 'accounts_app:customer_signup' %}">Sign Up</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                        {% endif %}
+
+                        {% if not user.is_authenticated %}
+                    <li><a class="dropdown-item" href="{% url 'accounts_app:for_business' %}">For businesses</a></li>
+                    {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero section -->
+    {% block hero_content %}{% endblock %}
+</div>
+{% else %}
+<!-- Navbar for non-hero pages -->
+<nav class="navbar navbar-expand-lg bg-white shadow-sm">
+    <div class="container px-4">
+        <a class="navbar-brand" href="{% url 'venues_app:home' %}">CozyWish</a>
+        <div class="nav-buttons ms-auto d-flex align-items-center">
+            {% if user.is_authenticated and user.is_customer %}
+            <a href="{% url 'booking_cart_app:cart' %}" class="btn btn-light me-3 position-relative">
+                <i class="fas fa-shopping-cart"></i>
+                {% if cart_count > 0 %}
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                    {{ cart_count }}
+                </span>
+                {% endif %}
+            </a>
+            {% endif %}
+
+            {% if user.is_authenticated %}
+            {% include 'notifications_app/notification_dropdown.html' %}
+            {% endif %}
+
+            {% if user.is_service_provider %}
+            <a href="{% url 'dashboard_app:provider_dashboard' %}" class="btn btn-light me-3">Provider Dashboard</a>
+            {% elif not user.is_authenticated or not user.is_customer %}
+            <a href="{% url 'accounts_app:for_business' %}" class="btn btn-light me-3 for-business-btn">For business</a>
+            {% endif %}
+            <div class="dropdown">
+                <button class="btn btn-light menu-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    Menu
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    {% if user.is_authenticated %}
+                        <li><a class="dropdown-item d-flex align-items-center" href="{% url 'accounts_app:profile' %}">
+                            <i class="fas fa-user me-3"></i>
+                            My Profile
+                        </a></li>
+                        {% if user.is_customer %}
+                        <li><a class="dropdown-item d-flex align-items-center" href="{% url 'booking_cart_app:booking_list' %}">
+                            <i class="fas fa-calendar-check me-3"></i>
+                            My Bookings
+                        </a></li>
+                        <li><a class="dropdown-item d-flex align-items-center" href="{% url 'booking_cart_app:cart' %}">
+                            <i class="fas fa-shopping-cart me-3"></i>
+                            My Cart
+                        </a></li>
+                        <li><a class="dropdown-item d-flex align-items-center" href="{% url 'payments_app:payment_history' %}">
+                            <i class="fas fa-credit-card me-3"></i>
+                            Payment History
+                        </a></li>
+                        <li><a class="dropdown-item d-flex align-items-center" href="{% url 'payments_app:payment_methods' %}">
+                            <i class="fas fa-wallet me-3"></i>
+                            Payment Methods
+                        </a></li>
+                        {% endif %}
+                        {% if user.is_service_provider %}
+                        <li><a class="dropdown-item d-flex align-items-center" href="{% url 'booking_cart_app:provider_booking_list' %}">
+                            <i class="fas fa-calendar-check me-3"></i>
+                            Bookings
+                        </a></li>
+                        <li><a class="dropdown-item d-flex align-items-center" href="{% url 'payments_app:provider_payment_history' %}">
+                            <i class="fas fa-credit-card me-3"></i>
+                            Payment History
+                        </a></li>
+                        <li><a class="dropdown-item d-flex align-items-center" href="{% url 'accounts_app:staff_list' %}">
+                            <i class="fas fa-users me-3"></i>
+                            My Staff
+                        </a></li>
+                        {% endif %}
+                        {% if user.is_staff %}
+                        <li><a class="dropdown-item d-flex align-items-center" href="{% url 'booking_cart_app:admin_booking_list' %}">
+                            <i class="fas fa-calendar-check me-3"></i>
+                            Bookings Management
+                        </a></li>
+                        <li><a class="dropdown-item d-flex align-items-center" href="{% url 'booking_cart_app:admin_booking_analytics' %}">
+                            <i class="fas fa-chart-bar me-3"></i>
+                            Booking Analytics
+                        </a></li>
+                        <li><a class="dropdown-item d-flex align-items-center" href="{% url 'payments_app:admin_payment_list' %}">
+                            <i class="fas fa-credit-card me-3"></i>
+                            Payment Management
+                        </a></li>
+                        <li><a class="dropdown-item d-flex align-items-center" href="{% url 'payments_app:admin_invoice_list' %}">
+                            <i class="fas fa-file-invoice-dollar me-3"></i>
+                            Invoice Management
+                        </a></li>
+                        <li><a class="dropdown-item d-flex align-items-center" href="{% url 'accounts_app:service_provider_approval_list' %}">
+                            <i class="fas fa-check-circle me-3"></i>
+                            Provider Approvals
+                        </a></li>
+                        <li><a class="dropdown-item d-flex align-items-center" href="{% url 'accounts_app:user_management' %}">
+                            <i class="fas fa-users-cog me-3"></i>
+                            User Management
+                        </a></li>
+                        <li><a class="dropdown-item d-flex align-items-center" href="{% url 'admin:index' %}">
+                            <i class="fas fa-cog me-3"></i>
+                            Django Admin
+                        </a></li>
+                        {% endif %}
+                        <li><hr class="dropdown-divider"></li>
+
+                        <li><a class="dropdown-item d-flex align-items-center" href="{% url 'accounts_app:logout' %}">
+                            <i class="fas fa-sign-out-alt me-3"></i>
+                            Log out
+                        </a></li>
+                    {% else %}
+                        <li><a class="dropdown-item d-flex align-items-center" href="{% url 'accounts_app:login' %}">
+                            <i class="fas fa-sign-in-alt me-3"></i>
+                            Log in
+                        </a></li>
+                        <li><hr class="dropdown-divider"></li>
+
+                        <li><a class="dropdown-item" href="{% url 'accounts_app:customer_signup' %}">Sign Up</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                    {% endif %}
+
+                    {% if not user.is_authenticated %}
+                    <li><a class="dropdown-item" href="{% url 'accounts_app:for_business' %}">For businesses</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</nav>
+{% endif %}
+
+<!-- Announcements -->
+{% if announcements %}
+    <div class="container mt-3">
+        {% include 'cms_app/includes/announcements.html' %}
+    </div>
+{% endif %}
+
+<!-- Messages -->
+{% if messages %}
+    <div class="container mt-3">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<!-- Main Content -->
+<div class="container mt-5 py-4">
+    {% block content %}{% endblock %}
+</div>
+
+<!-- Footer -->
+<footer class="bg-light py-4 mt-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+                <h5>CozyWish</h5>
+                <p>Find & Book Local Spa and Massage Services</p>
+            </div>
+            <div class="col-md-4">
+                <h5>Quick Links</h5>
+                <ul class="list-unstyled">
+                    <li><a href="{% url 'venues_app:home' %}" class="text-decoration-none">Home</a></li>
+                    <li><a href="{% url 'venues_app:venue_list' %}" class="text-decoration-none">Venues</a></li>
+                    <li><a href="{% url 'cms_app:page_detail' slug='about-us' %}" class="text-decoration-none">About Us</a></li>
+                    <li><a href="{% url 'cms_app:page_detail' slug='contact' %}" class="text-decoration-none">Contact</a></li>
+                    <li><a href="{% url 'cms_app:page_detail' slug='terms' %}" class="text-decoration-none">Terms of Service</a></li>
+                    <li><a href="{% url 'cms_app:page_detail' slug='privacy' %}" class="text-decoration-none">Privacy Policy</a></li>
+                    <li><a href="{% url 'cms_app:page_detail' slug='faq' %}" class="text-decoration-none">FAQ</a></li>
+                    <li><a href="{% url 'cms_app:blog_list' %}" class="text-decoration-none">Blog</a></li>
+                </ul>
+            </div>
+            <div class="col-md-4">
+                <h5>Contact Us</h5>
+                <address>
+                    <p><i class="fas fa-map-marker-alt me-2"></i> 123 Main St, New York, NY 10001</p>
+                    <p><i class="fas fa-phone me-2"></i> (123) 456-7890</p>
+                    <p><i class="fas fa-envelope me-2"></i> info@cozywish.com</p>
+                </address>
+            </div>
+        </div>
+        <hr>
+        <div class="text-center">
+            <p>&copy; {% now "Y" %} CozyWish. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+
+<!-- Bootstrap JS Bundle with Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Location Search JavaScript -->
+<script src="{% static 'js/location_search.js' %}"></script>
+<!-- Custom JavaScript -->
+{% block extra_js %}{% endblock %}
+<script src="{% static 'js/messages.js' %}"></script>
+</body>
+</html>

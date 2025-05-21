@@ -1,0 +1,274 @@
+app_name,feature,test_case_id,test_case_description,priority,steps_to_test,expected_result,actual_result,status,note,tested_by,date
+discount_app,Featured Discounts,DISC-001,View featured discounts as a customer,High,"1. Login as a customer
+2. Navigate to the featured discounts page","1. Featured discounts are displayed
+2. Discounts show correct information (name, description, value, dates)
+3. Discounts are categorized by type (venue, service, platform)",,Not Tested,,,
+discount_app,Venue Discounts,DISC-002,View discounts for a specific venue as a customer,High,"1. Login as a customer
+2. Navigate to a venue detail page
+3. Click on 'View Discounts' or similar link","1. All active discounts for the venue are displayed
+2. Both venue-wide and service-specific discounts are shown
+3. Discounts show correct information",,Not Tested,,,
+discount_app,Search Discounts,DISC-003,Search for discounts as a customer,Medium,"1. Login as a customer
+2. Navigate to the discount search page
+3. Enter search terms and/or apply filters
+4. Submit the search","1. Matching discounts are displayed
+2. Search results are accurate based on the search terms
+3. Filters work correctly",,Not Tested,,,
+discount_app,Discount Filtering,DISC-004,Filter discounts by various criteria,Medium,"1. Login as a customer
+2. Navigate to the discount search page
+3. Apply filters (discount type, value range, status)
+4. Submit the search","1. Filtered discounts are displayed
+2. Filters work correctly
+3. Multiple filters can be applied simultaneously",,Not Tested,,,
+discount_app,Discount Sorting,DISC-005,Sort discounts by various criteria,Medium,"1. Login as a customer
+2. Navigate to the discount search page
+3. Select a sorting option (value, expiry date, etc.)","1. Discounts are sorted according to the selected criteria
+2. Sorting works correctly in both ascending and descending order",,Not Tested,,,
+discount_app,Provider Discount List,DISC-006,View all discounts as a service provider,High,"1. Login as a service provider
+2. Navigate to the discount management page","1. All discounts created by the provider are displayed
+2. Discounts show correct information
+3. Discounts are categorized by type and status",,Not Tested,,,
+discount_app,Create Venue Discount,DISC-007,Create a new venue-wide discount as a service provider,High,"1. Login as a service provider
+2. Navigate to the discount management page
+3. Click 'Create Venue Discount'
+4. Fill in the discount details
+5. Submit the form","1. Form validation works correctly
+2. Discount is created with the correct information
+3. Discount appears in the provider's discount list
+4. Discount is marked as pending approval",,Not Tested,,,
+discount_app,Create Service Discount,DISC-008,Create a new service-specific discount as a service provider,High,"1. Login as a service provider
+2. Navigate to the discount management page
+3. Click 'Create Service Discount'
+4. Fill in the discount details
+5. Submit the form","1. Form validation works correctly
+2. Discount is created with the correct information
+3. Discount appears in the provider's discount list
+4. Discount is marked as pending approval",,Not Tested,,,
+discount_app,Update Venue Discount,DISC-009,Update an existing venue discount as a service provider,Medium,"1. Login as a service provider
+2. Navigate to the discount management page
+3. Find a venue discount and click 'Edit'
+4. Modify the discount details
+5. Submit the form","1. Form validation works correctly
+2. Discount is updated with the correct information
+3. Updated discount appears in the provider's discount list
+4. Discount is marked as pending approval again",,Not Tested,,,
+discount_app,Update Service Discount,DISC-010,Update an existing service discount as a service provider,Medium,"1. Login as a service provider
+2. Navigate to the discount management page
+3. Find a service discount and click 'Edit'
+4. Modify the discount details
+5. Submit the form","1. Form validation works correctly
+2. Discount is updated with the correct information
+3. Updated discount appears in the provider's discount list
+4. Discount is marked as pending approval again",,Not Tested,,,
+discount_app,Delete Venue Discount,DISC-011,Delete a venue discount as a service provider,Medium,"1. Login as a service provider
+2. Navigate to the discount management page
+3. Find a venue discount and click 'Delete'
+4. Confirm the deletion","1. Confirmation dialog is displayed
+2. Discount is deleted after confirmation
+3. Discount no longer appears in the provider's discount list",,Not Tested,,,
+discount_app,Delete Service Discount,DISC-012,Delete a service discount as a service provider,Medium,"1. Login as a service provider
+2. Navigate to the discount management page
+3. Find a service discount and click 'Delete'
+4. Confirm the deletion","1. Confirmation dialog is displayed
+2. Discount is deleted after confirmation
+3. Discount no longer appears in the provider's discount list",,Not Tested,,,
+discount_app,Admin Discount List,DISC-013,View all discounts as an admin,High,"1. Login as an admin
+2. Navigate to the admin discount management page","1. All discounts across the platform are displayed
+2. Discounts show correct information
+3. Discounts are categorized by type, status, and provider",,Not Tested,,,
+discount_app,Admin Discount Detail,DISC-014,View detailed information about a discount as an admin,Medium,"1. Login as an admin
+2. Navigate to the admin discount management page
+3. Click on a discount to view details","1. Detailed discount information is displayed
+2. All discount attributes are shown
+3. Related information (venue, service, provider) is displayed",,Not Tested,,,
+discount_app,Create Platform Discount,DISC-015,Create a new platform-wide discount as an admin,High,"1. Login as an admin
+2. Navigate to the admin discount management page
+3. Click 'Create Platform Discount'
+4. Fill in the discount details
+5. Submit the form","1. Form validation works correctly
+2. Discount is created with the correct information
+3. Discount appears in the admin's discount list
+4. Discount is automatically approved",,Not Tested,,,
+discount_app,Update Platform Discount,DISC-016,Update an existing platform discount as an admin,Medium,"1. Login as an admin
+2. Navigate to the admin discount management page
+3. Find a platform discount and click 'Edit'
+4. Modify the discount details
+5. Submit the form","1. Form validation works correctly
+2. Discount is updated with the correct information
+3. Updated discount appears in the admin's discount list",,Not Tested,,,
+discount_app,Delete Platform Discount,DISC-017,Delete a platform discount as an admin,Medium,"1. Login as an admin
+2. Navigate to the admin discount management page
+3. Find a platform discount and click 'Delete'
+4. Confirm the deletion","1. Confirmation dialog is displayed
+2. Discount is deleted after confirmation
+3. Discount no longer appears in the admin's discount list",,Not Tested,,,
+discount_app,Approve Discount,DISC-018,Approve a pending discount as an admin,High,"1. Login as an admin
+2. Navigate to the discount approval page
+3. Find a pending discount and click 'Approve'
+4. Add approval comments
+5. Submit the form","1. Discount is marked as approved
+2. Approval information (admin, date, comments) is recorded
+3. Discount appears as active in the system
+4. Provider is notified (if option selected)",,Not Tested,,,
+discount_app,Reject Discount,DISC-019,Reject a pending discount as an admin,High,"1. Login as an admin
+2. Navigate to the discount approval page
+3. Find a pending discount and click 'Reject'
+4. Add rejection comments
+5. Submit the form","1. Discount is marked as rejected
+2. Rejection information (admin, date, comments) is recorded
+3. Discount does not appear as active in the system
+4. Provider is notified (if option selected)",,Not Tested,,,
+discount_app,Admin Discount Dashboard,DISC-020,View discount statistics and metrics as an admin,Medium,"1. Login as an admin
+2. Navigate to the discount dashboard","1. Dashboard displays key metrics (total discounts, active discounts, etc.)
+2. Charts and graphs show discount distribution and performance
+3. Data is accurate and up-to-date",,Not Tested,,,
+discount_app,Discount Application,DISC-021,Verify that discounts are correctly applied to services,High,"1. Login as a customer
+2. Navigate to a service with an active discount
+3. Add the service to the cart
+4. Proceed to checkout","1. Discount is correctly applied to the service price
+2. Discounted price is displayed
+3. Discount information is shown
+4. Final price reflects the discount",,Not Tested,,,
+discount_app,Best Discount Selection,DISC-022,Verify that the best discount is selected when multiple apply,High,"1. Create multiple overlapping discounts for a service
+2. Login as a customer
+3. Navigate to the service
+4. Add the service to the cart","1. The most beneficial discount is applied
+2. Discount information shows which discount was applied
+3. Final price reflects the best discount",,Not Tested,,,
+discount_app,Discount Minimum Value,DISC-023,Verify that minimum booking value is enforced,Medium,"1. Create a discount with a minimum booking value
+2. Login as a customer
+3. Add a service below the minimum value
+4. Check if the discount is applied","1. Discount is not applied when below minimum value
+2. Discount is applied when above minimum value
+3. User is informed about the minimum value requirement",,Not Tested,,,
+discount_app,Discount Maximum Amount,DISC-024,Verify that maximum discount amount is enforced,Medium,"1. Create a percentage discount with a maximum amount
+2. Login as a customer
+3. Add an expensive service where the percentage would exceed the maximum
+4. Check if the discount is capped","1. Discount is capped at the maximum amount
+2. Final price reflects the capped discount
+3. Discount information shows the applied amount",,Not Tested,,,
+discount_app,Discount Usage Tracking,DISC-025,Verify that discount usage is tracked,Medium,"1. Login as a customer
+2. Add a discounted service to the cart
+3. Complete the checkout process
+4. Check the discount usage records","1. Discount usage is recorded
+2. Usage record contains correct information
+3. Usage statistics are updated",,Not Tested,,,
+discount_app,Discount Expiry,DISC-026,Verify that expired discounts are not applied,High,"1. Create a discount with an expiry date in the past
+2. Login as a customer
+3. Navigate to the service with the expired discount
+4. Check if the discount is applied","1. Expired discount is not applied
+2. Service shows regular price
+3. Expired discount is not shown to customers",,Not Tested,,,
+discount_app,Scheduled Discount,DISC-027,Verify that future discounts are not applied until start date,High,"1. Create a discount with a start date in the future
+2. Login as a customer
+3. Navigate to the service with the scheduled discount
+4. Check if the discount is applied","1. Scheduled discount is not applied before start date
+2. Service shows regular price
+3. Scheduled discount may be shown as 'coming soon'",,Not Tested,,,
+discount_app,Discount Visibility,DISC-028,Verify that discounts are visible in appropriate places,Medium,"1. Create various types of discounts
+2. Login as a customer
+3. Navigate through the platform (home page, venue page, service page, etc.)","1. Discounts are visible in appropriate locations
+2. Featured discounts are prominently displayed
+3. Discount information is clear and accurate",,Not Tested,,,
+discount_app,Discount Responsiveness,DISC-029,Verify that discount UI is responsive on different devices,Medium,"1. Login as a customer
+2. Navigate to pages with discounts
+3. Test on different screen sizes (desktop, tablet, mobile)","1. Discount UI is responsive and adapts to screen size
+2. All discount information is visible and accessible
+3. Discount actions (filtering, sorting) work on all devices",,Not Tested,,,
+discount_app,Discount Notifications,DISC-030,Verify that users are notified about relevant discounts,Low,"1. Create new discounts
+2. Login as a customer
+3. Check for notifications about new discounts","1. Users are notified about relevant new discounts
+2. Notifications are timely and accurate
+3. Notification preferences are respected",,Not Tested,,,
+discount_app,Discount Validation,DISC-031,Verify that unapproved discounts are not applied,High,"1. Create a discount without admin approval
+2. Login as a customer
+3. Navigate to the service with the unapproved discount
+4. Check if the discount is applied","1. Unapproved discount is not applied
+2. Service shows regular price
+3. Unapproved discount is not shown to customers",,Not Tested,,,
+discount_app,Discount Middleware,DISC-032,Verify that discount middleware applies discounts to services in templates,High,"1. Create active discounts
+2. Login as a customer
+3. Navigate to pages with service listings
+4. View service details","1. Discounts are automatically applied to services in templates
+2. Original and discounted prices are displayed
+3. Discount information is shown correctly",,Not Tested,,,
+discount_app,Discount Calculation,DISC-033,Verify that percentage discounts are calculated correctly,High,"1. Create percentage discounts with different values
+2. Login as a customer
+3. Navigate to services with these discounts
+4. Check the calculated discounted prices","1. Percentage discounts are calculated correctly
+2. Discounted prices match expected values
+3. Rounding is handled appropriately",,Not Tested,,,
+discount_app,Discount Calculation,DISC-034,Verify that fixed amount discounts are calculated correctly,High,"1. Create fixed amount discounts with different values
+2. Login as a customer
+3. Navigate to services with these discounts
+4. Check the calculated discounted prices","1. Fixed amount discounts are calculated correctly
+2. Discounted prices match expected values
+3. Discount doesn't exceed original price",,Not Tested,,,
+discount_app,Discount Security,DISC-035,Verify that providers can only manage their own discounts,High,"1. Login as service provider A
+2. Try to access edit page for provider B's discount
+3. Try to delete provider B's discount","1. Access should be denied
+2. Appropriate error message should be displayed
+3. No unauthorized modifications should be possible",,Not Tested,,,
+discount_app,Discount Security,DISC-036,Verify that only admins can approve discounts,High,"1. Login as service provider
+2. Try to access discount approval page
+3. Try to directly approve a discount via URL manipulation","1. Access should be denied
+2. Appropriate error message should be displayed
+3. No unauthorized approvals should be possible",,Not Tested,,,
+discount_app,Discount Security,DISC-037,Verify that only admins can create platform discounts,High,"1. Login as service provider
+2. Try to access platform discount creation page
+3. Try to create platform discount via direct POST request","1. Access should be denied
+2. Appropriate error message should be displayed
+3. No unauthorized creations should be possible",,Not Tested,,,
+discount_app,Discount Performance,DISC-038,Verify discount calculation performance with many overlapping discounts,Medium,"1. Create many overlapping discounts
+2. Login as a customer
+3. Navigate to service with multiple applicable discounts
+4. Measure response time","1. Page should load within acceptable time
+2. Discount calculation should be efficient
+3. No noticeable delay in displaying discounted prices",,Not Tested,,,
+discount_app,Discount Performance,DISC-039,Verify discount search performance with many discounts,Medium,"1. Create many discounts across the system
+2. Login as a customer
+3. Perform various searches and filters
+4. Measure response time","1. Search results should return within acceptable time
+2. Filtering should be efficient
+3. No timeout errors should occur",,Not Tested,,,
+discount_app,Discount Accessibility,DISC-040,Verify discount form accessibility,Medium,"1. Navigate to discount creation form
+2. Test keyboard navigation
+3. Check form labels and ARIA attributes","1. Form should be navigable via keyboard
+2. All fields should have proper labels
+3. Error messages should be associated with fields",,Not Tested,,,
+discount_app,Mobile Responsiveness,DISC-041,Verify discount forms on mobile devices,Medium,"1. Test discount creation/editing forms on mobile devices
+2. Check layout and usability","1. Forms should be usable on small screens
+2. No horizontal scrolling should be needed
+3. Touch targets should be adequately sized",,Not Tested,,,
+discount_app,Mobile Responsiveness,DISC-042,Verify discount display on mobile devices,Medium,"1. Test discount display on mobile devices
+2. Check layout and readability","1. Discount information should be properly displayed on small screens
+2. All important details should be visible
+3. UI should adapt to screen size",,Not Tested,,,
+discount_app,Browser Compatibility,DISC-043,Verify Chrome compatibility,High,"1. Test key discount functions in latest Chrome
+2. Test in Chrome on different OS","1. All functions should work correctly
+2. No visual or functional issues",,Not Tested,,,
+discount_app,Browser Compatibility,DISC-044,Verify Firefox compatibility,High,"1. Test key discount functions in latest Firefox
+2. Test in Firefox on different OS","1. All functions should work correctly
+2. No visual or functional issues",,Not Tested,,,
+discount_app,Browser Compatibility,DISC-045,Verify Safari compatibility,Medium,"1. Test key discount functions in latest Safari
+2. Test in Safari on different OS","1. All functions should work correctly
+2. No visual or functional issues",,Not Tested,,,
+discount_app,Browser Compatibility,DISC-046,Verify Edge compatibility,Medium,"1. Test key discount functions in latest Edge","1. All functions should work correctly
+2. No visual or functional issues",,Not Tested,,,
+discount_app,Browser Compatibility,DISC-047,Verify mobile browser compatibility,High,"1. Test key discount functions in mobile browsers
+2. Test on iOS and Android","1. All functions should work correctly
+2. No visual or functional issues",,Not Tested,,,
+discount_app,Internationalization,DISC-048,Verify discount currency formatting,Medium,"1. Change locale setting (if applicable)
+2. View discounted prices in different currencies","1. Currency symbols should be displayed correctly
+2. Decimal separators should follow locale conventions
+3. Discount amounts should be formatted according to locale",,Not Tested,,,
+discount_app,Data Management,DISC-049,Import discount dummy data,Low,"1. Run command: python manage.py import_discount_dummy_data","1. All dummy data should be imported correctly
+2. Data should be consistent and realistic
+3. Venue discounts, service discounts, platform discounts should be created",,Not Tested,,,
+discount_app,Integration,DISC-050,Verify integration with booking cart app,High,"1. Create active discounts
+2. Login as a customer
+3. Add discounted services to cart
+4. Proceed to checkout","1. Discounts are correctly applied in cart
+2. Discounts are maintained during checkout
+3. Order summary shows discounted prices
+4. Final total reflects all discounts",,Not Tested,,,

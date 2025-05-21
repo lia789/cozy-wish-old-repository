@@ -1,0 +1,394 @@
+{% extends 'dashboard_app/base_dashboard.html' %}
+{% load static %}
+{% load dashboard_tags %}
+
+{% block title %}Revenue Reports - CozyWish{% endblock %}
+
+{% block dashboard_title %}Revenue Reports{% endblock %}
+
+{% block sidebar_content %}
+<!-- Main Navigation -->
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'dashboard_app:provider_dashboard' %}">
+        <i class="fas fa-home"></i> Dashboard
+    </a>
+</li>
+
+<!-- Venue Management Section -->
+<div class="sidebar-section-header">Venue Management</div>
+{% if venues %}
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'venues_app:provider_venue_detail' slug=venues.0.slug %}">
+        <i class="fas fa-edit"></i> Manage Venue
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'venues_app:service_create' %}">
+        <i class="fas fa-plus"></i> Add Service
+    </a>
+</li>
+{% else %}
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'venues_app:create_venue' %}">
+        <i class="fas fa-plus"></i> Create Venue
+    </a>
+</li>
+{% endif %}
+
+<!-- Bookings Section -->
+<div class="sidebar-section-header">Bookings</div>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'dashboard_app:provider_todays_bookings' %}">
+        <i class="fas fa-calendar"></i> Today's Bookings
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'booking_cart_app:provider_booking_list' %}">
+        <i class="fas fa-list"></i> All Bookings
+    </a>
+</li>
+
+<!-- Analytics Section -->
+<div class="sidebar-section-header">Analytics</div>
+<li class="nav-item">
+    <a class="nav-link active" href="{% url 'dashboard_app:provider_revenue_reports' %}">
+        <i class="fas fa-chart-line"></i> Revenue Reports
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'dashboard_app:provider_service_performance' %}">
+        <i class="fas fa-chart-bar"></i> Service Performance
+    </a>
+</li>
+
+<!-- Team Section -->
+<div class="sidebar-section-header">Team</div>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'dashboard_app:provider_team_management' %}">
+        <i class="fas fa-users"></i> Team Management
+    </a>
+</li>
+{% endblock %}
+
+{% block dashboard_actions %}
+<div class="btn-group me-2">
+    <button type="button" class="btn btn-sm btn-outline-secondary" id="exportCSV">
+        <i class="fas fa-download"></i> Export CSV
+    </button>
+    <button type="button" class="btn btn-sm btn-outline-secondary" id="printReport">
+        <i class="fas fa-print"></i> Print
+    </button>
+</div>
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card dashboard-card mb-4">
+            <div class="dashboard-card-header">
+                <h5 class="mb-0">Filter Reports</h5>
+            </div>
+            <div class="dashboard-card-body">
+                <form method="get" class="row g-3">
+                    <div class="col-md-3">
+                        <label for="{{ form.period.id_for_label }}" class="form-label">Time Period</label>
+                        {{ form.period }}
+                    </div>
+                    <div class="col-md-3">
+                        <label for="{{ form.venue.id_for_label }}" class="form-label">Venue</label>
+                        {{ form.venue }}
+                    </div>
+                    <div class="col-md-2">
+                        <label for="{{ form.start_date.id_for_label }}" class="form-label">Start Date</label>
+                        {{ form.start_date }}
+                    </div>
+                    <div class="col-md-2">
+                        <label for="{{ form.end_date.id_for_label }}" class="form-label">End Date</label>
+                        {{ form.end_date }}
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">Apply Filter</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card dashboard-card">
+            <div class="dashboard-card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Revenue Overview</h5>
+                <span class="text-muted">{{ start_date|date:"M d, Y" }} - {{ end_date|date:"M d, Y" }}</span>
+            </div>
+            <div class="dashboard-card-body">
+                <canvas id="revenueChart" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card dashboard-card">
+            <div class="dashboard-card-header">
+                <h5 class="mb-0">Revenue Summary</h5>
+            </div>
+            <div class="dashboard-card-body">
+                <div class="mb-4">
+                    <h2 class="mb-1">${{ total_revenue|format_currency }}</h2>
+                    <p class="text-muted mb-0">Total Revenue</p>
+                </div>
+
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span>Average Daily Revenue</span>
+                        <span>${{ avg_daily_revenue|format_currency }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-1">
+                        <span>Highest Daily Revenue</span>
+                        <span>${{ highest_daily_revenue|format_currency }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-1">
+                        <span>Lowest Daily Revenue</span>
+                        <span>${{ lowest_daily_revenue|format_currency }}</span>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <h6 class="mb-2">Revenue by Venue</h6>
+                    {% for venue in venue_revenue %}
+                    <div class="d-flex justify-content-between mb-1">
+                        <span>{{ venue.name }}</span>
+                        <span>${{ venue.revenue|format_currency }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="mb-0">
+                    <h6 class="mb-2">Revenue by Payment Method</h6>
+                    {% for method in payment_method_revenue %}
+                    <div class="d-flex justify-content-between mb-1">
+                        <span>{{ method.name }}</span>
+                        <span>${{ method.revenue|format_currency }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card dashboard-card">
+            <div class="dashboard-card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Transaction History</h5>
+                <div class="input-group" style="width: 250px;">
+                    <input type="text" class="form-control" placeholder="Search transactions" id="transactionSearch">
+                    <button class="btn btn-outline-secondary" type="button">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="dashboard-card-body">
+                {% if transactions %}
+                <div class="table-responsive">
+                    <table class="table table-hover" id="transactionsTable">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Transaction ID</th>
+                                <th>Customer</th>
+                                <th>Venue</th>
+                                <th>Services</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for transaction in transactions %}
+                            <tr>
+                                <td>{{ transaction.created_at|date:"M d, Y" }}</td>
+                                <td>{{ transaction.transaction_id|truncatechars:8 }}</td>
+                                <td>{{ transaction.booking.user.get_full_name }}</td>
+                                <td>{{ transaction.booking.venue.name }}</td>
+                                <td>{{ transaction.booking.items.count }}</td>
+                                <td>${{ transaction.amount|format_currency }}</td>
+                                <td>
+                                    <span class="badge {{ transaction.status|get_status_badge_class }}">
+                                        {{ transaction.get_status_display }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="btn-group">
+                                        <a href="{% url 'payments_app:transaction_detail' transaction.transaction_id %}" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{% url 'payments_app:download_invoice' transaction.invoice.invoice_number %}" class="btn btn-sm btn-outline-secondary">
+                                            <i class="fas fa-file-invoice"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mt-4">
+                    <div>
+                        Showing {{ transactions.start_index }} to {{ transactions.end_index }} of {{ transactions.paginator.count }} transactions
+                    </div>
+                    <nav aria-label="Transaction pagination">
+                        <ul class="pagination mb-0">
+                            {% if transactions.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1{% if request.GET.period %}&period={{ request.GET.period }}{% endif %}{% if request.GET.venue %}&venue={{ request.GET.venue }}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}" aria-label="First">
+                                    <span aria-hidden="true">&laquo;&laquo;</span>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ transactions.previous_page_number }}{% if request.GET.period %}&period={{ request.GET.period }}{% endif %}{% if request.GET.venue %}&venue={{ request.GET.venue }}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                            {% endif %}
+
+                            {% for i in transactions.paginator.page_range %}
+                                {% if transactions.number == i %}
+                                <li class="page-item active"><span class="page-link">{{ i }}</span></li>
+                                {% elif i > transactions.number|add:"-3" and i < transactions.number|add:"3" %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ i }}{% if request.GET.period %}&period={{ request.GET.period }}{% endif %}{% if request.GET.venue %}&venue={{ request.GET.venue }}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}">{{ i }}</a>
+                                </li>
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if transactions.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ transactions.next_page_number }}{% if request.GET.period %}&period={{ request.GET.period }}{% endif %}{% if request.GET.venue %}&venue={{ request.GET.venue }}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ transactions.paginator.num_pages }}{% if request.GET.period %}&period={{ request.GET.period }}{% endif %}{% if request.GET.venue %}&venue={{ request.GET.venue }}{% endif %}{% if request.GET.start_date %}&start_date={{ request.GET.start_date }}{% endif %}{% if request.GET.end_date %}&end_date={{ request.GET.end_date }}{% endif %}" aria-label="Last">
+                                    <span aria-hidden="true">&raquo;&raquo;</span>
+                                </a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+                {% else %}
+                <div class="alert alert-info mb-0">
+                    <i class="fas fa-info-circle me-2"></i>
+                    No transactions found for the selected period.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block dashboard_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Revenue chart
+        const ctx = document.getElementById('revenueChart').getContext('2d');
+
+        const revenueData = {
+            labels: {{ chart_labels|safe }},
+            datasets: [{
+                label: 'Revenue',
+                data: {{ chart_data|safe }},
+                backgroundColor: 'rgba(47, 22, 15, 0.2)',
+                borderColor: '#2F160F',
+                borderWidth: 2,
+                tension: 0.3,
+                pointBackgroundColor: '#2F160F',
+                pointRadius: 4
+            }]
+        };
+
+        const revenueChart = new Chart(ctx, {
+            type: 'line',
+            data: revenueData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '$' + value;
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return '$' + context.raw;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Show/hide date inputs based on period selection
+        const periodSelect = document.getElementById('{{ form.period.id_for_label }}');
+        const startDateInput = document.getElementById('{{ form.start_date.id_for_label }}');
+        const endDateInput = document.getElementById('{{ form.end_date.id_for_label }}');
+
+        function toggleDateInputs() {
+            if (periodSelect.value === 'custom') {
+                startDateInput.parentElement.style.display = 'block';
+                endDateInput.parentElement.style.display = 'block';
+            } else {
+                startDateInput.parentElement.style.display = 'none';
+                endDateInput.parentElement.style.display = 'none';
+            }
+        }
+
+        // Initial toggle
+        toggleDateInputs();
+
+        // Toggle on change
+        periodSelect.addEventListener('change', toggleDateInputs);
+
+        // Transaction search functionality
+        const searchInput = document.getElementById('transactionSearch');
+        const table = document.getElementById('transactionsTable');
+
+        searchInput.addEventListener('keyup', function() {
+            const searchTerm = this.value.toLowerCase();
+            const rows = table.querySelectorAll('tbody tr');
+
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+
+        // Export CSV functionality
+        document.getElementById('exportCSV').addEventListener('click', function() {
+            window.location.href = window.location.pathname + window.location.search + '&export=csv';
+        });
+
+        // Print functionality
+        document.getElementById('printReport').addEventListener('click', function() {
+            window.print();
+        });
+    });
+</script>
+{% endblock %}

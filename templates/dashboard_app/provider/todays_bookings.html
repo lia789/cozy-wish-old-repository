@@ -1,0 +1,262 @@
+{% extends 'dashboard_app/base_dashboard.html' %}
+{% load static %}
+{% load dashboard_tags %}
+
+{% block title %}Today's Bookings - CozyWish{% endblock %}
+
+{% block dashboard_title %}Today's Bookings{% endblock %}
+
+{% block sidebar_content %}
+<!-- Main Navigation -->
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'dashboard_app:provider_dashboard' %}">
+        <i class="fas fa-home"></i> Dashboard
+    </a>
+</li>
+
+<!-- Venue Management Section -->
+<div class="sidebar-section-header">Venue Management</div>
+{% if venues %}
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'venues_app:provider_venue_detail' slug=venues.0.slug %}">
+        <i class="fas fa-edit"></i> Manage Venue
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'venues_app:service_create' %}">
+        <i class="fas fa-plus"></i> Add Service
+    </a>
+</li>
+{% else %}
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'venues_app:create_venue' %}">
+        <i class="fas fa-plus"></i> Create Venue
+    </a>
+</li>
+{% endif %}
+
+<!-- Bookings Section -->
+<div class="sidebar-section-header">Bookings</div>
+<li class="nav-item">
+    <a class="nav-link active" href="{% url 'dashboard_app:provider_todays_bookings' %}">
+        <i class="fas fa-calendar"></i> Today's Bookings
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'booking_cart_app:provider_booking_list' %}">
+        <i class="fas fa-list"></i> All Bookings
+    </a>
+</li>
+
+<!-- Analytics Section -->
+<div class="sidebar-section-header">Analytics</div>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'dashboard_app:provider_revenue_reports' %}">
+        <i class="fas fa-chart-line"></i> Revenue Reports
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'dashboard_app:provider_service_performance' %}">
+        <i class="fas fa-chart-bar"></i> Service Performance
+    </a>
+</li>
+
+<!-- Team Section -->
+<div class="sidebar-section-header">Team</div>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'dashboard_app:provider_team_management' %}">
+        <i class="fas fa-users"></i> Team Management
+    </a>
+</li>
+{% endblock %}
+
+{% block dashboard_actions %}
+<div class="btn-group me-2">
+    {% if not venues %}
+    <a href="{% url 'venues_app:create_venue' %}" class="btn btn-sm btn-primary">
+        <i class="fas fa-plus"></i> Add Venue
+    </a>
+    {% endif %}
+    {% if venues %}
+    <a href="{% url 'venues_app:service_create' %}" class="btn btn-sm btn-outline-primary">
+        <i class="fas fa-spa"></i> Add Service
+    </a>
+    <a href="{% url 'venues_app:provider_venue_detail' slug=venues.0.slug %}" class="btn btn-sm btn-outline-primary">
+        <i class="fas fa-edit"></i> Manage Venue
+    </a>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card dashboard-card mb-4">
+            <div class="dashboard-card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Today's Schedule</h5>
+                <span class="badge bg-primary">{{ today|date:"l, F j, Y" }}</span>
+            </div>
+            <div class="dashboard-card-body">
+                {% if booking_items %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Customer</th>
+                                <th>Service</th>
+                                <th>Duration</th>
+                                <th>Venue</th>
+                                <th>Price</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in booking_items %}
+                            <tr>
+                                <td>{{ item.time_slot|time:"g:i A" }}</td>
+                                <td>{{ item.booking.user.get_full_name }}</td>
+                                <td>{{ item.service.name }}</td>
+                                <td>{{ item.service.duration }} min</td>
+                                <td>{{ item.booking.venue.name }}</td>
+                                <td>${{ item.price|format_currency }}</td>
+                                <td>
+                                    <span class="badge {{ item.booking.status|get_status_badge_class }}">
+                                        {{ item.booking.get_status_display }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="btn-group">
+                                        <a href="{% url 'booking_cart_app:booking_detail' item.booking.booking_id %}" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        {% if item.booking.status == 'pending' %}
+                                        <a href="{% url 'booking_cart_app:confirm_booking' item.booking.booking_id %}" class="btn btn-sm btn-outline-success">
+                                            <i class="fas fa-check"></i>
+                                        </a>
+                                        <a href="{% url 'booking_cart_app:reject_booking' item.booking.booking_id %}" class="btn btn-sm btn-outline-danger">
+                                            <i class="fas fa-times"></i>
+                                        </a>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alert alert-info mb-0">
+                    <i class="fas fa-info-circle me-2"></i>
+                    You don't have any bookings scheduled for today.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card dashboard-card">
+            <div class="dashboard-card-header">
+                <h5 class="mb-0">Booking Summary</h5>
+            </div>
+            <div class="dashboard-card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <div class="p-3 bg-light rounded text-center">
+                            <h3 class="mb-0">{{ total_bookings }}</h3>
+                            <p class="text-muted mb-0">Total Bookings</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="p-3 bg-light rounded text-center">
+                            <h3 class="mb-0">{{ pending_bookings }}</h3>
+                            <p class="text-muted mb-0">Pending Bookings</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="p-3 bg-light rounded text-center">
+                            <h3 class="mb-0">{{ confirmed_bookings }}</h3>
+                            <p class="text-muted mb-0">Confirmed Bookings</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="p-3 bg-light rounded text-center">
+                            <h3 class="mb-0">${{ total_revenue|format_currency }}</h3>
+                            <p class="text-muted mb-0">Today's Revenue</p>
+                        </div>
+                    </div>
+                </div>
+
+                <h6 class="mt-4 mb-3">Booking Status</h6>
+                <div class="mb-3">
+                    <div class="d-flex align-items-center mb-2">
+                        <div style="width: 100px;">Pending</div>
+                        <div class="progress flex-grow-1" style="height: 20px;">
+                            {% with percentage=pending_percentage %}
+                            <div class="progress-bar bg-warning" role="progressbar" style="width: {{ percentage }}%;" aria-valuenow="{{ pending_bookings }}" aria-valuemin="0" aria-valuemax="{{ total_bookings }}">{{ pending_bookings }}</div>
+                            {% endwith %}
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center mb-2">
+                        <div style="width: 100px;">Confirmed</div>
+                        <div class="progress flex-grow-1" style="height: 20px;">
+                            {% with percentage=confirmed_percentage %}
+                            <div class="progress-bar bg-success" role="progressbar" style="width: {{ percentage }}%;" aria-valuenow="{{ confirmed_bookings }}" aria-valuemin="0" aria-valuemax="{{ total_bookings }}">{{ confirmed_bookings }}</div>
+                            {% endwith %}
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center mb-2">
+                        <div style="width: 100px;">Cancelled</div>
+                        <div class="progress flex-grow-1" style="height: 20px;">
+                            {% with percentage=cancelled_percentage %}
+                            <div class="progress-bar bg-danger" role="progressbar" style="width: {{ percentage }}%;" aria-valuenow="{{ cancelled_bookings }}" aria-valuemin="0" aria-valuemax="{{ total_bookings }}">{{ cancelled_bookings }}</div>
+                            {% endwith %}
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <div style="width: 100px;">Completed</div>
+                        <div class="progress flex-grow-1" style="height: 20px;">
+                            {% with percentage=completed_percentage %}
+                            <div class="progress-bar bg-info" role="progressbar" style="width: {{ percentage }}%;" aria-valuenow="{{ completed_bookings }}" aria-valuemin="0" aria-valuemax="{{ total_bookings }}">{{ completed_bookings }}</div>
+                            {% endwith %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card dashboard-card">
+            <div class="dashboard-card-header">
+                <h5 class="mb-0">Upcoming Days</h5>
+            </div>
+            <div class="dashboard-card-body">
+                <div class="list-group">
+                    {% for day in upcoming_days %}
+                    <a href="{% url 'dashboard_app:provider_day_bookings' day.date|date:'Y-m-d' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>{{ day.date|date:"l, F j" }}</strong>
+                            <div class="text-muted small">{{ day.date|date:"Y" }}</div>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <span class="badge bg-primary rounded-pill me-3">{{ day.booking_count }} Bookings</span>
+                            <i class="fas fa-chevron-right text-muted"></i>
+                        </div>
+                    </a>
+                    {% empty %}
+                    <div class="alert alert-info mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        No upcoming bookings for the next few days.
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

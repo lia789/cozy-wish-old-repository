@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+
+{% block title %}Update Booking Status - Admin - CozyWish{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'venues_app:home' %}">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'booking_cart_app:admin_booking_list' %}">Bookings Management</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'booking_cart_app:admin_booking_detail' booking_id=booking.booking_id %}">Booking Details</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Update Status</li>
+                </ol>
+            </nav>
+            
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Update Booking Status</h4>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <h5>Booking Information</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Booking ID:</strong> {{ booking.booking_id|truncatechars:8 }}</p>
+                                <p><strong>Customer:</strong> {{ booking.user.email }}</p>
+                                <p><strong>Venue:</strong> {{ booking.venue.name }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Date:</strong> {{ booking.booking_date|date:"M d, Y" }}</p>
+                                <p><strong>Total:</strong> ${{ booking.total_price }}</p>
+                                <p><strong>Current Status:</strong> 
+                                    {% if booking.status == 'pending' %}
+                                    <span class="badge bg-warning">Pending</span>
+                                    {% elif booking.status == 'confirmed' %}
+                                    <span class="badge bg-success">Confirmed</span>
+                                    {% elif booking.status == 'cancelled' %}
+                                    <span class="badge bg-danger">Cancelled</span>
+                                    {% elif booking.status == 'completed' %}
+                                    <span class="badge bg-info">Completed</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label">New Status</label>
+                            <div class="d-flex flex-column gap-2">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="status" id="status_pending" value="pending" {% if booking.status == 'pending' %}checked{% endif %}>
+                                    <label class="form-check-label" for="status_pending">
+                                        <span class="badge bg-warning">Pending</span> - Booking is awaiting confirmation
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="status" id="status_confirmed" value="confirmed" {% if booking.status == 'confirmed' %}checked{% endif %}>
+                                    <label class="form-check-label" for="status_confirmed">
+                                        <span class="badge bg-success">Confirmed</span> - Booking is confirmed and scheduled
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="status" id="status_completed" value="completed" {% if booking.status == 'completed' %}checked{% endif %}>
+                                    <label class="form-check-label" for="status_completed">
+                                        <span class="badge bg-info">Completed</span> - Service has been provided
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="status" id="status_cancelled" value="cancelled" {% if booking.status == 'cancelled' %}checked{% endif %}>
+                                    <label class="form-check-label" for="status_cancelled">
+                                        <span class="badge bg-danger">Cancelled</span> - Booking has been cancelled
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Note:</strong> Changing the booking status will notify the customer and service provider.
+                        </div>
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <a href="{% url 'booking_cart_app:admin_booking_detail' booking_id=booking.booking_id %}" class="btn btn-outline-secondary me-md-2">Cancel</a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Update Status
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

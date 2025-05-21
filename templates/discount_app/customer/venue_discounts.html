@@ -1,0 +1,186 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ venue.name }} - Discounts - CozyWish{% endblock %}
+
+{% block extra_css %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/discount_app/discount_app.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-5 radial-gradient-bg">
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col-12">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{% url 'venues_app:home' %}">Home</a></li>
+                        <li class="breadcrumb-item"><a href="{% url 'venues_app:venue_detail' venue.slug %}">{{ venue.name }}</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Discounts</li>
+                    </ol>
+                </nav>
+
+                <h1 class="page-title mb-3">
+                    <i class="fas fa-tags me-2"></i>Discounts at {{ venue.name }}
+                </h1>
+
+                <p class="lead">
+                    Discover special offers and discounts available at {{ venue.name }}. Book now to save!
+                </p>
+            </div>
+        </div>
+
+        {% if messages %}
+        <div class="messages mb-4">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if venue_discounts %}
+        <div class="row mb-4">
+            <div class="col-12">
+                <h2 class="h4 mb-0">Venue-Wide Discounts</h2>
+                <p class="text-muted">These discounts apply to all services at {{ venue.name }}</p>
+                <hr>
+            </div>
+        </div>
+
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-5">
+            {% for discount in venue_discounts %}
+            <div class="col">
+                <div class="card h-100 discount-card">
+                    <div class="card-header bg-primary-brand text-white">
+                        <h5 class="card-title mb-0">{{ discount.name }}</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="discount-value mb-3">
+                            {% if discount.discount_type == 'percentage' %}
+                            <span class="display-4 fw-bold text-primary-brand">{{ discount.discount_value }}%</span>
+                            <span class="text-muted">off</span>
+                            {% else %}
+                            <span class="display-4 fw-bold text-primary-brand">${{ discount.discount_value }}</span>
+                            <span class="text-muted">off</span>
+                            {% endif %}
+                        </div>
+
+                        <p class="card-text">{{ discount.description }}</p>
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">
+                                Valid until {{ discount.end_date|date:"M d, Y" }}
+                            </small>
+
+                            {% if discount.min_booking_value > 0 %}
+                            <small class="text-muted">
+                                Min. booking: ${{ discount.min_booking_value }}
+                            </small>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="card-footer bg-light">
+                        <a href="{% url 'venues_app:venue_detail' venue.slug %}" class="btn btn-primary w-100">
+                            <i class="fas fa-spa me-1"></i> Browse Services
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i> No venue-wide discounts are currently available at {{ venue.name }}.
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if service_discounts %}
+        <div class="row mb-4">
+            <div class="col-12">
+                <h2 class="h4 mb-0">Service-Specific Discounts</h2>
+                <p class="text-muted">These discounts apply to specific services at {{ venue.name }}</p>
+                <hr>
+            </div>
+        </div>
+
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            {% for discount in service_discounts %}
+            <div class="col">
+                <div class="card h-100 discount-card">
+                    <div class="card-header bg-primary-brand text-white">
+                        <h5 class="card-title mb-0">{{ discount.name }}</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="discount-value mb-3">
+                            {% if discount.discount_type == 'percentage' %}
+                            <span class="display-4 fw-bold text-primary-brand">{{ discount.discount_value }}%</span>
+                            <span class="text-muted">off</span>
+                            {% else %}
+                            <span class="display-4 fw-bold text-primary-brand">${{ discount.discount_value }}</span>
+                            <span class="text-muted">off</span>
+                            {% endif %}
+                        </div>
+
+                        <p class="card-text">{{ discount.description }}</p>
+
+                        <div class="mb-3">
+                            <span class="badge bg-secondary">{{ discount.service.title }}</span>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">
+                                Valid until {{ discount.end_date|date:"M d, Y" }}
+                            </small>
+
+                            <small class="text-muted">
+                                Regular price: ${{ discount.service.price }}
+                            </small>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-light">
+                        <a href="{% url 'venues_app:service_detail' discount.service.id %}" class="btn btn-primary w-100">
+                            <i class="fas fa-spa me-1"></i> View Service
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="row">
+            <div class="col-12">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i> No service-specific discounts are currently available at {{ venue.name }}.
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if not venue_discounts and not service_discounts %}
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i> There are currently no discounts available at {{ venue.name }}. Check back soon for special offers!
+                </div>
+
+                <div class="text-center mt-4">
+                    <a href="{% url 'venues_app:venue_detail' venue.slug %}" class="btn btn-primary">
+                        <i class="fas fa-arrow-left me-1"></i> Back to {{ venue.name }}
+                    </a>
+                    <a href="{% url 'discount_app:featured_discounts' %}" class="btn btn-outline-primary ms-2">
+                        <i class="fas fa-tags me-1"></i> Browse Featured Discounts
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

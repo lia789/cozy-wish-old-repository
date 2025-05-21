@@ -1,0 +1,171 @@
+{% extends 'base.html' %}
+
+{% block title %}Review Summary - CozyWish{% endblock %}
+
+{% block extra_css %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/review_app/review_app.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-5 radial-gradient-bg">
+    <div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Review Summary</h1>
+        <a href="{% url 'review_app:provider_venue_reviews' %}" class="btn btn-outline-primary">
+            <i class="fas fa-list me-2"></i> View All Reviews
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-4">
+            <div class="card shadow mb-4">
+                <div class="card-header bg-primary-brand text-white">
+                    <h5 class="mb-0">Overall Rating</h5>
+                </div>
+                <div class="card-body text-center">
+                    <div class="display-1 fw-bold">{{ average_rating|floatformat:1 }}</div>
+                    <div class="text-warning mb-3">
+                        {% for i in "12345" %}
+                        <i class="fas fa-star {% if forloop.counter <= average_rating|floatformat:0 %}text-warning{% elif forloop.counter <= average_rating|add:'0.5'|floatformat:0 %}text-warning-half{% else %}text-muted{% endif %}"></i>
+                        {% endfor %}
+                    </div>
+                    <p class="lead">Based on {{ total_reviews }} review{{ total_reviews|pluralize }}</p>
+                </div>
+            </div>
+
+            <div class="card shadow mb-4">
+                <div class="card-header bg-primary-brand text-white">
+                    <h5 class="mb-0">Rating Distribution</h5>
+                </div>
+                <div class="card-body">
+                    {% for rating in rating_distribution %}
+                    <div class="d-flex align-items-center mb-3">
+                        <div style="width: 80px;">
+                            {{ rating.rating }} <i class="fas fa-star text-warning"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="rating-bar">
+                                <div class="rating-bar-fill" style="width: {% if total_reviews > 0 %}{{ rating.count|divisibleby:total_reviews|floatformat:0 }}{% else %}0{% endif %}%;"></div>
+                            </div>
+                        </div>
+                        <div style="width: 80px; text-align: right;">
+                            {{ rating.count }} ({% if total_reviews > 0 %}{{ rating.count|divisibleby:total_reviews|floatformat:0 }}{% else %}0{% endif %}%)
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        No ratings data available.
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="card shadow mb-4">
+                <div class="card-header bg-primary-brand text-white">
+                    <h5 class="mb-0">Venue Ratings</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for stat in venue_stats %}
+                        <div class="col-md-6 mb-4">
+                            <div class="card h-100 venue-card">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ stat.venue.name }}</h5>
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <div class="text-warning">
+                                            {% for i in "12345" %}
+                                            <i class="fas fa-star {% if forloop.counter <= stat.average_rating|floatformat:0 %}text-warning{% else %}text-muted{% endif %}"></i>
+                                            {% endfor %}
+                                        </div>
+                                        <span class="badge bg-primary">{{ stat.average_rating|floatformat:1 }}</span>
+                                    </div>
+                                    <p class="card-text">{{ stat.total_reviews }} review{{ stat.total_reviews|pluralize }}</p>
+                                    <a href="{% url 'review_app:provider_venue_reviews' %}?venue={{ stat.venue.id }}" class="btn btn-outline-primary btn-sm">
+                                        View Reviews
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="col-12">
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                No venue data available.
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow">
+                <div class="card-header bg-primary-brand text-white">
+                    <h5 class="mb-0">Review Insights</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Strengths</h6>
+                            <ul>
+                                {% if average_rating >= 4 %}
+                                <li>Strong overall rating ({{ average_rating|floatformat:1 }} stars)</li>
+                                {% endif %}
+
+                                {% for stat in venue_stats %}
+                                {% if stat.average_rating >= 4.5 %}
+                                <li>{{ stat.venue.name }} has an excellent rating ({{ stat.average_rating|floatformat:1 }} stars)</li>
+                                {% endif %}
+                                {% endfor %}
+
+                                {% for rating in rating_distribution %}
+                                {% if rating.rating == 5 and rating.count > 0 %}
+                                <li>{{ rating.count }} 5-star review{{ rating.count|pluralize }}</li>
+                                {% endif %}
+                                {% endfor %}
+
+                                {% if not average_rating >= 4 and not venue_stats|filter_by_rating:4.5 and not rating_distribution|filter_by_rating_count:5 %}
+                                <li>No significant strengths identified yet</li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Areas for Improvement</h6>
+                            <ul>
+                                {% if average_rating < 4 %}
+                                <li>Overall rating could be improved ({{ average_rating|floatformat:1 }} stars)</li>
+                                {% endif %}
+
+                                {% for stat in venue_stats %}
+                                {% if stat.average_rating < 3.5 %}
+                                <li>{{ stat.venue.name }} has a below-average rating ({{ stat.average_rating|floatformat:1 }} stars)</li>
+                                {% endif %}
+                                {% endfor %}
+
+                                {% for rating in rating_distribution %}
+                                {% if rating.rating <= 2 and rating.count > 0 %}
+                                <li>{{ rating.count }} {{ rating.rating }}-star review{{ rating.count|pluralize }}</li>
+                                {% endif %}
+                                {% endfor %}
+
+                                {% if not average_rating < 4 and not venue_stats|filter_by_rating_below:3.5 and not rating_distribution|filter_by_rating_count_below:2 %}
+                                <li>No significant areas for improvement identified</li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info mt-3 mb-0">
+                        <i class="fas fa-lightbulb me-2"></i>
+                        <strong>Tip:</strong> Responding to reviews, especially negative ones, can improve customer satisfaction and show that you value feedback.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+</div>
+{% endblock %}

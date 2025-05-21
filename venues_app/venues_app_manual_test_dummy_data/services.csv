@@ -1,0 +1,101 @@
+venue_name,title,short_description,price,discounted_price,duration,is_active
+Spa Paradise,Swedish Massage,A relaxing full-body massage using long strokes and kneading to improve circulation and relieve tension.,99.99,89.99,60,True
+Spa Paradise,Deep Tissue Massage,A therapeutic massage targeting deeper muscle layers to release chronic tension and pain.,129.99,119.99,60,True
+Spa Paradise,Hot Stone Massage,A massage therapy that uses smooth heated stones placed on specific points of the body to warm and relax muscles.,149.99,139.99,90,True
+Spa Paradise,Aromatherapy Massage,A massage enhanced with essential oils to promote relaxation and well-being.,119.99,109.99,60,True
+Spa Paradise,Couples Massage,A side-by-side massage experience for couples or friends in the same room.,199.99,179.99,60,True
+Massage Haven,Sports Massage,A massage designed to help athletes prepare for and recover from intense physical activity.,109.99,99.99,60,True
+Massage Haven,Prenatal Massage,A gentle massage specifically designed for expectant mothers to relieve discomfort and promote relaxation.,89.99,79.99,45,True
+Massage Haven,Reflexology,A therapeutic massage focusing on pressure points in the feet that correspond to different body organs and systems.,79.99,69.99,30,True
+Massage Haven,Thai Massage,An ancient massage technique combining acupressure and assisted yoga postures to improve flexibility and energy flow.,129.99,119.99,90,True
+Massage Haven,Chair Massage,A quick massage performed while seated in a specially designed chair focusing on the back neck and shoulders.,49.99,39.99,15,True
+Beauty Haven,Haircut and Style,Professional haircut and styling tailored to your preferences and face shape.,59.99,49.99,45,True
+Beauty Haven,Color and Highlights,Professional hair coloring and highlighting services to enhance your look.,149.99,129.99,120,True
+Beauty Haven,Facial Treatment,Customized facial treatment to cleanse exfoliate and nourish the skin.,89.99,79.99,60,True
+Beauty Haven,Makeup Application,Professional makeup application for special occasions or everyday glamour.,69.99,59.99,45,True
+Beauty Haven,Eyebrow Shaping,Professional eyebrow shaping using waxing or threading techniques.,29.99,24.99,15,True
+Nail Paradise,Manicure,Classic manicure including nail shaping cuticle care and polish application.,39.99,34.99,30,True
+Nail Paradise,Pedicure,Relaxing pedicure including foot soak exfoliation nail care and polish application.,59.99,49.99,45,True
+Nail Paradise,Gel Manicure,Long-lasting gel manicure that resists chipping for up to two weeks.,49.99,44.99,45,True
+Nail Paradise,Nail Art,Creative nail art designs to express your personal style.,19.99,14.99,15,True
+Nail Paradise,Paraffin Treatment,Moisturizing paraffin wax treatment for hands or feet to soften and smooth skin.,29.99,24.99,20,True
+Wellness Center,Nutritional Consultation,Personalized nutritional guidance to support your health and wellness goals.,79.99,69.99,60,True
+Wellness Center,Acupuncture Session,Traditional Chinese medicine treatment using thin needles to balance energy flow.,89.99,79.99,45,True
+Wellness Center,Reiki Healing,Energy healing technique that promotes relaxation and stress reduction.,69.99,59.99,60,True
+Wellness Center,Infrared Sauna,Detoxifying infrared sauna session to promote relaxation and wellness.,39.99,34.99,30,True
+Wellness Center,Health Coaching,Ongoing support and guidance to help you achieve your health and wellness goals.,99.99,89.99,60,True
+Yoga Studio,Vinyasa Flow,Dynamic yoga class linking breath with movement for strength and flexibility.,19.99,14.99,60,True
+Yoga Studio,Hatha Yoga,Gentle yoga class focusing on basic postures and breathing techniques.,19.99,14.99,60,True
+Yoga Studio,Yin Yoga,Slow-paced yoga style with postures held for longer periods to target deep connective tissues.,19.99,14.99,75,True
+Yoga Studio,Meditation Class,Guided meditation class to promote mindfulness and inner peace.,15.99,12.99,45,True
+Yoga Studio,Private Yoga Session,One-on-one yoga instruction tailored to your specific needs and goals.,89.99,79.99,60,True
+Massage Studio,Deep Tissue Massage,Therapeutic massage focusing on deeper layers of muscle tissue to release tension and pain.,119.99,109.99,60,True
+Massage Studio,Sports Recovery Massage,Specialized massage designed for athletes to enhance performance and recovery.,129.99,119.99,60,True
+Massage Studio,Trigger Point Therapy,Focused massage targeting specific trigger points to relieve pain and tension.,99.99,89.99,45,True
+Massage Studio,Myofascial Release,Gentle sustained pressure to eliminate pain and restore motion in fascial tissue.,109.99,99.99,60,True
+Massage Studio,Cupping Therapy,Ancient therapy using suction cups to promote blood flow and healing.,79.99,69.99,30,True
+Fitness Center,Personal Training Session,One-on-one fitness training customized to your specific goals and fitness level.,79.99,69.99,60,True
+Fitness Center,Group Fitness Class,Energetic group workout combining cardio and strength training for all fitness levels.,19.99,14.99,60,True
+Fitness Center,Nutrition Consultation,Personalized nutrition guidance to support your fitness and health goals.,89.99,79.99,45,True
+Fitness Center,Fitness Assessment,Comprehensive evaluation of your current fitness level with personalized recommendations.,49.99,39.99,30,True
+Fitness Center,Recovery Session,Guided stretching and recovery techniques to enhance performance and prevent injury.,39.99,34.99,30,True
+Yoga Place,Beginner Yoga,Gentle introduction to yoga fundamentals perfect for newcomers.,19.99,14.99,60,True
+Yoga Place,Power Yoga,Dynamic and challenging yoga practice to build strength and endurance.,24.99,19.99,75,True
+Yoga Place,Restorative Yoga,Gentle practice using props to support the body in passive poses for deep relaxation.,19.99,14.99,60,True
+Yoga Place,Prenatal Yoga,Specially designed yoga practice for expectant mothers to promote wellness and comfort.,24.99,19.99,60,True
+Yoga Place,Yoga Therapy,Personalized yoga practice addressing specific health concerns and conditions.,89.99,79.99,60,True
+Meditation Center,Guided Meditation,Instructor-led meditation session to promote mindfulness and inner peace.,19.99,14.99,45,True
+Meditation Center,Mindfulness Workshop,Interactive workshop teaching practical mindfulness techniques for daily life.,39.99,34.99,90,True
+Meditation Center,Sound Bath,Immersive meditation experience using sound vibrations for deep relaxation.,29.99,24.99,60,True
+Meditation Center,Breathwork Session,Guided breathing techniques to reduce stress and increase energy.,24.99,19.99,45,True
+Meditation Center,Private Meditation Coaching,One-on-one guidance to develop or deepen your meditation practice.,69.99,59.99,60,True
+Barbershop Elite,Classic Haircut,Traditional barbershop haircut with precision and attention to detail.,29.99,24.99,30,True
+Barbershop Elite,Beard Trim,Professional beard shaping and trimming for a well-groomed appearance.,19.99,14.99,15,True
+Barbershop Elite,Hot Towel Shave,Traditional straight razor shave with hot towel treatment for a smooth finish.,39.99,34.99,30,True
+Barbershop Elite,Hair and Beard Combo,Comprehensive grooming package including haircut and beard trim.,44.99,39.99,45,True
+Barbershop Elite,Gray Blending,Subtle color service to reduce gray hair for a natural youthful look.,49.99,44.99,45,True
+Hair Design Studio,Women's Haircut,Professional haircut and style tailored to your face shape and preferences.,59.99,49.99,45,True
+Hair Design Studio,Men's Haircut,Precision haircut for men including styling and finishing.,39.99,34.99,30,True
+Hair Design Studio,Full Color Service,Professional hair coloring service for a vibrant new look.,99.99,89.99,90,True
+Hair Design Studio,Highlights/Lowlights,Dimensional color technique to add depth and dimension to your hair.,129.99,119.99,120,True
+Hair Design Studio,Blowout and Style,Professional blow dry and styling for a polished finished look.,49.99,44.99,45,True
+Acupuncture Clinic,Initial Consultation,Comprehensive assessment and first acupuncture treatment for new patients.,99.99,89.99,75,True
+Acupuncture Clinic,Follow-up Treatment,Ongoing acupuncture treatment based on your individual treatment plan.,79.99,69.99,45,True
+Acupuncture Clinic,Cosmetic Acupuncture,Specialized facial acupuncture to promote skin health and reduce signs of aging.,129.99,119.99,60,True
+Acupuncture Clinic,Cupping Therapy,Traditional therapy using suction cups to promote circulation and healing.,59.99,49.99,30,True
+Acupuncture Clinic,Herbal Consultation,Personalized consultation for traditional herbal medicine recommendations.,69.99,59.99,45,True
+Chiropractic Care,Initial Assessment,Comprehensive evaluation including health history and spinal examination.,99.99,89.99,60,True
+Chiropractic Care,Adjustment Session,Spinal adjustment to improve alignment and relieve pain.,59.99,49.99,30,True
+Chiropractic Care,Therapeutic Exercises,Guided exercises to strengthen and stabilize the spine and joints.,49.99,39.99,30,True
+Chiropractic Care,Posture Analysis,Detailed assessment of posture with corrective recommendations.,39.99,34.99,30,True
+Chiropractic Care,Maintenance Plan,Ongoing chiropractic care to maintain spinal health and prevent issues.,199.99,179.99,30,True
+Float Therapy,Introductory Float,First-time floating experience in a sensory deprivation tank.,69.99,59.99,60,True
+Float Therapy,Standard Float Session,Relaxing float session in a sensory deprivation tank for stress relief.,89.99,79.99,90,True
+Float Therapy,Extended Float,Extended floating experience for deeper relaxation and meditation.,119.99,109.99,120,True
+Float Therapy,Float Membership,Monthly membership for regular floating sessions at a discounted rate.,199.99,179.99,90,True
+Float Therapy,Float and Massage Combo,Combination of float therapy and massage for complete relaxation.,149.99,139.99,120,True
+Medical Spa Center,Botox Treatment,FDA-approved injectable treatment to reduce the appearance of wrinkles.,349.99,299.99,30,True
+Medical Spa Center,Dermal Fillers,Injectable treatments to restore volume and smooth wrinkles.,399.99,349.99,45,True
+Medical Spa Center,Chemical Peel,Exfoliating treatment to improve skin texture and reduce imperfections.,149.99,129.99,45,True
+Medical Spa Center,Microdermabrasion,Non-invasive treatment to exfoliate skin and promote cell renewal.,99.99,89.99,30,True
+Medical Spa Center,Laser Hair Removal,Advanced laser technology for permanent hair reduction.,199.99,179.99,30,True
+Tanning Studio,Single Tanning Session,One-time use of tanning bed for a quick bronze glow.,19.99,14.99,15,True
+Tanning Studio,Spray Tan,Professional airbrush spray tan application for a natural-looking tan.,39.99,34.99,30,True
+Tanning Studio,Monthly Unlimited,Unlimited tanning sessions for one month.,99.99,89.99,15,True
+Tanning Studio,Tan Enhancer Application,Application of tan-enhancing lotion to maximize your tanning results.,9.99,7.99,5,True
+Tanning Studio,Premium Bed Session,Session in our top-of-the-line tanning bed with advanced features.,29.99,24.99,15,True
+Waxing Center,Eyebrow Waxing,Precise eyebrow shaping using professional waxing techniques.,19.99,14.99,15,True
+Waxing Center,Lip or Chin Wax,Quick and effective hair removal for lip or chin area.,14.99,12.99,10,True
+Waxing Center,Full Leg Wax,Complete hair removal for both legs from ankle to hip.,69.99,59.99,45,True
+Waxing Center,Brazilian Wax,Complete hair removal in the bikini area.,59.99,49.99,30,True
+Waxing Center,Back or Chest Wax,Hair removal for back or chest area.,49.99,44.99,30,True
+Physical Therapy Center,Initial Evaluation,Comprehensive assessment to develop a personalized treatment plan.,99.99,89.99,60,True
+Physical Therapy Center,Treatment Session,Hands-on therapy and exercises based on your treatment plan.,79.99,69.99,45,True
+Physical Therapy Center,Sports Rehabilitation,Specialized therapy for athletes recovering from injuries.,89.99,79.99,45,True
+Physical Therapy Center,Post-Surgery Rehabilitation,Targeted therapy to restore function after surgical procedures.,89.99,79.99,45,True
+Physical Therapy Center,Home Exercise Program,Customized exercise program to continue therapy at home.,49.99,39.99,30,True
+Cryotherapy Spa,Whole Body Cryotherapy,Brief exposure to extremely cold temperatures to reduce inflammation and pain.,69.99,59.99,3,True
+Cryotherapy Spa,Localized Cryotherapy,Targeted cold therapy for specific areas of pain or inflammation.,49.99,39.99,15,True
+Cryotherapy Spa,Cryo Facial,Cold therapy facial treatment to reduce puffiness and promote skin health.,59.99,49.99,20,True
+Cryotherapy Spa,Compression Therapy,Pneumatic compression to improve circulation and reduce muscle soreness.,39.99,34.99,30,True
+Cryotherapy Spa,Recovery Package,Combination of cryotherapy and compression for enhanced recovery.,99.99,89.99,45,True

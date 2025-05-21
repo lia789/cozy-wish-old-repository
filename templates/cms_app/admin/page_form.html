@@ -1,0 +1,195 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% if is_create %}Create Page{% else %}Edit Page{% endif %} - CozyWish Admin{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/cms_app/cms_app.css' %}">
+<link rel="stylesheet" href="{% static 'css/cms_app/cms_admin.css' %}">
+<link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Admin Header -->
+    <div class="admin-header rounded-4 mb-4 p-4 text-center">
+        <h1 class="display-5 mb-2">{% if is_create %}Create New Page{% else %}Edit Page{% endif %}</h1>
+        <p class="lead mb-0">{% if is_create %}Add a new static page to your website{% else %}Update the content and settings for this page{% endif %}</p>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="{% url 'cms_app:admin_page_list' %}">Pages</a></li>
+                        <li class="breadcrumb-item active">{% if is_create %}Create{% else %}Edit{% endif %}</li>
+                    </ol>
+                </nav>
+                <a href="{% url 'cms_app:admin_page_list' %}" class="btn btn-outline-primary rounded-pill">
+                    <i class="fas fa-arrow-left me-2"></i> Back to Pages
+                </a>
+            </div>
+
+            <div class="admin-card">
+                <div class="card-body p-4 p-md-5">
+                <form method="post" class="admin-form">
+                    {% csrf_token %}
+
+                    <div class="row mb-4">
+                        <div class="col-md-8">
+                            <div class="form-group mb-4">
+                                <label for="{{ form.title.id_for_label }}" class="form-label">Page Title</label>
+                                {{ form.title }}
+                                {% if form.title.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.title.errors }}
+                                </div>
+                                {% endif %}
+                                <div class="form-text">The title of your page. This will be displayed at the top of the page and in browser tabs.</div>
+                            </div>
+
+                            <div class="form-group mb-4">
+                                <label for="{{ form.content.id_for_label }}" class="form-label">Page Content</label>
+                                {{ form.content }}
+                                {% if form.content.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.content.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="card shadow-sm border-0 rounded-4 mb-4">
+                                <div class="card-header bg-primary text-white rounded-top-4">
+                                    <h5 class="mb-0 brand-text">Page Settings</h5>
+                                </div>
+                                <div class="card-body p-4">
+                                    <div class="form-group mb-3">
+                                        <label for="{{ form.status.id_for_label }}" class="form-label">Status</label>
+                                        {{ form.status }}
+                                        {% if form.status.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.status.errors }}
+                                        </div>
+                                        {% endif %}
+                                        <div class="form-text">
+                                            <strong>Draft:</strong> Not visible to users<br>
+                                            <strong>Published:</strong> Visible to all users<br>
+                                            <strong>Archived:</strong> No longer visible
+                                        </div>
+                                    </div>
+
+                                    {% if not is_create %}
+                                    <div class="form-group mb-0">
+                                        <label class="form-label">Page URL</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light">/page/</span>
+                                            <input type="text" class="form-control" value="{{ page.slug }}" readonly>
+                                        </div>
+                                        <div class="form-text">The URL cannot be changed after creation.</div>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="card shadow-sm border-0 rounded-4 mb-4">
+                                <div class="card-header bg-primary text-white rounded-top-4">
+                                    <h5 class="mb-0 brand-text">SEO Settings</h5>
+                                </div>
+                                <div class="card-body p-4">
+                                    <div class="form-group mb-3">
+                                        <label for="{{ form.meta_description.id_for_label }}" class="form-label">Meta Description</label>
+                                        {{ form.meta_description }}
+                                        {% if form.meta_description.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.meta_description.errors }}
+                                        </div>
+                                        {% endif %}
+                                        <div class="form-text">A brief description of your page for search engines. Max 160 characters.</div>
+                                    </div>
+
+                                    <div class="form-group mb-0">
+                                        <label for="{{ form.meta_keywords.id_for_label }}" class="form-label">Meta Keywords</label>
+                                        {{ form.meta_keywords }}
+                                        {% if form.meta_keywords.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.meta_keywords.errors }}
+                                        </div>
+                                        {% endif %}
+                                        <div class="form-text">Comma-separated keywords related to your page.</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between border-top pt-4">
+                        <a href="{% url 'cms_app:admin_page_list' %}" class="btn btn-outline-secondary rounded-pill">
+                            <i class="fas fa-times me-2"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary rounded-pill">
+                            <i class="fas fa-{% if is_create %}plus{% else %}save{% endif %} me-2"></i>
+                            {% if is_create %}Create Page{% else %}Update Page{% endif %}
+                        </button>
+                    </div>
+                </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/cms_app/cms_app.js' %}"></script>
+<script src="{% static 'js/cms_app/wysiwyg_editor.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#{{ form.content.id_for_label }}').summernote({
+            height: 500,
+            toolbar: [
+                ['style', ['style']],
+                ['font', ['bold', 'italic', 'underline', 'clear']],
+                ['fontname', ['fontname']],
+                ['color', ['color']],
+                ['para', ['ul', 'ol', 'paragraph']],
+                ['table', ['table']],
+                ['insert', ['link', 'picture']],
+                ['view', ['fullscreen', 'codeview', 'help']]
+            ],
+            styleTags: [
+                'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote'
+            ],
+            callbacks: {
+                onImageUpload: function(files) {
+                    alert('Please use the Media Library to upload images and then insert them using the link tool.');
+                }
+            }
+        });
+
+        // Add custom styles to Summernote
+        const noteEditorFrames = document.querySelectorAll('.note-editor.note-frame');
+        noteEditorFrames.forEach(frame => {
+            frame.style.borderRadius = '0.5rem';
+            frame.style.border = '1px solid rgba(0,0,0,0.1)';
+            frame.style.overflow = 'hidden';
+        });
+
+        const noteToolbars = document.querySelectorAll('.note-toolbar');
+        noteToolbars.forEach(toolbar => {
+            toolbar.style.backgroundColor = '#f8f9fa';
+            toolbar.style.borderBottom = '1px solid rgba(0,0,0,0.1)';
+            toolbar.style.padding = '0.5rem';
+        });
+
+        const noteStatusbars = document.querySelectorAll('.note-statusbar');
+        noteStatusbars.forEach(statusbar => {
+            statusbar.style.backgroundColor = '#f8f9fa';
+            statusbar.style.borderTop = '1px solid rgba(0,0,0,0.1)';
+        });
+    });
+</script>
+{% endblock %}

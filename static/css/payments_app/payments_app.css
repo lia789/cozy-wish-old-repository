@@ -1,0 +1,547 @@
+/* Payments App Styles */
+
+/* Simple Background */
+.radial-gradient-bg {
+    background-color: #f8f9fa;
+}
+
+/* Brand Colors */
+:root {
+    --primary-color: #2F160F;
+    --primary-light: #5a3d36;
+    --primary-dark: #1a0d09;
+    --accent-color: #fae1d7;
+    --accent-light: #fdf3ef;
+    --accent-dark: #f5c7b6;
+    --text-color: #333333;
+    --text-muted: #666666;
+    --border-color: rgba(0,0,0,0.1);
+}
+
+.bg-primary-brand {
+    background-color: var(--primary-color) !important;
+    color: white;
+}
+
+.text-primary-brand {
+    color: var(--primary-color) !important;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-primary:hover, .btn-primary:focus {
+    background-color: var(--primary-light);
+    border-color: var(--primary-light);
+}
+
+.btn-outline-primary {
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-outline-primary:hover, .btn-outline-primary:focus {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+}
+
+/* Brand text styling */
+.brand-text {
+    font-family: 'Yeseva One', serif;
+    color: var(--primary-color);
+    letter-spacing: 0.5px;
+}
+
+/* Page Headers */
+.page-header {
+    margin-bottom: 2rem;
+}
+
+.page-title {
+    font-family: 'Yeseva One', serif;
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+}
+
+/* Cards */
+.card {
+    border-radius: 1rem;
+    border: none;
+    box-shadow: 0 10px 25px rgba(47, 22, 15, 0.08);
+    overflow: hidden;
+    transition: transform 0.3s, box-shadow 0.3s;
+    margin-bottom: 1.5rem;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(47, 22, 15, 0.12);
+}
+
+.card-header {
+    background-color: #fff;
+    border-bottom: 1px solid var(--border-color);
+    padding: 1rem 1.25rem;
+}
+
+.card-header.bg-primary-brand {
+    background-color: var(--primary-color) !important;
+    color: white;
+}
+
+/* Payment Method Card */
+.payment-method-card {
+    border-radius: 1rem;
+    border: none;
+    box-shadow: 0 5px 15px rgba(47, 22, 15, 0.08);
+    transition: all 0.3s ease;
+    margin-bottom: 1rem;
+}
+
+.payment-method-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(47, 22, 15, 0.12);
+}
+
+.payment-method-card .card-body {
+    padding: 1.5rem;
+}
+
+.payment-method-icon {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: var(--primary-color);
+}
+
+.payment-method-details {
+    margin-bottom: 0.5rem;
+}
+
+.payment-method-name {
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-bottom: 0.25rem;
+}
+
+.payment-method-number {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.payment-method-expiry {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.payment-method-default-badge {
+    background-color: var(--accent-color);
+    color: var(--primary-color);
+    font-weight: 500;
+    padding: 0.25rem 0.75rem;
+    border-radius: 50px;
+    font-size: 0.75rem;
+}
+
+/* Transaction Card */
+.transaction-card {
+    border-radius: 1rem;
+    border: none;
+    box-shadow: 0 5px 15px rgba(47, 22, 15, 0.08);
+    transition: all 0.3s ease;
+    margin-bottom: 1rem;
+}
+
+.transaction-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(47, 22, 15, 0.12);
+}
+
+.transaction-card .card-body {
+    padding: 1.5rem;
+}
+
+.transaction-date {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.transaction-amount {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+}
+
+.transaction-status {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+}
+
+.transaction-status-completed {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.transaction-status-pending {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.transaction-status-failed {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.transaction-status-refunded {
+    background-color: #d1ecf1;
+    color: #0c5460;
+}
+
+.transaction-details {
+    margin-bottom: 0.5rem;
+}
+
+.transaction-details-label {
+    font-weight: 500;
+    color: var(--text-color);
+    margin-bottom: 0.25rem;
+}
+
+.transaction-details-value {
+    color: var(--text-muted);
+}
+
+/* Invoice Card */
+.invoice-card {
+    border-radius: 1rem;
+    border: none;
+    box-shadow: 0 5px 15px rgba(47, 22, 15, 0.08);
+    transition: all 0.3s ease;
+    margin-bottom: 1rem;
+}
+
+.invoice-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(47, 22, 15, 0.12);
+}
+
+.invoice-card .card-body {
+    padding: 1.5rem;
+}
+
+.invoice-number {
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-bottom: 0.25rem;
+}
+
+.invoice-date {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.invoice-amount {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+}
+
+.invoice-status {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+}
+
+.invoice-status-paid {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.invoice-status-pending {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.invoice-status-cancelled {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+/* Payment Form */
+.payment-form {
+    background-color: white;
+    border-radius: 1rem;
+    box-shadow: 0 10px 25px rgba(47, 22, 15, 0.08);
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.payment-form-title {
+    font-family: 'Yeseva One', serif;
+    color: var(--primary-color);
+    margin-bottom: 1.5rem;
+}
+
+.payment-form-section {
+    margin-bottom: 2rem;
+}
+
+.payment-form-section-title {
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.payment-method-option {
+    margin-bottom: 1rem;
+}
+
+.payment-method-option-label {
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+/* Payment Confirmation */
+.payment-confirmation {
+    text-align: center;
+    padding: 3rem 2rem;
+}
+
+.payment-confirmation-icon {
+    font-size: 5rem;
+    color: #28a745;
+    margin-bottom: 1.5rem;
+}
+
+.payment-confirmation-title {
+    font-family: 'Yeseva One', serif;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+.payment-confirmation-message {
+    font-size: 1.25rem;
+    color: var(--text-muted);
+    margin-bottom: 2rem;
+}
+
+.payment-confirmation-details {
+    display: inline-block;
+    background-color: var(--accent-light);
+    padding: 1rem 2rem;
+    border-radius: 1rem;
+    margin-bottom: 2rem;
+}
+
+.payment-confirmation-detail-label {
+    font-weight: 500;
+    color: var(--text-muted);
+    margin-right: 0.5rem;
+}
+
+.payment-confirmation-detail-value {
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+/* Receipt */
+.receipt {
+    background-color: white;
+    border-radius: 1rem;
+    box-shadow: 0 10px 25px rgba(47, 22, 15, 0.08);
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.receipt-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.receipt-logo {
+    max-width: 150px;
+    margin-bottom: 1rem;
+}
+
+.receipt-title {
+    font-family: 'Yeseva One', serif;
+    color: var(--primary-color);
+    margin-bottom: 0.25rem;
+}
+
+.receipt-subtitle {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.receipt-details {
+    margin-bottom: 2rem;
+}
+
+.receipt-detail {
+    margin-bottom: 1rem;
+}
+
+.receipt-detail-label {
+    font-weight: 500;
+    color: var(--text-color);
+    margin-bottom: 0.25rem;
+}
+
+.receipt-detail-value {
+    color: var(--text-muted);
+}
+
+.receipt-total {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    text-align: right;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
+}
+
+/* Tables */
+.table {
+    margin-bottom: 0;
+}
+
+.table th {
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+.table-hover tbody tr:hover {
+    background-color: var(--accent-light);
+}
+
+/* Badges */
+.badge {
+    padding: 0.5rem 0.75rem;
+    border-radius: 50px;
+    font-weight: 500;
+}
+
+.badge-primary {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.badge-success {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.badge-warning {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.badge-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.badge-info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+}
+
+/* Forms */
+.form-control {
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-color);
+    transition: all 0.3s;
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.25rem rgba(47, 22, 15, 0.15);
+}
+
+.form-label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: var(--text-color);
+}
+
+.form-check-input:checked {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+/* Credit Card Form */
+.credit-card-form {
+    background-color: white;
+    border-radius: 1rem;
+    box-shadow: 0 10px 25px rgba(47, 22, 15, 0.08);
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.credit-card-form-title {
+    font-family: 'Yeseva One', serif;
+    color: var(--primary-color);
+    margin-bottom: 1.5rem;
+}
+
+.credit-card-icon {
+    font-size: 2rem;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 767.98px) {
+    .payment-form {
+        padding: 1.5rem;
+    }
+
+    .receipt {
+        padding: 1.5rem;
+    }
+
+    .payment-confirmation {
+        padding: 2rem 1.5rem;
+    }
+
+    .payment-confirmation-icon {
+        font-size: 4rem;
+    }
+
+    .payment-confirmation-title {
+        font-size: 1.75rem;
+    }
+
+    .payment-confirmation-message {
+        font-size: 1.1rem;
+    }
+
+    .transaction-amount {
+        font-size: 1.25rem;
+    }
+
+    .invoice-amount {
+        font-size: 1.25rem;
+    }
+}

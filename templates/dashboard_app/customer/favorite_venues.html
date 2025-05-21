@@ -1,0 +1,161 @@
+{% extends 'dashboard_app/base_dashboard.html' %}
+{% load static %}
+{% load dashboard_tags %}
+
+{% block title %}Favorite Venues - CozyWish{% endblock %}
+
+{% block dashboard_title %}Favorite Venues{% endblock %}
+
+{% block sidebar_content %}
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'dashboard_app:customer_dashboard' %}">
+        <i class="fas fa-tachometer-alt"></i> Dashboard
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'dashboard_app:customer_booking_history' %}">
+        <i class="fas fa-history"></i> Booking History
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'dashboard_app:customer_active_bookings' %}">
+        <i class="fas fa-calendar-check"></i> Active Bookings
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link active" href="{% url 'dashboard_app:customer_favorite_venues' %}">
+        <i class="fas fa-heart"></i> Favorite Venues
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'dashboard_app:customer_profile_management' %}">
+        <i class="fas fa-user-cog"></i> Profile Management
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'dashboard_app:customer_review_history' %}">
+        <i class="fas fa-star"></i> Review History
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'dashboard_app:dashboard_preferences' %}">
+        <i class="fas fa-cog"></i> Dashboard Preferences
+    </a>
+</li>
+{% endblock %}
+
+{% block dashboard_actions %}
+<div class="btn-group me-2">
+    <a href="{% url 'venues_app:venue_search' %}" class="btn btn-sm btn-primary">
+        <i class="fas fa-search"></i> Explore Venues
+    </a>
+    <a href="{% url 'booking_cart_app:cart' %}" class="btn btn-sm btn-outline-primary">
+        <i class="fas fa-shopping-cart"></i> View Cart
+    </a>
+</div>
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="card dashboard-card mb-4">
+    <div class="dashboard-card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Your Favorite Venues</h5>
+        <span class="badge bg-primary">{{ favorite_venues.count }} Venues</span>
+    </div>
+    <div class="dashboard-card-body">
+        {% if favorite_venues %}
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            {% for venue in favorite_venues %}
+            <div class="col">
+                <div class="card h-100">
+                    {% if venue.images.first %}
+                    <img src="{{ venue.images.first.image.url }}" class="card-img-top" alt="{{ venue.name }}" style="height: 180px; object-fit: cover;">
+                    {% else %}
+                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 180px;">
+                        <i class="fas fa-store fa-3x text-muted"></i>
+                    </div>
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ venue.name }}</h5>
+                        <p class="card-text text-muted">
+                            <i class="fas fa-map-marker-alt me-1"></i> {{ venue.city }}, {{ venue.state }}
+                        </p>
+
+                        <div class="mb-2">
+                            {% if venue_reviews|get_item:venue.id %}
+                            {% with review=venue_reviews|get_item:venue.id %}
+                            <div class="mb-1">
+                                {% for i in "12345" %}
+                                <i class="fas fa-star {% if forloop.counter <= review.rating %}text-warning{% else %}text-muted{% endif %}"></i>
+                                {% endfor %}
+                                <span class="ms-1">Your Rating</span>
+                            </div>
+                            {% endwith %}
+                            {% else %}
+                            <div class="text-muted small">
+                                <i class="fas fa-star-half-alt me-1"></i> You haven't reviewed this venue yet
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="badge bg-info">
+                                <i class="fas fa-calendar-check me-1"></i> {{ venue_booking_counts|get_item:venue.id }} Bookings
+                            </span>
+                            <div class="btn-group">
+                                <a href="{% url 'venues_app:venue_detail' venue.id %}" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-eye"></i> View
+                                </a>
+                                <a href="{% url 'booking_cart_app:add_to_cart' venue.id %}" class="btn btn-sm btn-outline-success">
+                                    <i class="fas fa-calendar-plus"></i> Book
+                                </a>
+                                {% if not venue_reviews|get_item:venue.id %}
+                                <a href="{% url 'review_app:add_review' venue.id %}" class="btn btn-sm btn-outline-warning">
+                                    <i class="fas fa-star"></i> Review
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="alert alert-info mb-0">
+            <i class="fas fa-info-circle me-2"></i>
+            You don't have any favorite venues yet. Book services or write reviews to add venues to your favorites.
+        </div>
+        <div class="text-center mt-4">
+            <a href="{% url 'venues_app:venue_search' %}" class="btn btn-primary">
+                <i class="fas fa-search me-1"></i> Explore Venues
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% if favorite_venues %}
+<div class="card dashboard-card">
+    <div class="dashboard-card-header">
+        <h5 class="mb-0">Recommended Venues</h5>
+    </div>
+    <div class="dashboard-card-body">
+        <div class="alert alert-info mb-0">
+            <i class="fas fa-lightbulb me-2"></i>
+            Based on your booking history and preferences, we'll show you venues you might like. Check back soon for personalized recommendations!
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Custom template filter for dictionary access
+    if (!window.getItem) {
+        window.getItem = function(dict, key) {
+            return dict[key] || null;
+        };
+    }
+</script>
+{% endblock %}

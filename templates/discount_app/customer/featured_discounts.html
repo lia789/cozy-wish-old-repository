@@ -1,0 +1,223 @@
+{% extends 'base.html' %}
+
+{% block title %}Featured Discounts - CozyWish{% endblock %}
+
+{% block extra_css %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/discount_app/discount_app.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-5 radial-gradient-bg">
+    <div class="container">
+        <h1 class="page-title mb-4"><i class="fas fa-tags me-2"></i>Featured Discounts</h1>
+
+        {% if messages %}
+        <div class="messages mb-4">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h2 class="h4 mb-0">Platform Specials</h2>
+                    <a href="{% url 'discount_app:search_discounts' %}" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-search me-1"></i> Search All Discounts
+                    </a>
+                </div>
+                <hr>
+            </div>
+        </div>
+
+        {% if featured_platform_discounts %}
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-5">
+            {% for discount in featured_platform_discounts %}
+            <div class="col">
+                <div class="card h-100 discount-card">
+                    <div class="card-header bg-primary-brand text-white">
+                        <h5 class="card-title mb-0">{{ discount.name }}</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="discount-value mb-3">
+                            {% if discount.discount_type == 'percentage' %}
+                            <span class="display-4 fw-bold text-primary-brand">{{ discount.discount_value }}%</span>
+                            <span class="text-muted">off</span>
+                            {% else %}
+                            <span class="display-4 fw-bold text-primary-brand">${{ discount.discount_value }}</span>
+                            <span class="text-muted">off</span>
+                            {% endif %}
+                        </div>
+
+                        <p class="card-text">{{ discount.description }}</p>
+
+                        {% if discount.category %}
+                        <div class="mb-3">
+                            <span class="badge bg-secondary">{{ discount.category.name }}</span>
+                        </div>
+                        {% endif %}
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">
+                                Valid until {{ discount.end_date|date:"M d, Y" }}
+                            </small>
+
+                            {% if discount.min_booking_value > 0 %}
+                            <small class="text-muted">
+                                Min. booking: ${{ discount.min_booking_value }}
+                            </small>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="card-footer bg-light">
+                        <a href="{% url 'discount_app:search_discounts' %}" class="btn btn-primary w-100">
+                            <i class="fas fa-search me-1"></i> Find Services
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i> No platform discounts are currently featured. Check back soon!
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="row mb-4">
+            <div class="col-12">
+                <h2 class="h4 mb-0">Top Venue Discounts</h2>
+                <hr>
+            </div>
+        </div>
+
+        {% if top_venue_discounts %}
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-5">
+            {% for discount in top_venue_discounts %}
+            <div class="col">
+                <div class="card h-100 discount-card">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="card-title mb-0">{{ discount.name }}</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="discount-value mb-3">
+                            {% if discount.discount_type == 'percentage' %}
+                            <span class="display-4 fw-bold text-success">{{ discount.discount_value }}%</span>
+                            <span class="text-muted">off</span>
+                            {% else %}
+                            <span class="display-4 fw-bold text-success">${{ discount.discount_value }}</span>
+                            <span class="text-muted">off</span>
+                            {% endif %}
+                        </div>
+
+                        <p class="card-text">{{ discount.description }}</p>
+
+                        <div class="mb-3">
+                            <span class="badge bg-primary-brand">{{ discount.venue.name }}</span>
+                            <span class="badge bg-secondary">{{ discount.venue.category.name }}</span>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">
+                                Valid until {{ discount.end_date|date:"M d, Y" }}
+                            </small>
+
+                            {% if discount.min_booking_value > 0 %}
+                            <small class="text-muted">
+                                Min. booking: ${{ discount.min_booking_value }}
+                            </small>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="card-footer bg-light">
+                        <a href="{% url 'venues_app:venue_detail' discount.venue.slug %}" class="btn btn-success w-100">
+                            <i class="fas fa-store me-1"></i> View Venue
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i> No venue discounts are currently available. Check back soon!
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="row mb-4">
+            <div class="col-12">
+                <h2 class="h4 mb-0">Top Service Discounts</h2>
+                <hr>
+            </div>
+        </div>
+
+        {% if top_service_discounts %}
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            {% for discount in top_service_discounts %}
+            <div class="col">
+                <div class="card h-100 discount-card">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="card-title mb-0">{{ discount.name }}</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="discount-value mb-3">
+                            {% if discount.discount_type == 'percentage' %}
+                            <span class="display-4 fw-bold text-info">{{ discount.discount_value }}%</span>
+                            <span class="text-muted">off</span>
+                            {% else %}
+                            <span class="display-4 fw-bold text-info">${{ discount.discount_value }}</span>
+                            <span class="text-muted">off</span>
+                            {% endif %}
+                        </div>
+
+                        <p class="card-text">{{ discount.description }}</p>
+
+                        <div class="mb-3">
+                            <span class="badge bg-primary-brand">{{ discount.service.venue.name }}</span>
+                            <span class="badge bg-secondary">{{ discount.service.title }}</span>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">
+                                Valid until {{ discount.end_date|date:"M d, Y" }}
+                            </small>
+
+                            <small class="text-muted">
+                                Regular price: ${{ discount.service.price }}
+                            </small>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-light">
+                        <a href="{% url 'venues_app:service_detail' discount.service.id %}" class="btn btn-info w-100 text-white">
+                            <i class="fas fa-spa me-1"></i> View Service
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="row">
+            <div class="col-12">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i> No service discounts are currently available. Check back soon!
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

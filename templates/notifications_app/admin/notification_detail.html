@@ -1,0 +1,210 @@
+{% extends 'admin_base.html' %}
+{% load static %}
+
+{% block title %}Notification Detail{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'notifications_app:admin_notification_dashboard' %}">Notification Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'notifications_app:admin_notification_list' %}">All Notifications</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Notification Detail</li>
+        </ol>
+    </nav>
+    
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-primary">Notification Details</h6>
+                    <div>
+                        {% if notification.is_active %}
+                        <form method="post" action="{% url 'notifications_app:admin_deactivate_notification' notification.id %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-warning">
+                                <i class="fas fa-ban"></i> Deactivate
+                            </button>
+                        </form>
+                        {% else %}
+                        <span class="badge bg-danger">Inactive</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <h5 class="card-title">
+                            <span class="badge bg-{{ notification.priority }} me-2">{{ notification.priority|title }}</span>
+                            {{ notification.title }}
+                        </h5>
+                        <p class="text-muted">
+                            Created: {{ notification.created_at|date:"M d, Y, g:i a" }}
+                            {% if notification.expires_at %}
+                            <span class="ms-3">Expires: {{ notification.expires_at|date:"M d, Y, g:i a" }}</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h6 class="text-muted mb-2">Category</h6>
+                        <p>
+                            {% if notification.category.icon %}
+                            <i class="fas {{ notification.category.icon }} me-2"></i>
+                            {% endif %}
+                            {{ notification.category.name }}
+                        </p>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h6 class="text-muted mb-2">Message</h6>
+                        <div class="p-3 bg-light rounded">
+                            {{ notification.message|linebreaks }}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h6 class="text-muted mb-2">Additional Information</h6>
+                        <table class="table table-bordered">
+                            <tbody>
+                                <tr>
+                                    <th style="width: 30%">System-wide</th>
+                                    <td>
+                                        {% if notification.is_system_wide %}
+                                        <span class="badge bg-success">Yes</span>
+                                        {% else %}
+                                        <span class="badge bg-secondary">No</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Status</th>
+                                    <td>
+                                        {% if notification.is_active %}
+                                        <span class="badge bg-success">Active</span>
+                                        {% else %}
+                                        <span class="badge bg-danger">Inactive</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Related Object</th>
+                                    <td>
+                                        {% if notification.content_object %}
+                                        {{ notification.content_type.model|title }}: {{ notification.content_object }}
+                                        {% else %}
+                                        <span class="text-muted">None</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Recipient Statistics</h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <h5 class="card-title">{{ total_recipients }} Recipients</h5>
+                        <div class="progress mb-2">
+                            {% if total_recipients > 0 %}
+                            <div class="progress-bar bg-success" role="progressbar" style="width: {{ read_count|floatformat:0 }}%;" aria-valuenow="{{ read_count }}" aria-valuemin="0" aria-valuemax="{{ total_recipients }}">{{ read_count }}</div>
+                            <div class="progress-bar bg-warning" role="progressbar" style="width: {{ unread_count|floatformat:0 }}%;" aria-valuenow="{{ unread_count }}" aria-valuemin="0" aria-valuemax="{{ total_recipients }}">{{ unread_count }}</div>
+                            {% else %}
+                            <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0</div>
+                            {% endif %}
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-success">{{ read_count }} Read</span>
+                            <span class="text-warning">{{ unread_count }} Unread</span>
+                        </div>
+                    </div>
+                    
+                    {% if user_notifications %}
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>Status</th>
+                                    <th>Read At</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user_notification in user_notifications %}
+                                <tr>
+                                    <td>{{ user_notification.user.email }}</td>
+                                    <td>
+                                        {% if user_notification.is_read %}
+                                        <span class="badge bg-success">Read</span>
+                                        {% else %}
+                                        <span class="badge bg-warning text-dark">Unread</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if user_notification.read_at %}
+                                        {{ user_notification.read_at|date:"M d, Y" }}
+                                        {% else %}
+                                        <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        <p class="mb-0">This notification has no recipients.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="d-flex justify-content-between">
+        <a href="{% url 'notifications_app:admin_notification_list' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Notifications
+        </a>
+        
+        {% if notification.is_system_wide and notification.is_active %}
+        <a href="{% url 'notifications_app:admin_create_announcement' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Create New Announcement
+        </a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .badge.bg-low {
+        background-color: #6c757d;
+    }
+    
+    .badge.bg-medium {
+        background-color: #0d6efd;
+    }
+    
+    .badge.bg-high {
+        background-color: #dc3545;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Upload Image{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0 rounded-4">
+                <div class="card-header bg-primary text-white rounded-top-4">
+                    <h5 class="mb-0 brand-text">Upload {{ image_type|title }} Image</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post" enctype="multipart/form-data" id="image-upload-form">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-4">
+                                    <label for="{{ form.image.id_for_label }}" class="form-label">Image</label>
+                                    {{ form.image }}
+                                    {% if form.image.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.image.errors }}
+                                    </div>
+                                    {% endif %}
+                                    <div class="form-text">
+                                        {{ form.image.help_text }}
+                                    </div>
+                                </div>
+                                
+                                {% if form.caption %}
+                                <div class="mb-4">
+                                    <label for="{{ form.caption.id_for_label }}" class="form-label">Caption</label>
+                                    {{ form.caption }}
+                                    {% if form.caption.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.caption.errors }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% endif %}
+                                
+                                {{ form.image_type }}
+                                {{ form.entity_type }}
+                                {{ form.entity_id }}
+                                
+                                <div class="d-flex justify-content-between border-top pt-4">
+                                    <a href="javascript:history.back()" class="btn btn-outline-secondary rounded-pill">
+                                        <i class="fas fa-times me-2"></i> Cancel
+                                    </a>
+                                    <button type="submit" class="btn btn-primary rounded-pill">
+                                        <i class="fas fa-upload me-2"></i> Upload Image
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="card shadow-sm border-0 rounded-4 mb-4">
+                                    <div class="card-header bg-primary text-white rounded-top-4">
+                                        <h5 class="mb-0 brand-text">Preview</h5>
+                                    </div>
+                                    <div class="card-body p-4">
+                                        <div id="image-preview" class="text-center py-5">
+                                            <i class="fas fa-image fa-5x text-muted mb-3"></i>
+                                            <p class="text-muted mb-0">Select an image to preview</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="card shadow-sm border-0 rounded-4">
+                                    <div class="card-header bg-primary text-white rounded-top-4">
+                                        <h5 class="mb-0 brand-text">Image Guidelines</h5>
+                                    </div>
+                                    <div class="card-body p-4">
+                                        {% if image_type == 'profile' %}
+                                        <h6>Profile Image Guidelines</h6>
+                                        <ul>
+                                            <li>Square format (1:1 aspect ratio)</li>
+                                            <li>Recommended size: 800x800 pixels</li>
+                                            <li>JPEG format with 85% quality</li>
+                                            <li>Maximum file size: 100KB</li>
+                                        </ul>
+                                        {% elif image_type == 'logo' %}
+                                        <h6>Logo Guidelines</h6>
+                                        <ul>
+                                            <li>PNG format with transparency</li>
+                                            <li>Recommended size: 500x500 pixels</li>
+                                            <li>Maximum file size: 150KB</li>
+                                            <li>We'll create a high-resolution version automatically</li>
+                                        </ul>
+                                        {% elif image_type == 'venue' %}
+                                        <h6>Venue Image Guidelines</h6>
+                                        <ul>
+                                            <li>3:2 aspect ratio (landscape orientation)</li>
+                                            <li>Recommended size: 1200x800 pixels</li>
+                                            <li>JPEG format with 90% quality</li>
+                                            <li>Maximum file size: 500KB</li>
+                                        </ul>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const imageInput = document.getElementById('{{ form.image.id_for_label }}');
+        const imagePreview = document.getElementById('image-preview');
+        
+        // Preview uploaded image
+        imageInput.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    imagePreview.innerHTML = `<img src="${e.target.result}" class="img-fluid rounded-3" alt="Preview">`;
+                };
+                
+                reader.readAsDataURL(this.files[0]);
+            } else {
+                imagePreview.innerHTML = `
+                    <i class="fas fa-image fa-5x text-muted mb-3"></i>
+                    <p class="text-muted mb-0">Select an image to preview</p>
+                `;
+            }
+        });
+    });
+</script>
+{% endblock %}

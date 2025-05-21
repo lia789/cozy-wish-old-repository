@@ -1,0 +1,9 @@
+email,ip_address,user_agent,timestamp,was_successful
+customer1@example.com,192.168.1.1,Mozilla/5.0 (Windows NT 10.0; Win64; x64),2023-05-10 14:29:30,False
+customer1@example.com,192.168.1.1,Mozilla/5.0 (Windows NT 10.0; Win64; x64),2023-05-10 14:30:00,True
+customer2@example.com,192.168.1.2,Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7),2023-05-11 09:15:00,True
+unknown@example.com,192.168.1.6,Mozilla/5.0 (Windows NT 10.0; Win64; x64),2023-05-11 15:45:00,False
+unknown@example.com,192.168.1.6,Mozilla/5.0 (Windows NT 10.0; Win64; x64),2023-05-11 15:46:00,False
+provider1@example.com,192.168.1.3,Mozilla/5.0 (iPhone; CPU iPhone OS 14_7_1),2023-05-12 10:45:00,True
+staff1@example.com,192.168.1.4,Mozilla/5.0 (X11; Linux x86_64),2023-05-13 08:30:00,True
+admin@example.com,192.168.1.5,Mozilla/5.0 (Windows NT 10.0; Win64; x64),2023-05-14 11:20:00,True

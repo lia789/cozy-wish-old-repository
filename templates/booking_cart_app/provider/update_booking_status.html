@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+
+{% block title %}Update Booking Status - Service Provider - CozyWish{% endblock %}
+
+{% block extra_css %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/booking_cart_app/booking_cart_app.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-5 radial-gradient-bg">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <!-- Breadcrumb -->
+                <nav aria-label="breadcrumb" class="mb-4">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{% url 'venues_app:home' %}" class="text-primary-brand">Home</a></li>
+                        <li class="breadcrumb-item"><a href="{% url 'booking_cart_app:provider_booking_list' %}" class="text-primary-brand">Bookings</a></li>
+                        <li class="breadcrumb-item"><a href="{% url 'booking_cart_app:provider_booking_detail' booking_id=booking.booking_id %}" class="text-primary-brand">Booking Details</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Update Status</li>
+                    </ol>
+                </nav>
+
+                {% if messages %}
+                <div class="mb-4">
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        <div class="d-flex align-items-center">
+                            {% if message.tags == 'success' %}
+                            <i class="fas fa-check-circle me-2"></i>
+                            {% elif message.tags == 'error' or message.tags == 'danger' %}
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            {% elif message.tags == 'warning' %}
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            {% elif message.tags == 'info' %}
+                            <i class="fas fa-info-circle me-2"></i>
+                            {% endif %}
+                            {{ message }}
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <div class="card shadow mb-4">
+                    <div class="card-header bg-primary-brand">
+                        <h4 class="mb-0"><i class="fas fa-edit me-2"></i>Update Booking Status</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-4">
+                            <h5 class="border-bottom pb-2 mb-3">Booking Information</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <h6 class="text-muted mb-1">Booking ID</h6>
+                                        <p class="fw-bold mb-0">{{ booking.booking_id }}</p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <h6 class="text-muted mb-1">Customer</h6>
+                                        <p class="mb-0">{{ booking.user.get_full_name|default:booking.user.email }}</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <h6 class="text-muted mb-1">Date</h6>
+                                        <p class="mb-0"><i class="far fa-calendar-alt me-1"></i>{{ booking.booking_date|date:"M d, Y" }}</p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <h6 class="text-muted mb-1">Current Status</h6>
+                                        <p class="mb-0">
+                                            {% if booking.status == 'pending' %}
+                                            <span class="booking-status booking-status-pending">Pending</span>
+                                            {% elif booking.status == 'confirmed' %}
+                                            <span class="booking-status booking-status-confirmed">Confirmed</span>
+                                            {% elif booking.status == 'cancelled' %}
+                                            <span class="booking-status booking-status-cancelled">Cancelled</span>
+                                            {% elif booking.status == 'completed' %}
+                                            <span class="booking-status booking-status-completed">Completed</span>
+                                            {% elif booking.status == 'disputed' %}
+                                            <span class="booking-status booking-status-disputed">Disputed</span>
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <h5 class="border-bottom pb-2 mb-3">New Status</h5>
+                                <div class="d-flex flex-column gap-3">
+                                    <div class="form-check p-3 border rounded {% if booking.status == 'pending' %}bg-light{% endif %}">
+                                        <input class="form-check-input" type="radio" name="status" id="status_pending" value="pending" {% if booking.status == 'pending' %}checked{% endif %}>
+                                        <label class="form-check-label" for="status_pending">
+                                            <div class="d-flex align-items-center">
+                                                <span class="booking-status booking-status-pending me-2">Pending</span>
+                                                <span>Booking is awaiting confirmation</span>
+                                            </div>
+                                        </label>
+                                    </div>
+                                    <div class="form-check p-3 border rounded {% if booking.status == 'confirmed' %}bg-light{% endif %}">
+                                        <input class="form-check-input" type="radio" name="status" id="status_confirmed" value="confirmed" {% if booking.status == 'confirmed' %}checked{% endif %}>
+                                        <label class="form-check-label" for="status_confirmed">
+                                            <div class="d-flex align-items-center">
+                                                <span class="booking-status booking-status-confirmed me-2">Confirmed</span>
+                                                <span>Booking is confirmed and scheduled</span>
+                                            </div>
+                                        </label>
+                                    </div>
+                                    <div class="form-check p-3 border rounded {% if booking.status == 'completed' %}bg-light{% endif %}">
+                                        <input class="form-check-input" type="radio" name="status" id="status_completed" value="completed" {% if booking.status == 'completed' %}checked{% endif %}>
+                                        <label class="form-check-label" for="status_completed">
+                                            <div class="d-flex align-items-center">
+                                                <span class="booking-status booking-status-completed me-2">Completed</span>
+                                                <span>Service has been provided</span>
+                                            </div>
+                                        </label>
+                                    </div>
+                                    <div class="form-check p-3 border rounded {% if booking.status == 'cancelled' %}bg-light{% endif %}">
+                                        <input class="form-check-input" type="radio" name="status" id="status_cancelled" value="cancelled" {% if booking.status == 'cancelled' %}checked{% endif %}>
+                                        <label class="form-check-label" for="status_cancelled">
+                                            <div class="d-flex align-items-center">
+                                                <span class="booking-status booking-status-cancelled me-2">Cancelled</span>
+                                                <span>Booking has been cancelled</span>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="alert alert-info mb-4">
+                                <div class="d-flex">
+                                    <i class="fas fa-info-circle me-2 mt-1"></i>
+                                    <div>
+                                        <strong>Note:</strong> Changing the booking status will notify the customer. Please ensure you select the correct status.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <a href="{% url 'booking_cart_app:provider_booking_detail' booking_id=booking.booking_id %}" class="btn btn-outline-secondary me-md-2">
+                                    <i class="fas fa-times me-2"></i>Cancel
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-2"></i>Update Status
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

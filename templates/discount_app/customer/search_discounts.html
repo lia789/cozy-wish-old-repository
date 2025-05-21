@@ -1,0 +1,261 @@
+{% extends 'base.html' %}
+
+{% block title %}Search Discounts - CozyWish{% endblock %}
+
+{% block extra_css %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/discount_app/discount_app.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-5 radial-gradient-bg">
+    <div class="container">
+        <h1 class="page-title mb-4"><i class="fas fa-search me-2"></i>Search Discounts</h1>
+
+        {% if messages %}
+        <div class="messages mb-4">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="row">
+            <div class="col-lg-3 mb-4">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary-brand text-white">
+                        <h5 class="card-title mb-0">Filter Discounts</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="get" class="discount-filter-form">
+                            <div class="mb-3">
+                                <label for="{{ filter_form.search.id_for_label }}" class="form-label">Search</label>
+                                {{ filter_form.search }}
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="{{ filter_form.discount_type.id_for_label }}" class="form-label">Discount Type</label>
+                                {{ filter_form.discount_type }}
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="{{ filter_form.min_value.id_for_label }}" class="form-label">Minimum Value</label>
+                                {{ filter_form.min_value }}
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="{{ filter_form.max_value.id_for_label }}" class="form-label">Maximum Value</label>
+                                {{ filter_form.max_value }}
+                            </div>
+
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-filter me-1"></i> Apply Filters
+                                </button>
+                            </div>
+                        </form>
+
+                        {% if request.GET %}
+                        <div class="d-grid mt-3">
+                            <a href="{% url 'discount_app:search_discounts' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-1"></i> Clear Filters
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="card shadow-sm mt-4">
+                    <div class="card-header bg-secondary text-white">
+                        <h5 class="card-title mb-0">Discount Summary</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Venue Discounts:</span>
+                            <span class="badge bg-success rounded-pill">{{ venue_discount_count }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span>Service Discounts:</span>
+                            <span class="badge bg-info rounded-pill">{{ service_discount_count }}</span>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between">
+                            <span>Total Discounts:</span>
+                            <span class="badge bg-primary-brand rounded-pill">{{ venue_discount_count|add:service_discount_count }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-9">
+                {% if discounts %}
+                <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+                    {% for discount in discounts %}
+                    <div class="col">
+                        <div class="card h-100 discount-card">
+                            {% if discount|class_name == 'VenueDiscount' %}
+                            <div class="card-header bg-primary-brand text-white">
+                                <h5 class="card-title mb-0">{{ discount.name }}</h5>
+                                <span class="badge bg-light text-primary-brand">Venue Discount</span>
+                            </div>
+                            {% else %}
+                            <div class="card-header bg-primary-brand text-white">
+                                <h5 class="card-title mb-0">{{ discount.name }}</h5>
+                                <span class="badge bg-light text-primary-brand">Service Discount</span>
+                            </div>
+                            {% endif %}
+
+                            <div class="card-body">
+                                <div class="discount-value mb-3">
+                                    {% if discount.discount_type == 'percentage' %}
+                                    <span class="display-4 fw-bold text-primary-brand">{{ discount.discount_value }}%</span>
+                                    <span class="text-muted">off</span>
+                                    {% else %}
+                                    <span class="display-4 fw-bold text-primary-brand">${{ discount.discount_value }}</span>
+                                    <span class="text-muted">off</span>
+                                    {% endif %}
+                                </div>
+
+                                <p class="card-text">{{ discount.description }}</p>
+
+                                <div class="mb-3">
+                                    {% if discount|class_name == 'VenueDiscount' %}
+                                    <span class="badge bg-primary-brand">{{ discount.venue.name }}</span>
+                                    <span class="badge bg-secondary">{{ discount.venue.category.name }}</span>
+                                    {% else %}
+                                    <span class="badge bg-primary-brand">{{ discount.service.venue.name }}</span>
+                                    <span class="badge bg-secondary">{{ discount.service.title }}</span>
+                                    {% endif %}
+                                </div>
+
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">
+                                        Valid until {{ discount.end_date|date:"M d, Y" }}
+                                    </small>
+
+                                    {% if discount|class_name == 'VenueDiscount' and discount.min_booking_value > 0 %}
+                                    <small class="text-muted">
+                                        Min. booking: ${{ discount.min_booking_value }}
+                                    </small>
+                                    {% elif discount|class_name == 'ServiceDiscount' %}
+                                    <small class="text-muted">
+                                        Regular price: ${{ discount.service.price }}
+                                    </small>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="card-footer bg-light">
+                                {% if discount|class_name == 'VenueDiscount' %}
+                                <a href="{% url 'venues_app:venue_detail' discount.venue.slug %}" class="btn btn-primary w-100">
+                                    <i class="fas fa-store me-1"></i> View Venue
+                                </a>
+                                {% else %}
+                                <a href="{% url 'venues_app:service_detail' discount.service.id %}" class="btn btn-primary w-100">
+                                    <i class="fas fa-spa me-1"></i> View Service
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                {% if discounts.has_other_pages %}
+                <nav aria-label="Page navigation" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        {% if discounts.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="First">
+                                <span aria-hidden="true">&laquo;&laquo;</span>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ discounts.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#" aria-label="First">
+                                <span aria-hidden="true">&laquo;&laquo;</span>
+                            </a>
+                        </li>
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                        {% endif %}
+
+                        {% for i in discounts.paginator.page_range %}
+                        {% if discounts.number == i %}
+                        <li class="page-item active"><a class="page-link" href="#">{{ i }}</a></li>
+                        {% elif i > discounts.number|add:'-3' and i < discounts.number|add:'3' %}
+                        <li class="page-item"><a class="page-link" href="?page={{ i }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ i }}</a></li>
+                        {% endif %}
+                        {% endfor %}
+
+                        {% if discounts.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ discounts.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ discounts.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Last">
+                                <span aria-hidden="true">&raquo;&raquo;</span>
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#" aria-label="Last">
+                                <span aria-hidden="true">&raquo;&raquo;</span>
+                            </a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+
+                {% else %}
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i> No discounts found matching your criteria. Try adjusting your filters or check back later for new offers.
+                </div>
+
+                <div class="text-center mt-4">
+                    <a href="{% url 'discount_app:featured_discounts' %}" class="btn btn-primary">
+                        <i class="fas fa-tags me-1"></i> Browse Featured Discounts
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Add Bootstrap form classes to filter form inputs
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('{{ filter_form.search.id_for_label }}');
+        const discountTypeSelect = document.getElementById('{{ filter_form.discount_type.id_for_label }}');
+        const minValueInput = document.getElementById('{{ filter_form.min_value.id_for_label }}');
+        const maxValueInput = document.getElementById('{{ filter_form.max_value.id_for_label }}');
+
+        if (searchInput) searchInput.classList.add('form-control');
+        if (discountTypeSelect) discountTypeSelect.classList.add('form-select');
+        if (minValueInput) minValueInput.classList.add('form-control');
+        if (maxValueInput) maxValueInput.classList.add('form-control');
+    });
+</script>
+{% endblock %}

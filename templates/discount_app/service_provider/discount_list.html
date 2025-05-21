@@ -1,0 +1,237 @@
+{% extends 'base.html' %}
+
+{% block title %}My Discounts{% endblock %}
+
+{% block extra_css %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/discount_app/discount_app.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-5 radial-gradient-bg">
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="page-title mb-4"><i class="fas fa-tags me-2"></i>My Discounts</h1>
+
+            {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="d-flex justify-content-between mb-4">
+                <div>
+                    <a href="{% url 'discount_app:create_venue_discount' %}" class="btn btn-primary me-2">
+                        <i class="fas fa-plus"></i> Create Venue Discount
+                    </a>
+                    <a href="{% url 'discount_app:create_service_discount' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-plus"></i> Create Service Discount
+                    </a>
+                </div>
+
+                <button class="btn btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#filterCollapse" aria-expanded="false" aria-controls="filterCollapse">
+                    <i class="fas fa-filter"></i> Filter
+                </button>
+            </div>
+
+            <div class="collapse mb-4" id="filterCollapse">
+                <div class="card card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-3">
+                            {{ filter_form.status.label_tag }}
+                            {{ filter_form.status }}
+                        </div>
+                        <div class="col-md-3">
+                            {{ filter_form.discount_type.label_tag }}
+                            {{ filter_form.discount_type }}
+                        </div>
+                        <div class="col-md-2">
+                            {{ filter_form.min_value.label_tag }}
+                            {{ filter_form.min_value }}
+                        </div>
+                        <div class="col-md-2">
+                            {{ filter_form.max_value.label_tag }}
+                            {{ filter_form.max_value }}
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary w-100">Apply</button>
+                        </div>
+                        <div class="col-12 mt-3">
+                            {{ filter_form.search.label_tag }}
+                            <div class="input-group">
+                                {{ filter_form.search }}
+                                <button class="btn btn-outline-secondary" type="submit">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            {% if discounts %}
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Type</th>
+                            <th>Value</th>
+                            <th>Applied To</th>
+                            <th>Valid Period</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for discount in discounts %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'discount_app:discount_detail' discount_type=discount|class_name|lower discount_id=discount.id %}">
+                                    {{ discount.name }}
+                                </a>
+                            </td>
+                            <td>
+                                {% if discount.discount_type == 'percentage' %}
+                                <span class="badge bg-primary-brand">Percentage</span>
+                                {% else %}
+                                <span class="badge bg-secondary">Fixed Amount</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if discount.discount_type == 'percentage' %}
+                                {{ discount.discount_value }}%
+                                {% else %}
+                                ${{ discount.discount_value }}
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if discount|class_name == 'VenueDiscount' %}
+                                <span class="badge bg-primary-brand">{{ discount.venue.name }}</span>
+                                {% else %}
+                                <span class="badge bg-success">{{ discount.service.title }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {{ discount.start_date|date:"M d, Y" }} - {{ discount.end_date|date:"M d, Y" }}
+                            </td>
+                            <td>
+                                {% if discount.get_status == 'active' %}
+                                <span class="badge bg-success">Active</span>
+                                {% elif discount.get_status == 'scheduled' %}
+                                <span class="badge bg-warning text-dark">Scheduled</span>
+                                {% elif discount.get_status == 'expired' %}
+                                <span class="badge bg-danger">Expired</span>
+                                {% endif %}
+
+                                {% if not discount.is_approved %}
+                                <span class="badge bg-secondary">Pending Approval</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group">
+                                    <a href="{% url 'discount_app:discount_detail' discount_type=discount|class_name|lower discount_id=discount.id %}" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+
+                                    {% if discount.get_status != 'expired' %}
+                                    {% if discount|class_name == 'VenueDiscount' %}
+                                    <a href="{% url 'discount_app:edit_venue_discount' discount_id=discount.id %}" class="btn btn-sm btn-outline-secondary">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    {% else %}
+                                    <a href="{% url 'discount_app:edit_service_discount' discount_id=discount.id %}" class="btn btn-sm btn-outline-secondary">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    {% endif %}
+                                    {% endif %}
+
+                                    <a href="{% url 'discount_app:delete_discount' discount_type=discount|class_name|lower discount_id=discount.id %}" class="btn btn-sm btn-outline-danger">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            {% if discounts.has_other_pages %}
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    {% if discounts.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="First">
+                            <span aria-hidden="true">&laquo;&laquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ discounts.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" aria-label="First">
+                            <span aria-hidden="true">&laquo;&laquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    {% for i in discounts.paginator.page_range %}
+                    {% if discounts.number == i %}
+                    <li class="page-item active"><a class="page-link" href="#">{{ i }}</a></li>
+                    {% elif i > discounts.number|add:'-3' and i < discounts.number|add:'3' %}
+                    <li class="page-item"><a class="page-link" href="?page={{ i }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ i }}</a></li>
+                    {% endif %}
+                    {% endfor %}
+
+                    {% if discounts.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ discounts.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ discounts.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Last">
+                            <span aria-hidden="true">&raquo;&raquo;</span>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" aria-label="Last">
+                            <span aria-hidden="true">&raquo;&raquo;</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+
+            {% else %}
+            <div class="alert alert-info">
+                <p class="mb-0">You don't have any discounts yet. Create your first discount using the buttons above.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+</div>
+{% endblock %}

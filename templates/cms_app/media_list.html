@@ -1,0 +1,384 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Media Library - CozyWish{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/cms_app/cms_app.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-12 mb-4">
+            <div class="page-header text-center">
+                <h1 class="brand-text display-4 mb-2">Media Library</h1>
+                <p class="lead text-muted">Manage your images and files</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-lg-9">
+            <!-- Action Bar -->
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+                <div class="d-flex gap-2">
+                    <a href="{% url 'cms_app:media_upload' %}" class="btn btn-primary rounded-pill">
+                        <i class="fas fa-upload me-2"></i> Upload Media
+                    </a>
+                </div>
+                <div class="d-flex">
+                    <div class="input-group">
+                        <input type="text" class="form-control media-search" placeholder="Search media...">
+                        <button class="btn btn-primary" type="button">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Filter Bar -->
+            <div class="card shadow-sm border-0 rounded-4 mb-4">
+                <div class="card-body p-3">
+                    <div class="d-flex flex-wrap gap-2">
+                        <button class="btn btn-sm btn-primary rounded-pill media-filter" data-type="all">
+                            All Media
+                        </button>
+                        <button class="btn btn-sm btn-outline-primary rounded-pill media-filter" data-type="image">
+                            Images
+                        </button>
+                        <button class="btn btn-sm btn-outline-primary rounded-pill media-filter" data-type="document">
+                            Documents
+                        </button>
+                        <button class="btn btn-sm btn-outline-primary rounded-pill media-filter" data-type="video">
+                            Videos
+                        </button>
+                        <button class="btn btn-sm btn-outline-primary rounded-pill media-filter" data-type="audio">
+                            Audio
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Bulk Actions -->
+            <div class="bulk-actions mb-4" style="display: none;">
+                <div class="alert alert-primary rounded-4 d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong><span class="selected-count">0</span> items selected</strong>
+                    </div>
+                    <div>
+                        <button class="btn btn-sm btn-danger rounded-pill bulk-delete-button">
+                            <i class="fas fa-trash-alt me-2"></i> Delete Selected
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Media Grid -->
+            <div class="alert-container mb-4"></div>
+            
+            {% if media_items %}
+            <div class="media-grid mb-4">
+                {% for item in media_items %}
+                <div class="media-item" data-media-id="{{ item.id }}" data-media-type="{{ item.file_type }}">
+                    <div class="media-preview">
+                        {% if item.file_type == 'image' %}
+                        <img src="{{ item.file.url }}" alt="{{ item.title }}">
+                        {% elif item.file_type == 'document' %}
+                        <i class="fas fa-file-alt fa-3x text-primary"></i>
+                        {% elif item.file_type == 'video' %}
+                        <i class="fas fa-file-video fa-3x text-danger"></i>
+                        {% elif item.file_type == 'audio' %}
+                        <i class="fas fa-file-audio fa-3x text-warning"></i>
+                        {% else %}
+                        <i class="fas fa-file fa-3x text-secondary"></i>
+                        {% endif %}
+                    </div>
+                    <div class="media-info">
+                        <h6 class="media-title">{{ item.title }}</h6>
+                        <div class="media-meta">
+                            <small>{{ item.file_type|title }} • {{ item.file.size|filesizeformat }}</small>
+                        </div>
+                    </div>
+                    <div class="media-actions">
+                        <a href="{{ item.file.url }}" class="btn btn-sm btn-outline-primary rounded-circle" target="_blank" title="View">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <a href="{% url 'cms_app:media_delete' item.id %}" class="btn btn-sm btn-outline-danger rounded-circle" title="Delete">
+                            <i class="fas fa-trash-alt"></i>
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Pagination -->
+            {% if media_items.paginator.num_pages > 1 %}
+            <nav aria-label="Media pagination" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if media_items.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link rounded-circle" href="?page=1{% if file_type %}&type={{ file_type }}{% endif %}" aria-label="First">
+                            <i class="fas fa-angle-double-left"></i>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link rounded-circle" href="?page={{ media_items.previous_page_number }}{% if file_type %}&type={{ file_type }}{% endif %}" aria-label="Previous">
+                            <i class="fas fa-angle-left"></i>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <a class="page-link rounded-circle" href="#" aria-label="First">
+                            <i class="fas fa-angle-double-left"></i>
+                        </a>
+                    </li>
+                    <li class="page-item disabled">
+                        <a class="page-link rounded-circle" href="#" aria-label="Previous">
+                            <i class="fas fa-angle-left"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                    
+                    {% for i in media_items.paginator.page_range %}
+                        {% if media_items.number == i %}
+                        <li class="page-item active"><a class="page-link rounded-circle" href="#">{{ i }}</a></li>
+                        {% elif i > media_items.number|add:'-3' and i < media_items.number|add:'3' %}
+                        <li class="page-item"><a class="page-link rounded-circle" href="?page={{ i }}{% if file_type %}&type={{ file_type }}{% endif %}">{{ i }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if media_items.has_next %}
+                    <li class="page-item">
+                        <a class="page-link rounded-circle" href="?page={{ media_items.next_page_number }}{% if file_type %}&type={{ file_type }}{% endif %}" aria-label="Next">
+                            <i class="fas fa-angle-right"></i>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link rounded-circle" href="?page={{ media_items.paginator.num_pages }}{% if file_type %}&type={{ file_type }}{% endif %}" aria-label="Last">
+                            <i class="fas fa-angle-double-right"></i>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <a class="page-link rounded-circle" href="#" aria-label="Next">
+                            <i class="fas fa-angle-right"></i>
+                        </a>
+                    </li>
+                    <li class="page-item disabled">
+                        <a class="page-link rounded-circle" href="#" aria-label="Last">
+                            <i class="fas fa-angle-double-right"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+            
+            {% else %}
+            <div class="text-center py-5">
+                <div class="mb-4">
+                    <i class="fas fa-photo-video fa-5x text-muted"></i>
+                </div>
+                <h3 class="brand-text mb-3">No Media Found</h3>
+                <p class="text-muted mb-4">Your media library is empty. Upload some files to get started.</p>
+                <a href="{% url 'cms_app:media_upload' %}" class="btn btn-primary rounded-pill">
+                    <i class="fas fa-upload me-2"></i> Upload Media
+                </a>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="col-lg-3">
+            <!-- Usage Stats -->
+            <div class="card shadow-sm border-0 rounded-4 mb-4">
+                <div class="card-header bg-primary text-white rounded-top-4">
+                    <h5 class="mb-0 brand-text">Media Stats</h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="mb-3">
+                        <h6 class="mb-2">Storage Used</h6>
+                        <div class="progress rounded-pill mb-2" style="height: 10px;">
+                            <div class="progress-bar bg-primary" role="progressbar" style="width: {{ storage_percentage }}%;" aria-valuenow="{{ storage_percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                        <small class="text-muted">{{ storage_used|filesizeformat }} of {{ storage_limit|filesizeformat }}</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <h6 class="mb-2">File Types</h6>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Images</span>
+                            <span class="badge bg-primary rounded-pill">{{ image_count }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Documents</span>
+                            <span class="badge bg-primary rounded-pill">{{ document_count }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Videos</span>
+                            <span class="badge bg-primary rounded-pill">{{ video_count }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span>Audio</span>
+                            <span class="badge bg-primary rounded-pill">{{ audio_count }}</span>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h6 class="mb-2">Total Files</h6>
+                        <h3 class="brand-text">{{ total_count }}</h3>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tips -->
+            <div class="card shadow-sm border-0 rounded-4 mb-4">
+                <div class="card-header bg-primary text-white rounded-top-4">
+                    <h5 class="mb-0 brand-text">Media Tips</h5>
+                </div>
+                <div class="card-body p-4">
+                    <ul class="list-unstyled mb-0">
+                        <li class="d-flex align-items-center mb-3">
+                            <div class="icon-circle bg-primary text-white rounded-circle me-3" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-image"></i>
+                            </div>
+                            <span>Optimize images before uploading</span>
+                        </li>
+                        <li class="d-flex align-items-center mb-3">
+                            <div class="icon-circle bg-primary text-white rounded-circle me-3" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-tags"></i>
+                            </div>
+                            <span>Use descriptive file names</span>
+                        </li>
+                        <li class="d-flex align-items-center mb-3">
+                            <div class="icon-circle bg-primary text-white rounded-circle me-3" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                            <span>Add alt text to images</span>
+                        </li>
+                        <li class="d-flex align-items-center">
+                            <div class="icon-circle bg-primary text-white rounded-circle me-3" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-trash-alt"></i>
+                            </div>
+                            <span>Delete unused media regularly</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Announcements -->
+            {% if announcements %}
+            <div class="card shadow-sm border-0 rounded-4 mb-4">
+                <div class="card-header bg-primary text-white rounded-top-4">
+                    <h5 class="mb-0 brand-text">Announcements</h5>
+                </div>
+                <div class="card-body p-4">
+                    {% for announcement in announcements %}
+                    <div class="alert alert-{{ announcement.announcement_type }} mb-3 rounded-3">
+                        <div class="d-flex">
+                            {% if announcement.announcement_type == 'info' %}
+                                <i class="fas fa-info-circle me-2 mt-1"></i>
+                            {% elif announcement.announcement_type == 'success' %}
+                                <i class="fas fa-check-circle me-2 mt-1"></i>
+                            {% elif announcement.announcement_type == 'warning' %}
+                                <i class="fas fa-exclamation-triangle me-2 mt-1"></i>
+                            {% elif announcement.announcement_type == 'danger' %}
+                                <i class="fas fa-exclamation-circle me-2 mt-1"></i>
+                            {% endif %}
+                            <div>
+                                <h6 class="alert-heading fw-bold">{{ announcement.title }}</h6>
+                                <p class="mb-0">{{ announcement.content }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Media Browser Modal -->
+<div class="modal fade" id="mediaBrowserModal" tabindex="-1" aria-labelledby="mediaBrowserModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title brand-text" id="mediaBrowserModalLabel">Select Media</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="media-grid">
+                            {% for item in media_items %}
+                            <div class="media-item" data-media-id="{{ item.id }}" data-media-type="{{ item.file_type }}" data-media-url="{{ item.file.url }}">
+                                <div class="media-preview">
+                                    {% if item.file_type == 'image' %}
+                                    <img src="{{ item.file.url }}" alt="{{ item.title }}">
+                                    {% elif item.file_type == 'document' %}
+                                    <i class="fas fa-file-alt fa-3x text-primary"></i>
+                                    {% elif item.file_type == 'video' %}
+                                    <i class="fas fa-file-video fa-3x text-danger"></i>
+                                    {% elif item.file_type == 'audio' %}
+                                    <i class="fas fa-file-audio fa-3x text-warning"></i>
+                                    {% else %}
+                                    <i class="fas fa-file fa-3x text-secondary"></i>
+                                    {% endif %}
+                                </div>
+                                <div class="media-info">
+                                    <h6 class="media-title">{{ item.title }}</h6>
+                                    <div class="media-meta">
+                                        <small>{{ item.file_type|title }} • {{ item.file.size|filesizeformat }}</small>
+                                    </div>
+                                </div>
+                                <div class="media-actions">
+                                    <button class="btn btn-sm btn-primary rounded-circle select-media-button" data-media-url="{{ item.file.url }}" data-media-type="{{ item.file_type }}" title="Select">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card shadow-sm border-0 rounded-4 mb-4">
+                            <div class="card-header bg-primary text-white rounded-top-4">
+                                <h5 class="mb-0 brand-text">Upload New</h5>
+                            </div>
+                            <div class="card-body p-4">
+                                <form method="post" enctype="multipart/form-data" action="{% url 'cms_app:media_upload' %}">
+                                    {% csrf_token %}
+                                    <div class="mb-3">
+                                        <label for="id_title" class="form-label">Title</label>
+                                        <input type="text" name="title" id="id_title" class="form-control" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="id_file" class="form-label">File</label>
+                                        <input type="file" name="file" id="id_file" class="form-control" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="id_description" class="form-label">Description</label>
+                                        <textarea name="description" id="id_description" class="form-control" rows="3"></textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary w-100">
+                                        <i class="fas fa-upload me-2"></i> Upload
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/cms_app/cms_app.js' %}"></script>
+<script src="{% static 'js/cms_app/media_browser.js' %}"></script>
+{% endblock %}

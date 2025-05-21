@@ -1,0 +1,388 @@
+{% extends 'base.html' %}
+
+{% block title %}Process Payment - CozyWish{% endblock %}
+
+{% block extra_css %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/payments_app/payments_app.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-5 radial-gradient-bg">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'venues_app:home' %}">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'booking_cart_app:booking_detail' booking_id=booking.booking_id %}">Booking Details</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Process Payment</li>
+                </ol>
+            </nav>
+
+            <div class="page-header">
+                <h1 class="page-title">Process Payment</h1>
+                {% if is_multi_booking %}
+                <p class="text-muted">Complete your payment to confirm your bookings from multiple venues</p>
+                {% else %}
+                <p class="text-muted">Complete your payment to confirm your booking</p>
+                {% endif %}
+            </div>
+
+            {% if is_multi_booking %}
+            <!-- Multi-booking summary -->
+            <div class="alert alert-info mb-4">
+                <div class="d-flex">
+                    <div class="me-3">
+                        <i class="fas fa-info-circle fa-2x text-primary"></i>
+                    </div>
+                    <div>
+                        <h6 class="alert-heading">Multi-Venue Checkout</h6>
+                        <p class="mb-0">You are checking out services from {{ related_bookings|length }} different venues. Each venue will create a separate booking.</p>
+                    </div>
+                </div>
+            </div>
+
+            {% for related_booking in related_bookings %}
+            <div class="card mb-4">
+                <div class="card-header bg-primary-brand d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 text-white">Booking at {{ related_booking.venue.name }}</h5>
+                    <span class="badge bg-light text-dark">Booking #{{ forloop.counter }}</span>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6>Booking ID</h6>
+                            <p>{{ related_booking.booking_id }}</p>
+                            <h6>Venue</h6>
+                            <p>{{ related_booking.venue.name }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Booking Date</h6>
+                            <p>{{ related_booking.booking_date|date:"M d, Y H:i" }}</p>
+                            <h6>Total Price</h6>
+                            <p class="fw-bold">${{ related_booking.total_price }}</p>
+                        </div>
+                    </div>
+
+                    <h6>Services</h6>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Service</th>
+                                    <th>Date</th>
+                                    <th>Time</th>
+                                    <th>Quantity</th>
+                                    <th>Price</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in related_booking.items.all %}
+                                <tr>
+                                    <td>{{ item.service_title }}</td>
+                                    <td>{{ item.date|date:"M d, Y" }}</td>
+                                    <td>{{ item.time_slot|time:"g:i A" }}</td>
+                                    <td>{{ item.quantity }}</td>
+                                    <td>${{ item.service_price }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot class="table-light">
+                                <tr>
+                                    <td colspan="4" class="text-end fw-bold">Subtotal:</td>
+                                    <td class="fw-bold">${{ related_booking.total_price }}</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <!-- Single booking summary -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary-brand">
+                    <h5 class="mb-0 text-white">Booking Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6>Booking ID</h6>
+                            <p>{{ booking.booking_id }}</p>
+                            <h6>Venue</h6>
+                            <p>{{ booking.venue.name }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Booking Date</h6>
+                            <p>{{ booking.booking_date|date:"M d, Y H:i" }}</p>
+                            <h6>Total Price</h6>
+                            <p class="fw-bold">${{ booking.total_price }}</p>
+                        </div>
+                    </div>
+
+                    <h6>Services</h6>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Service</th>
+                                    <th>Date</th>
+                                    <th>Time</th>
+                                    <th>Quantity</th>
+                                    <th>Price</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in booking.items.all %}
+                                <tr>
+                                    <td>{{ item.service_title }}</td>
+                                    <td>{{ item.date|date:"M d, Y" }}</td>
+                                    <td>{{ item.time_slot|time:"g:i A" }}</td>
+                                    <td>{{ item.quantity }}</td>
+                                    <td>${{ item.service_price }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot class="table-light">
+                                <tr>
+                                    <td colspan="4" class="text-end fw-bold">Total:</td>
+                                    <td class="fw-bold">${{ booking.total_price }}</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="card payment-form mb-4">
+                <div class="card-header bg-primary-brand">
+                    <h5 class="mb-0 text-white">Payment Information</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+
+                        <div class="payment-form-section mb-4">
+                            <h5 class="payment-form-section-title">Payment Method</h5>
+                            <div class="form-check payment-method-option mb-2">
+                                <input class="form-check-input" type="radio" name="payment_method_choice" id="new_payment_method" value="new" {% if form.payment_method_choice.value == 'new' %}checked{% endif %}>
+                                <label class="form-check-label payment-method-option-label" for="new_payment_method">
+                                    Use a new payment method
+                                </label>
+                            </div>
+                            <div class="form-check payment-method-option mb-3">
+                                <input class="form-check-input" type="radio" name="payment_method_choice" id="saved_payment_method" value="saved" {% if form.payment_method_choice.value == 'saved' %}checked{% endif %}>
+                                <label class="form-check-label payment-method-option-label" for="saved_payment_method">
+                                    Use a saved payment method
+                                </label>
+                            </div>
+                        </div>
+
+                        <div id="new_payment_method_fields" class="payment-form-section mb-4">
+                            <h5 class="payment-form-section-title">New Payment Method</h5>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="id_payment_type" class="form-label">Payment Type</label>
+                                    <select name="payment_type" id="id_payment_type" class="form-select">
+                                        <option value="">Select payment type</option>
+                                        {% for value, text in form.fields.payment_type.choices %}
+                                        <option value="{{ value }}" {% if form.payment_type.value == value %}selected{% endif %}>{{ text }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    {% if form.payment_type.errors %}
+                                    <div class="text-danger">{{ form.payment_type.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="id_name" class="form-label">Name on Card</label>
+                                    <input type="text" name="name" id="id_name" class="form-control" value="{{ form.name.value|default:'' }}">
+                                    {% if form.name.errors %}
+                                    <div class="text-danger">{{ form.name.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="id_card_number" class="form-label">Card Number</label>
+                                    <input type="text" name="card_number" id="id_card_number" class="form-control" value="{{ form.card_number.value|default:'' }}">
+                                    {% if form.card_number.errors %}
+                                    <div class="text-danger">{{ form.card_number.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label for="id_expiry_date" class="form-label">Expiry Date</label>
+                                    <input type="date" name="expiry_date" id="id_expiry_date" class="form-control" value="{{ form.expiry_date.value|date:'Y-m-d'|default:'' }}">
+                                    {% if form.expiry_date.errors %}
+                                    <div class="text-danger">{{ form.expiry_date.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label for="id_cvv" class="form-label">CVV</label>
+                                    <input type="text" name="cvv" id="id_cvv" class="form-control" value="{{ form.cvv.value|default:'' }}">
+                                    {% if form.cvv.errors %}
+                                    <div class="text-danger">{{ form.cvv.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" name="save_payment_method" id="id_save_payment_method" {% if form.save_payment_method.value %}checked{% endif %}>
+                                <label class="form-check-label" for="id_save_payment_method">
+                                    Save this payment method for future use
+                                </label>
+                            </div>
+                        </div>
+
+                        <div id="saved_payment_method_fields" class="payment-form-section mb-4">
+                            <h5 class="payment-form-section-title">Saved Payment Methods</h5>
+                            {% if form.fields.saved_payment_method.queryset.exists %}
+                            <div class="mb-3">
+                                <select name="saved_payment_method" id="id_saved_payment_method" class="form-select">
+                                    <option value="">Select a payment method</option>
+                                    {% for payment_method in form.fields.saved_payment_method.queryset %}
+                                    <option value="{{ payment_method.id }}" {% if form.saved_payment_method.value == payment_method.id %}selected{% endif %}>
+                                        {{ payment_method }} {% if payment_method.is_default %}(Default){% endif %}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                                {% if form.saved_payment_method.errors %}
+                                <div class="text-danger">{{ form.saved_payment_method.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            {% else %}
+                            <div class="alert alert-info">
+                                <div class="d-flex">
+                                    <div class="me-3">
+                                        <i class="fas fa-info-circle fa-2x text-primary"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="alert-heading">No Saved Payment Methods</h6>
+                                        <p class="mb-0">You don't have any saved payment methods. Please use a new payment method.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'booking_cart_app:booking_detail' booking_id=booking.booking_id %}" class="btn btn-outline-primary">
+                                <i class="fas fa-arrow-left me-2"></i>Back to Booking
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-credit-card me-2"></i>Pay ${{ total_amount }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card mb-4">
+                <div class="card-header bg-primary-brand">
+                    <h5 class="mb-0 text-white">Payment Summary</h5>
+                </div>
+                <div class="card-body">
+                    {% if is_multi_booking %}
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Number of Bookings:</span>
+                        <span>{{ related_bookings|length }}</span>
+                    </div>
+                    {% for related_booking in related_bookings %}
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>{{ related_booking.venue.name }}:</span>
+                        <span>${{ related_booking.total_price }}</span>
+                    </div>
+                    {% endfor %}
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Tax:</span>
+                        <span>$0.00</span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between mb-0">
+                        <span class="fw-bold">Total:</span>
+                        <span class="fw-bold">${{ total_amount }}</span>
+                    </div>
+                    {% else %}
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Subtotal:</span>
+                        <span>${{ booking.total_price }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Tax:</span>
+                        <span>$0.00</span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between mb-0">
+                        <span class="fw-bold">Total:</span>
+                        <span class="fw-bold">${{ booking.total_price }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header bg-primary-brand">
+                    <h5 class="mb-0 text-white">Payment Security</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex mb-3">
+                        <div class="me-3">
+                            <i class="fas fa-lock fa-2x text-primary-brand"></i>
+                        </div>
+                        <div>
+                            <h6>Secure Transactions</h6>
+                            <p class="mb-0">All transactions are secure and encrypted. Your credit card information is never stored on our servers.</p>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="d-flex mb-3">
+                        <div class="me-3">
+                            <i class="fas fa-shield-alt fa-2x text-primary-brand"></i>
+                        </div>
+                        <div>
+                            <h6>Privacy Protected</h6>
+                            <p class="mb-0">Your personal information is protected and will never be shared with third parties.</p>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="d-flex">
+                        <div class="me-3">
+                            <i class="fas fa-undo fa-2x text-primary-brand"></i>
+                        </div>
+                        <div>
+                            <h6>Easy Refunds</h6>
+                            <p class="mb-0">If you need to cancel, refunds are processed quickly and easily.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const newPaymentMethodRadio = document.getElementById('new_payment_method');
+        const savedPaymentMethodRadio = document.getElementById('saved_payment_method');
+        const newPaymentMethodFields = document.getElementById('new_payment_method_fields');
+        const savedPaymentMethodFields = document.getElementById('saved_payment_method_fields');
+
+        function togglePaymentMethodFields() {
+            if (newPaymentMethodRadio.checked) {
+                newPaymentMethodFields.style.display = 'block';
+                savedPaymentMethodFields.style.display = 'none';
+            } else {
+                newPaymentMethodFields.style.display = 'none';
+                savedPaymentMethodFields.style.display = 'block';
+            }
+        }
+
+        newPaymentMethodRadio.addEventListener('change', togglePaymentMethodFields);
+        savedPaymentMethodRadio.addEventListener('change', togglePaymentMethodFields);
+
+        // Initial toggle
+        togglePaymentMethodFields();
+    });
+</script>
+{% endblock %}

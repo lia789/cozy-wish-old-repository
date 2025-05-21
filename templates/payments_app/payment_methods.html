@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+
+{% block title %}Payment Methods - CozyWish{% endblock %}
+
+{% block extra_css %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/payments_app/payments_app.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-5 radial-gradient-bg">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="page-header">
+                    <h1 class="page-title">Payment Methods</h1>
+                    <p class="text-muted">Manage your saved payment methods for faster checkout</p>
+                </div>
+
+                <div class="d-flex justify-content-end mb-4">
+                    <a href="{% url 'payments_app:add_payment_method' %}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Add Payment Method
+                    </a>
+                </div>
+
+            {% if payment_methods %}
+            <div class="row">
+                {% for payment_method in payment_methods %}
+                <div class="col-lg-6 col-md-6 mb-4">
+                    <div class="card payment-method-card h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div class="payment-method-icon">
+                                    {% if payment_method.payment_type == 'credit_card' %}
+                                    <i class="far fa-credit-card"></i>
+                                    {% elif payment_method.payment_type == 'debit_card' %}
+                                    <i class="fas fa-credit-card"></i>
+                                    {% elif payment_method.payment_type == 'paypal' %}
+                                    <i class="fab fa-paypal"></i>
+                                    {% elif payment_method.payment_type == 'apple_pay' %}
+                                    <i class="fab fa-apple-pay"></i>
+                                    {% elif payment_method.payment_type == 'google_pay' %}
+                                    <i class="fab fa-google-pay"></i>
+                                    {% else %}
+                                    <i class="fas fa-money-bill-wave"></i>
+                                    {% endif %}
+                                </div>
+                                {% if payment_method.is_default %}
+                                <span class="payment-method-default-badge">Default</span>
+                                {% endif %}
+                            </div>
+
+                            <div class="payment-method-details">
+                                <h5 class="payment-method-name">{{ payment_method.get_payment_type_display }}</h5>
+                                <p class="payment-method-number mb-1">•••• {{ payment_method.last_four }}</p>
+                                <p class="payment-method-expiry mb-3">{% if payment_method.expiry_date %}Expires: {{ payment_method.expiry_date|date:"m/Y" }}{% endif %}</p>
+                                <p class="text-muted mb-0">{{ payment_method.name }}</p>
+                            </div>
+
+                            <div class="d-flex justify-content-between mt-4">
+                                {% if not payment_method.is_default %}
+                                <form method="post" action="{% url 'payments_app:set_default_payment_method' payment_method_id=payment_method.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-check-circle me-1"></i> Set as Default
+                                    </button>
+                                </form>
+                                {% else %}
+                                <div></div>
+                                {% endif %}
+
+                                <div class="btn-group">
+                                    <a href="{% url 'payments_app:edit_payment_method' payment_method_id=payment_method.id %}" class="btn btn-sm btn-outline-primary me-2">
+                                        <i class="fas fa-edit me-1"></i> Edit
+                                    </a>
+                                    <a href="{% url 'payments_app:delete_payment_method' payment_method_id=payment_method.id %}" class="btn btn-sm btn-outline-danger">
+                                        <i class="fas fa-trash me-1"></i> Delete
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>
+                You don't have any saved payment methods. Add a payment method to make checkout faster.
+            </div>
+            {% endif %}
+
+            <div class="d-flex justify-content-between">
+                <a href="{% url 'venues_app:home' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Home
+                </a>
+                <a href="{% url 'payments_app:payment_history' %}" class="btn btn-primary">
+                    <i class="fas fa-history me-2"></i>View Payment History
+                </a>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Secure Payments</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-3">
+                        <i class="fas fa-lock me-2 text-success"></i>
+                        Your payment information is secure and encrypted.
+                    </p>
+                    <p class="mb-3">
+                        <i class="fas fa-shield-alt me-2 text-success"></i>
+                        We do not store your full card details.
+                    </p>
+                    <p class="mb-0">
+                        <i class="fas fa-credit-card me-2 text-success"></i>
+                        Set a default payment method for faster checkout.
+                    </p>
+                </div>
+            </div>
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Accepted Payment Methods</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex flex-wrap justify-content-between">
+                        <div class="mb-3 text-center" style="width: 70px;">
+                            <i class="fab fa-cc-visa fa-2x mb-2"></i>
+                            <p class="small mb-0">Visa</p>
+                        </div>
+                        <div class="mb-3 text-center" style="width: 70px;">
+                            <i class="fab fa-cc-mastercard fa-2x mb-2"></i>
+                            <p class="small mb-0">Mastercard</p>
+                        </div>
+                        <div class="mb-3 text-center" style="width: 70px;">
+                            <i class="fab fa-cc-amex fa-2x mb-2"></i>
+                            <p class="small mb-0">Amex</p>
+                        </div>
+                        <div class="mb-3 text-center" style="width: 70px;">
+                            <i class="fab fa-cc-paypal fa-2x mb-2"></i>
+                            <p class="small mb-0">PayPal</p>
+                        </div>
+                        <div class="mb-3 text-center" style="width: 70px;">
+                            <i class="fab fa-apple-pay fa-2x mb-2"></i>
+                            <p class="small mb-0">Apple Pay</p>
+                        </div>
+                        <div class="mb-3 text-center" style="width: 70px;">
+                            <i class="fab fa-google-pay fa-2x mb-2"></i>
+                            <p class="small mb-0">Google Pay</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,83 @@
+{% load i18n %}{% load static %}<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% trans "Django Debug Toolbar" %}</title>
+    <link rel="stylesheet" href="{% static 'debug_toolbar/css/print.css' %}" media="print">
+    <link rel="stylesheet" href="{% static 'debug_toolbar/css/toolbar.css' %}">
+    {% if toolbar.config.JQUERY_URL %}
+    <script src="{{ toolbar.config.JQUERY_URL }}"></script>
+    <script src="{% static 'debug_toolbar/js/legacy_toolbar.js' %}"></script>
+    {% else %}
+    <script src="{% static 'debug_toolbar/js/toolbar.js' %}"></script>
+    {% endif %}
+    <script id="djDebugBaseTemplate" type="text/template">
+        <div id="djDebug" class="djdt-hidden" dir="ltr"
+             data-store-id="{{ toolbar.store_id }}" data-render-panel-url="{% url 'djdt:render_panel' %}"
+             {{ toolbar.config.ROOT_TAG_EXTRA_ATTRS|safe }}>
+            <div class="djdt-hidden" id="djDebugToolbar">
+                <ul id="djDebugPanelList">
+                    {% if toolbar.config.RENDER_PANELS %}
+                        {% for panel in toolbar.panels %}
+                            <li class="djDebugPanelButton">
+                                {% if panel.has_content and panel.enabled %}
+                                    <a href="#" class="djDebugPanelLink" data-panel-id="{{ panel.panel_id }}">
+                                        <span class="djdt-label">{{ panel.title }}</span>
+                                        {% if panel.nav_subtitle %}
+                                            <span class="djdt-subtitle">{{ panel.nav_subtitle }}</span>
+                                        {% endif %}
+                                    </a>
+                                {% else %}
+                                    <div class="djDebugPanelLink djdt-contentless{% if not panel.enabled %} djdt-disabled{% endif %}">
+                                        <span class="djdt-label">{{ panel.title }}</span>
+                                        {% if panel.nav_subtitle %}
+                                            <span class="djdt-subtitle">{{ panel.nav_subtitle }}</span>
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                    {% else %}
+                        <li id="djDebugButton">
+                            <a href="#" title="{% trans "Debug information" %}" class="djdt-button">
+                                <span class="djdt-label">{% trans "Django Debug Toolbar" %}</span>
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+            <div class="djdt-hidden" id="djDebugToolbarHandle" data-toggles-url="{% url 'djdt:render_panel' %}">
+                {% if toolbar.config.SHOW_COLLAPSED %}
+                    <span title="{% trans "Show toolbar" %}" class="djdt-button djdt-button-show"></span>
+                    <span title="{% trans "Close toolbar" %}" class="djdt-button djdt-button-close"></span>
+                {% else %}
+                    <span title="{% trans "Hide toolbar" %}" class="djdt-button djdt-button-hide"></span>
+                    <span title="{% trans "Close toolbar" %}" class="djdt-button djdt-button-close"></span>
+                {% endif %}
+            </div>
+            <div class="djdt-hidden" id="djDebugContent"></div>
+        </div>
+    </script>
+</head>
+<body>
+    {% for panel in toolbar.panels %}
+        {% if panel.has_content and panel.enabled %}
+            <div id="{{ panel.panel_id }}" class="djdt-panelContent djdt-hidden">
+                <div class="djDebugPanelTitle">
+                    <button type="button" class="djDebugClose">×</button>
+                    <h3>{{ panel.title|safe }}</h3>
+                </div>
+                <div class="djDebugPanelContent">
+                    {% if toolbar.config.RENDER_PANELS %}
+                        {{ panel.content|safe }}
+                    {% else %}
+                        <div class="djdt-loader"></div>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+    {% endfor %}
+    <div id="djDebugWindow" class="djdt-panelContent djdt-hidden"></div>
+</body>
+</html>

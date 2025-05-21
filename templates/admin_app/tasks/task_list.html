@@ -1,0 +1,376 @@
+{% extends 'admin_app/base.html' %}
+
+{% block admin_content %}
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Task Management</h1>
+    <div>
+        <a href="{% url 'admin_app:task_create' %}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+            <i class="fas fa-plus fa-sm text-white-50 me-1"></i> Create Task
+        </a>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">Filters</h6>
+    </div>
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-3">
+                <label for="status" class="form-label">Status</label>
+                <select name="status" id="status" class="form-select">
+                    <option value="" {% if not status %}selected{% endif %}>All Statuses</option>
+                    {% for status_value, status_label in status_choices %}
+                    <option value="{{ status_value }}" {% if status == status_value %}selected{% endif %}>{{ status_label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="priority" class="form-label">Priority</label>
+                <select name="priority" id="priority" class="form-select">
+                    <option value="" {% if not priority %}selected{% endif %}>All Priorities</option>
+                    {% for priority_value, priority_label in priority_choices %}
+                    <option value="{{ priority_value }}" {% if priority == priority_value %}selected{% endif %}>{{ priority_label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="assigned_to" class="form-label">Assigned To</label>
+                <select name="assigned_to" id="assigned_to" class="form-select">
+                    <option value="" {% if not assigned_to %}selected{% endif %}>All Assignees</option>
+                    <option value="me" {% if assigned_to == 'me' %}selected{% endif %}>Assigned to Me</option>
+                    {% for user in admin_users %}
+                    <option value="{{ user.id }}" {% if assigned_to == user.id|stringformat:"i" %}selected{% endif %}>{{ user.email }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="created_by" class="form-label">Created By</label>
+                <select name="created_by" id="created_by" class="form-select">
+                    <option value="" {% if not created_by %}selected{% endif %}>All Creators</option>
+                    <option value="me" {% if created_by == 'me' %}selected{% endif %}>Created by Me</option>
+                    {% for user in admin_users %}
+                    <option value="{{ user.id }}" {% if created_by == user.id|stringformat:"i" %}selected{% endif %}>{{ user.email }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="due_date" class="form-label">Due Date</label>
+                <select name="due_date" id="due_date" class="form-select">
+                    <option value="" {% if not due_date_filter %}selected{% endif %}>All Due Dates</option>
+                    <option value="overdue" {% if due_date_filter == 'overdue' %}selected{% endif %}>Overdue</option>
+                    <option value="today" {% if due_date_filter == 'today' %}selected{% endif %}>Due Today</option>
+                    <option value="tomorrow" {% if due_date_filter == 'tomorrow' %}selected{% endif %}>Due Tomorrow</option>
+                    <option value="this_week" {% if due_date_filter == 'this_week' %}selected{% endif %}>Due This Week</option>
+                    <option value="next_week" {% if due_date_filter == 'next_week' %}selected{% endif %}>Due Next Week</option>
+                    <option value="no_due_date" {% if due_date_filter == 'no_due_date' %}selected{% endif %}>No Due Date</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="q" class="form-label">Search</label>
+                <input type="text" name="q" id="q" class="form-control" placeholder="Search by title, description..." value="{{ search_query }}">
+            </div>
+            <div class="col-md-6 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary me-2">Apply Filters</button>
+                <a href="{% url 'admin_app:task_list' %}" class="btn btn-secondary">Reset</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Tasks Table -->
+<div class="card shadow mb-4">
+    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+        <h6 class="m-0 font-weight-bold text-primary">Tasks ({{ total_count }})</h6>
+    </div>
+    <div class="card-body">
+        {% if tasks %}
+        <div class="table-responsive">
+            <table class="table table-bordered" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Assigned To</th>
+                        <th>Priority</th>
+                        <th>Status</th>
+                        <th>Due Date</th>
+                        <th>Created</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for task in tasks %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'admin_app:task_detail' task_id=task.id %}">
+                                {{ task.title }}
+                            </a>
+                        </td>
+                        <td>
+                            {% if task.assigned_to %}
+                            {{ task.assigned_to.email }}
+                            {% else %}
+                            <span class="text-muted">Unassigned</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if task.priority == 'low' %}
+                            <span class="badge bg-success">Low</span>
+                            {% elif task.priority == 'medium' %}
+                            <span class="badge bg-info">Medium</span>
+                            {% elif task.priority == 'high' %}
+                            <span class="badge bg-warning">High</span>
+                            {% elif task.priority == 'urgent' %}
+                            <span class="badge bg-danger">Urgent</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if task.status == 'pending' %}
+                            <span class="badge bg-warning">Pending</span>
+                            {% elif task.status == 'in_progress' %}
+                            <span class="badge bg-info">In Progress</span>
+                            {% elif task.status == 'completed' %}
+                            <span class="badge bg-success">Completed</span>
+                            {% elif task.status == 'cancelled' %}
+                            <span class="badge bg-danger">Cancelled</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if task.due_date %}
+                            <span class="{% if task.is_overdue and task.status != 'completed' %}text-danger{% endif %}">
+                                {{ task.due_date|date:"M d, Y" }}
+                                {% if task.is_overdue and task.status != 'completed' %}
+                                <i class="fas fa-exclamation-circle" title="Overdue"></i>
+                                {% endif %}
+                            </span>
+                            {% else %}
+                            <span class="text-muted">No due date</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ task.created_at|date:"M d, Y" }}</td>
+                        <td>
+                            <div class="btn-group">
+                                <a href="{% url 'admin_app:task_detail' task_id=task.id %}" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{% url 'admin_app:task_edit' task_id=task.id %}" class="btn btn-sm btn-info">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{% url 'admin_app:task_delete' task_id=task.id %}" class="btn btn-sm btn-danger">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Pagination -->
+        {% if tasks.paginator.num_pages > 1 %}
+        <nav aria-label="Page navigation" class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% if tasks.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1{% if request.GET.urlencode %}&{{ request.GET.urlencode }}{% endif %}" aria-label="First">
+                        <span aria-hidden="true">&laquo;&laquo;</span>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ tasks.previous_page_number }}{% if request.GET.urlencode %}&{{ request.GET.urlencode }}{% endif %}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <a class="page-link" href="#" aria-label="First">
+                        <span aria-hidden="true">&laquo;&laquo;</span>
+                    </a>
+                </li>
+                <li class="page-item disabled">
+                    <a class="page-link" href="#" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                {% endif %}
+                
+                {% for i in tasks.paginator.page_range %}
+                    {% if tasks.number == i %}
+                    <li class="page-item active"><a class="page-link" href="#">{{ i }}</a></li>
+                    {% elif i > tasks.number|add:'-3' and i < tasks.number|add:'3' %}
+                    <li class="page-item"><a class="page-link" href="?page={{ i }}{% if request.GET.urlencode %}&{{ request.GET.urlencode }}{% endif %}">{{ i }}</a></li>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if tasks.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ tasks.next_page_number }}{% if request.GET.urlencode %}&{{ request.GET.urlencode }}{% endif %}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ tasks.paginator.num_pages }}{% if request.GET.urlencode %}&{{ request.GET.urlencode }}{% endif %}" aria-label="Last">
+                        <span aria-hidden="true">&raquo;&raquo;</span>
+                    </a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <a class="page-link" href="#" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+                <li class="page-item disabled">
+                    <a class="page-link" href="#" aria-label="Last">
+                        <span aria-hidden="true">&raquo;&raquo;</span>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+        
+        {% else %}
+        <div class="text-center py-4">
+            <i class="fas fa-tasks fa-3x text-muted mb-3"></i>
+            <p class="mb-0">No tasks found matching your criteria.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Task Stats -->
+<div class="row">
+    <!-- Status Chart -->
+    <div class="col-xl-6 col-lg-6">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Task Status Distribution</h6>
+            </div>
+            <div class="card-body">
+                <div class="chart-pie pt-4 pb-2">
+                    <canvas id="statusChart"></canvas>
+                </div>
+                <div class="mt-4 text-center small">
+                    <span class="me-2">
+                        <i class="fas fa-circle text-warning"></i> Pending
+                    </span>
+                    <span class="me-2">
+                        <i class="fas fa-circle text-info"></i> In Progress
+                    </span>
+                    <span class="me-2">
+                        <i class="fas fa-circle text-success"></i> Completed
+                    </span>
+                    <span class="me-2">
+                        <i class="fas fa-circle text-danger"></i> Cancelled
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Priority Chart -->
+    <div class="col-xl-6 col-lg-6">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Task Priority Distribution</h6>
+            </div>
+            <div class="card-body">
+                <div class="chart-pie pt-4 pb-2">
+                    <canvas id="priorityChart"></canvas>
+                </div>
+                <div class="mt-4 text-center small">
+                    <span class="me-2">
+                        <i class="fas fa-circle text-success"></i> Low
+                    </span>
+                    <span class="me-2">
+                        <i class="fas fa-circle text-info"></i> Medium
+                    </span>
+                    <span class="me-2">
+                        <i class="fas fa-circle text-warning"></i> High
+                    </span>
+                    <span class="me-2">
+                        <i class="fas fa-circle text-danger"></i> Urgent
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block admin_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Status Chart
+        const statusData = {{ status_data|safe }};
+        const statusCtx = document.getElementById('statusChart').getContext('2d');
+        new Chart(statusCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Pending', 'In Progress', 'Completed', 'Cancelled'],
+                datasets: [{
+                    data: [
+                        statusData.pending,
+                        statusData.in_progress,
+                        statusData.completed,
+                        statusData.cancelled
+                    ],
+                    backgroundColor: [
+                        '#f6c23e', '#36b9cc', '#1cc88a', '#e74a3b'
+                    ],
+                    hoverBackgroundColor: [
+                        '#dda20a', '#2c9faf', '#17a673', '#be2617'
+                    ],
+                    hoverBorderColor: "rgba(234, 236, 244, 1)",
+                }]
+            },
+            options: {
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                cutout: '70%',
+            }
+        });
+        
+        // Priority Chart
+        const priorityData = {{ priority_data|safe }};
+        const priorityCtx = document.getElementById('priorityChart').getContext('2d');
+        new Chart(priorityCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Low', 'Medium', 'High', 'Urgent'],
+                datasets: [{
+                    data: [
+                        priorityData.low,
+                        priorityData.medium,
+                        priorityData.high,
+                        priorityData.urgent
+                    ],
+                    backgroundColor: [
+                        '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b'
+                    ],
+                    hoverBackgroundColor: [
+                        '#17a673', '#2c9faf', '#dda20a', '#be2617'
+                    ],
+                    hoverBorderColor: "rgba(234, 236, 244, 1)",
+                }]
+            },
+            options: {
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                cutout: '70%',
+            }
+        });
+    });
+</script>
+{% endblock %}

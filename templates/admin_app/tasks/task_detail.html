@@ -1,0 +1,287 @@
+{% extends 'admin_app/base.html' %}
+
+{% block admin_content %}
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Task Details</h1>
+    <div>
+        <a href="{% url 'admin_app:task_edit' task_id=task.id %}" class="d-none d-sm-inline-block btn btn-sm btn-info shadow-sm me-2">
+            <i class="fas fa-edit fa-sm text-white-50 me-1"></i> Edit Task
+        </a>
+        <a href="{% url 'admin_app:task_delete' task_id=task.id %}" class="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm me-2">
+            <i class="fas fa-trash fa-sm text-white-50 me-1"></i> Delete Task
+        </a>
+        <a href="{% url 'admin_app:task_list' %}" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm">
+            <i class="fas fa-arrow-left fa-sm text-white-50 me-1"></i> Back to Tasks
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Task Information</h6>
+            </div>
+            <div class="card-body">
+                <h4 class="mb-3">{{ task.title }}</h4>
+                
+                <div class="mb-4">
+                    <h6 class="font-weight-bold">Description</h6>
+                    <div class="card">
+                        <div class="card-body">
+                            {{ task.description|linebreaks }}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h6 class="font-weight-bold">Status</h6>
+                        <form method="post" action="{% url 'admin_app:task_update_status' task_id=task.id %}" class="d-flex align-items-center">
+                            {% csrf_token %}
+                            <select name="status" class="form-select me-2">
+                                <option value="pending" {% if task.status == 'pending' %}selected{% endif %}>Pending</option>
+                                <option value="in_progress" {% if task.status == 'in_progress' %}selected{% endif %}>In Progress</option>
+                                <option value="completed" {% if task.status == 'completed' %}selected{% endif %}>Completed</option>
+                                <option value="cancelled" {% if task.status == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                            </select>
+                            <button type="submit" class="btn btn-primary">Update</button>
+                        </form>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="font-weight-bold">Priority</h6>
+                        <div>
+                            {% if task.priority == 'low' %}
+                            <span class="badge bg-success">Low</span>
+                            {% elif task.priority == 'medium' %}
+                            <span class="badge bg-info">Medium</span>
+                            {% elif task.priority == 'high' %}
+                            <span class="badge bg-warning">High</span>
+                            {% elif task.priority == 'urgent' %}
+                            <span class="badge bg-danger">Urgent</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h6 class="font-weight-bold">Due Date</h6>
+                        <div>
+                            {% if task.due_date %}
+                            <span class="{% if task.is_overdue and task.status != 'completed' %}text-danger{% endif %}">
+                                {{ task.due_date|date:"F j, Y" }}
+                                {% if task.is_overdue and task.status != 'completed' %}
+                                <i class="fas fa-exclamation-circle" title="Overdue"></i>
+                                {% endif %}
+                            </span>
+                            {% else %}
+                            <span class="text-muted">No due date</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="font-weight-bold">Created</h6>
+                        <div>{{ task.created_at|date:"F j, Y, g:i a" }}</div>
+                    </div>
+                </div>
+                
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h6 class="font-weight-bold">Created By</h6>
+                        <div>
+                            <a href="{% url 'admin_app:user_detail' user_id=task.created_by.id %}">
+                                {{ task.created_by.email }}
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="font-weight-bold">Assigned To</h6>
+                        <div>
+                            {% if task.assigned_to %}
+                            <a href="{% url 'admin_app:user_detail' user_id=task.assigned_to.id %}">
+                                {{ task.assigned_to.email }}
+                            </a>
+                            {% else %}
+                            <span class="text-muted">Unassigned</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <h6 class="font-weight-bold">Last Updated</h6>
+                    <div>{{ task.updated_at|date:"F j, Y, g:i a" }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Task Timeline</h6>
+            </div>
+            <div class="card-body">
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-item-marker">
+                            <div class="timeline-item-marker-text">{{ task.created_at|date:"M d" }}</div>
+                            <div class="timeline-item-marker-indicator bg-primary">
+                                <i class="fas fa-plus"></i>
+                            </div>
+                        </div>
+                        <div class="timeline-item-content">
+                            <p class="mb-0">Task created by {{ task.created_by.email }}</p>
+                            <div class="text-muted small">{{ task.created_at|date:"g:i a" }}</div>
+                        </div>
+                    </div>
+                    
+                    {% if task_history %}
+                    {% for history in task_history %}
+                    <div class="timeline-item">
+                        <div class="timeline-item-marker">
+                            <div class="timeline-item-marker-text">{{ history.timestamp|date:"M d" }}</div>
+                            <div class="timeline-item-marker-indicator bg-info">
+                                <i class="fas fa-edit"></i>
+                            </div>
+                        </div>
+                        <div class="timeline-item-content">
+                            <p class="mb-0">{{ history.description }}</p>
+                            <div class="text-muted small">{{ history.timestamp|date:"g:i a" }} by {{ history.user.email }}</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+                    
+                    {% if task.status == 'completed' %}
+                    <div class="timeline-item">
+                        <div class="timeline-item-marker">
+                            <div class="timeline-item-marker-text">{{ task.updated_at|date:"M d" }}</div>
+                            <div class="timeline-item-marker-indicator bg-success">
+                                <i class="fas fa-check"></i>
+                            </div>
+                        </div>
+                        <div class="timeline-item-content">
+                            <p class="mb-0">Task marked as completed</p>
+                            <div class="text-muted small">{{ task.updated_at|date:"g:i a" }}</div>
+                        </div>
+                    </div>
+                    {% elif task.status == 'cancelled' %}
+                    <div class="timeline-item">
+                        <div class="timeline-item-marker">
+                            <div class="timeline-item-marker-text">{{ task.updated_at|date:"M d" }}</div>
+                            <div class="timeline-item-marker-indicator bg-danger">
+                                <i class="fas fa-times"></i>
+                            </div>
+                        </div>
+                        <div class="timeline-item-content">
+                            <p class="mb-0">Task cancelled</p>
+                            <div class="text-muted small">{{ task.updated_at|date:"g:i a" }}</div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Quick Actions</h6>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    {% if task.status != 'completed' %}
+                    <form method="post" action="{% url 'admin_app:task_mark_completed' task_id=task.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success w-100 mb-2">
+                            <i class="fas fa-check me-1"></i> Mark as Completed
+                        </button>
+                    </form>
+                    {% endif %}
+                    
+                    {% if task.status != 'cancelled' and task.status != 'completed' %}
+                    <form method="post" action="{% url 'admin_app:task_mark_cancelled' task_id=task.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger w-100 mb-2">
+                            <i class="fas fa-times me-1"></i> Cancel Task
+                        </button>
+                    </form>
+                    {% endif %}
+                    
+                    <a href="{% url 'admin_app:task_edit' task_id=task.id %}" class="btn btn-info w-100 mb-2">
+                        <i class="fas fa-edit me-1"></i> Edit Task
+                    </a>
+                    
+                    <a href="{% url 'admin_app:task_create' %}?clone={{ task.id }}" class="btn btn-primary w-100">
+                        <i class="fas fa-clone me-1"></i> Clone Task
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block admin_js %}
+<style>
+    .timeline {
+        position: relative;
+        padding-left: 1.5rem;
+    }
+    
+    .timeline:before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0.75rem;
+        height: 100%;
+        width: 1px;
+        background-color: #e3e6f0;
+    }
+    
+    .timeline-item {
+        position: relative;
+        padding-bottom: 1.5rem;
+    }
+    
+    .timeline-item:last-child {
+        padding-bottom: 0;
+    }
+    
+    .timeline-item-marker {
+        position: absolute;
+        left: -1.5rem;
+        width: 1.5rem;
+    }
+    
+    .timeline-item-marker-text {
+        position: absolute;
+        width: 6rem;
+        color: #858796;
+        font-size: 0.7rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        text-align: right;
+        right: 100%;
+        top: 0.25rem;
+        padding-right: 0.5rem;
+    }
+    
+    .timeline-item-marker-indicator {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 1.5rem;
+        height: 1.5rem;
+        border-radius: 100%;
+        color: #fff;
+        font-size: 0.675rem;
+    }
+    
+    .timeline-item-content {
+        padding-left: 0.75rem;
+        padding-top: 0.25rem;
+    }
+</style>
+{% endblock %}

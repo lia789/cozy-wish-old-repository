@@ -1,0 +1,246 @@
+{% extends 'dashboard_app/base_dashboard.html' %}
+{% load static %}
+{% load dashboard_tags %}
+
+{% block title %}Service Provider Dashboard - CozyWish{% endblock %}
+
+{% block dashboard_title %}Service Provider Dashboard{% endblock %}
+
+{% block sidebar_content %}
+<!-- Main Navigation -->
+<li class="nav-item">
+    <a class="nav-link active" href="{% url 'dashboard_app:provider_dashboard' %}">
+        <i class="fas fa-home"></i> Dashboard
+    </a>
+</li>
+
+<!-- Venue Management Section -->
+<div class="sidebar-section-header">Venue Management</div>
+{% if venues %}
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'venues_app:provider_venue_detail' slug=venues.0.slug %}">
+        <i class="fas fa-edit"></i> Manage Venue
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'venues_app:service_create' %}">
+        <i class="fas fa-plus"></i> Add Service
+    </a>
+</li>
+{% else %}
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'venues_app:create_venue' %}">
+        <i class="fas fa-plus"></i> Create Venue
+    </a>
+</li>
+{% endif %}
+
+<!-- Bookings Section -->
+<div class="sidebar-section-header">Bookings</div>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'dashboard_app:provider_todays_bookings' %}">
+        <i class="fas fa-calendar"></i> Today's Bookings
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'booking_cart_app:provider_booking_list' %}">
+        <i class="fas fa-list"></i> All Bookings
+    </a>
+</li>
+
+<!-- Analytics Section -->
+<div class="sidebar-section-header">Analytics</div>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'dashboard_app:provider_revenue_reports' %}">
+        <i class="fas fa-chart-line"></i> Revenue Reports
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'dashboard_app:provider_service_performance' %}">
+        <i class="fas fa-chart-bar"></i> Service Performance
+    </a>
+</li>
+
+<!-- Team Section -->
+<div class="sidebar-section-header">Team</div>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'dashboard_app:provider_team_management' %}">
+        <i class="fas fa-users"></i> Team Management
+    </a>
+</li>
+{% endblock %}
+
+{% block dashboard_actions %}
+<div class="btn-group me-2">
+    {% if not venues %}
+    <a href="{% url 'venues_app:create_venue' %}" class="btn btn-sm btn-primary">
+        <i class="fas fa-plus"></i> Add Venue
+    </a>
+    {% endif %}
+    {% if venues %}
+    <a href="{% url 'venues_app:service_create' %}" class="btn btn-sm btn-outline-primary">
+        <i class="fas fa-spa"></i> Add Service
+    </a>
+    <a href="{% url 'venues_app:provider_venue_detail' slug=venues.0.slug %}" class="btn btn-sm btn-outline-primary">
+        <i class="fas fa-edit"></i> Manage Venue
+    </a>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="dashboard-stat">
+            <div class="d-flex align-items-center justify-content-center mb-2">
+                <i class="fas fa-calendar-check text-primary me-2" style="font-size: 1.5rem;"></i>
+                <div class="dashboard-stat-value">{{ total_bookings }}</div>
+            </div>
+            <div class="dashboard-stat-label">Total Bookings</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="dashboard-stat">
+            <div class="d-flex align-items-center justify-content-center mb-2">
+                <i class="fas fa-hourglass-half text-warning me-2" style="font-size: 1.5rem;"></i>
+                <div class="dashboard-stat-value">{{ pending_bookings }}</div>
+            </div>
+            <div class="dashboard-stat-label">Pending Bookings</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="dashboard-stat">
+            <div class="d-flex align-items-center justify-content-center mb-2">
+                <i class="fas fa-check-circle text-success me-2" style="font-size: 1.5rem;"></i>
+                <div class="dashboard-stat-value">{{ confirmed_bookings }}</div>
+            </div>
+            <div class="dashboard-stat-label">Confirmed Bookings</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="dashboard-stat">
+            <div class="d-flex align-items-center justify-content-center mb-2">
+                <i class="fas fa-dollar-sign text-primary me-2" style="font-size: 1.5rem;"></i>
+                <div class="dashboard-stat-value">${{ total_revenue|format_currency }}</div>
+            </div>
+            <div class="dashboard-stat-label">Total Revenue</div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card dashboard-card">
+            <div class="dashboard-card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Today's Bookings</h5>
+                <a href="{% url 'dashboard_app:provider_todays_bookings' %}" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+            <div class="dashboard-card-body">
+                {% if todays_bookings %}
+                <div class="list-group">
+                    {% for booking in todays_bookings %}
+                    <div class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">{{ booking.user.get_full_name }}</h6>
+                            <small>{{ booking.booking_date|date:"M d, Y" }}</small>
+                        </div>
+                        <p class="mb-1">
+                            {% for item in booking.items.all|slice:":3" %}
+                            <span class="badge bg-light text-dark">{{ item.service.name }}</span>
+                            {% endfor %}
+                            {% if booking.items.count > 3 %}
+                            <span class="badge bg-light text-dark">+{{ booking.items.count|add:"-3" }} more</span>
+                            {% endif %}
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small>Booking #{{ booking.booking_id|truncatechars:8 }}</small>
+                            <span class="badge {{ booking.status|get_status_badge_class }}">
+                                {{ booking.get_status_display }}
+                            </span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="alert alert-info mb-0">
+                    <i class="fas fa-info-circle me-2"></i>
+                    You don't have any bookings for today.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card dashboard-card">
+            <div class="dashboard-card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Recent Bookings</h5>
+                <a href="{% url 'booking_cart_app:provider_booking_list' %}" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+            <div class="dashboard-card-body">
+                {% if recent_bookings %}
+                <div class="list-group">
+                    {% for booking in recent_bookings %}
+                    <div class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">{{ booking.user.get_full_name }}</h6>
+                            <small>{{ booking.booking_date|date:"M d, Y" }}</small>
+                        </div>
+                        <p class="mb-1">${{ booking.total_price|format_currency }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small>Booking #{{ booking.booking_id|truncatechars:8 }}</small>
+                            <span class="badge {{ booking.status|get_status_badge_class }}">
+                                {{ booking.get_status_display }}
+                            </span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="alert alert-info mb-0">
+                    <i class="fas fa-info-circle me-2"></i>
+                    You don't have any recent bookings.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card dashboard-card">
+            <div class="dashboard-card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Recent Reviews</h5>
+                <a href="#" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+            <div class="dashboard-card-body">
+                {% if recent_reviews %}
+                <div class="list-group">
+                    {% for review in recent_reviews %}
+                    <div class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">{{ review.user.get_full_name }}</h6>
+                            <small>{{ review.created_at|date:"M d, Y" }}</small>
+                        </div>
+                        <div class="mb-1">
+                            {% for i in "12345" %}
+                            <i class="fas fa-star {% if forloop.counter <= review.rating %}text-warning{% else %}text-muted{% endif %}"></i>
+                            {% endfor %}
+                        </div>
+                        <p class="mb-1">{{ review.comment|truncatechars:100 }}</p>
+                        <small>{{ review.venue.name }}</small>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="alert alert-info mb-0">
+                    <i class="fas fa-info-circle me-2"></i>
+                    You don't have any reviews yet.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

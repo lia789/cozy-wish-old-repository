@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+
+{% block title %}Submit Review - {{ venue.name }} - CozyWish{% endblock %}
+
+{% block extra_css %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/review_app/review_app.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-5 radial-gradient-bg">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow">
+                    <div class="card-header bg-primary-brand text-white">
+                        <h4 class="mb-0"><i class="fas fa-star me-2"></i>Review {{ venue.name }}</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="text-center mb-4">
+                            <h5 class="text-primary-brand">How was your experience?</h5>
+                            <div class="star-rating" id="star-rating">
+                                <span class="star" data-value="1"><i class="fas fa-star"></i></span>
+                                <span class="star" data-value="2"><i class="fas fa-star"></i></span>
+                                <span class="star" data-value="3"><i class="fas fa-star"></i></span>
+                                <span class="star" data-value="4"><i class="fas fa-star"></i></span>
+                                <span class="star" data-value="5"><i class="fas fa-star"></i></span>
+                            </div>
+                        </div>
+
+                        <form method="post">
+                            {% csrf_token %}
+                            {{ form.rating }}
+
+                            <div class="mb-3">
+                                <label for="{{ form.comment.id_for_label }}" class="form-label">Your Review</label>
+                                {{ form.comment }}
+                                {% if form.comment.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.comment.errors }}
+                                </div>
+                                {% endif %}
+                                <div class="form-text">Share your experience with others. What did you like? What could be improved?</div>
+                            </div>
+
+                            <div class="d-flex justify-content-between">
+                                <a href="{% url 'venues_app:venue_detail' venue_id=venue.id %}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-arrow-left me-2"></i>Cancel
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-paper-plane me-2"></i>Submit Review
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card shadow mt-4">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">Review Guidelines</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="mb-0">
+                            <li>Be honest and specific about your experience</li>
+                            <li>Focus on the service quality, staff, and overall experience</li>
+                            <li>Keep it respectful and constructive</li>
+                            <li>Avoid personal attacks or offensive language</li>
+                            <li>Don't include personal information about yourself or others</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const stars = document.querySelectorAll('.star');
+        const ratingInput = document.getElementById('star-rating-input');
+
+        // Set initial rating if editing
+        const initialRating = ratingInput.value;
+        if (initialRating) {
+            setRating(initialRating);
+        }
+
+        // Add click event to stars
+        stars.forEach(star => {
+            star.addEventListener('click', function() {
+                const value = this.getAttribute('data-value');
+                setRating(value);
+                ratingInput.value = value;
+            });
+        });
+
+        // Set rating function
+        function setRating(value) {
+            stars.forEach(star => {
+                const starValue = star.getAttribute('data-value');
+                if (starValue <= value) {
+                    star.classList.add('active');
+                } else {
+                    star.classList.remove('active');
+                }
+            });
+        }
+
+        // Add hover effects
+        stars.forEach(star => {
+            star.addEventListener('mouseover', function() {
+                const value = this.getAttribute('data-value');
+
+                stars.forEach(s => {
+                    const starValue = s.getAttribute('data-value');
+                    if (starValue <= value) {
+                        s.classList.add('hover');
+                    } else {
+                        s.classList.remove('hover');
+                    }
+                });
+            });
+
+            star.addEventListener('mouseout', function() {
+                stars.forEach(s => {
+                    s.classList.remove('hover');
+                });
+            });
+        });
+    });
+</script>
+{% endblock %}

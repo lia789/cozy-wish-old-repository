@@ -1,0 +1,246 @@
+/* Review App Styles */
+
+/* Simple Background */
+.radial-gradient-bg {
+    background-color: #f8f9fa;
+}
+
+/* Brand Colors */
+.bg-primary-brand {
+    background-color: #2F160F !important;
+    color: white;
+}
+
+.text-primary-brand {
+    color: #2F160F !important;
+}
+
+.btn-primary {
+    background-color: #2F160F;
+    border-color: #2F160F;
+}
+
+.btn-primary:hover, .btn-primary:focus {
+    background-color: #1a0d09;
+    border-color: #1a0d09;
+}
+
+.btn-outline-primary {
+    color: #2F160F;
+    border-color: #2F160F;
+}
+
+.btn-outline-primary:hover, .btn-outline-primary:focus {
+    background-color: #2F160F;
+    border-color: #2F160F;
+    color: white;
+}
+
+/* Page Headers */
+.page-header {
+    margin-bottom: 2rem;
+}
+
+.page-title {
+    font-family: 'Yeseva One', serif;
+    color: #2F160F;
+    margin-bottom: 0.5rem;
+}
+
+/* Cards */
+.card {
+    border-radius: 10px;
+    border: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+}
+
+.card-header {
+    background-color: #fff;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 1rem 1.25rem;
+}
+
+.card-header.bg-primary-brand {
+    background-color: #2F160F !important;
+    color: white;
+}
+
+/* Review Styles */
+.review-item {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 1rem 0;
+}
+
+.review-item:last-child {
+    border-bottom: none;
+}
+
+.review-author {
+    font-weight: 500;
+    color: #2F160F;
+    margin-bottom: 0.25rem;
+}
+
+.review-date {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.review-content {
+    color: #333;
+    margin-top: 0.5rem;
+}
+
+.review-response {
+    background-color: #f8f9fa;
+    border-left: 3px solid #2F160F;
+    padding: 1rem;
+    margin-top: 1rem;
+    border-radius: 0 8px 8px 0;
+}
+
+.review-response-header {
+    font-weight: 500;
+    color: #2F160F;
+    margin-bottom: 0.5rem;
+}
+
+.review-response-content {
+    color: #333;
+}
+
+/* Star Rating Styles */
+.star-rating {
+    font-size: 2rem;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+}
+
+.star-rating .star {
+    cursor: pointer;
+    color: #ddd;
+    transition: color 0.2s;
+    margin: 0 0.25rem;
+}
+
+.star-rating .star.active {
+    color: #FFD700;
+}
+
+.star-rating .star:hover {
+    color: #FFD700;
+}
+
+.rating-distribution {
+    margin-bottom: 1.5rem;
+}
+
+.rating-bar {
+    height: 24px;
+    border-radius: 4px;
+    background-color: #f8f9fa;
+    margin-bottom: 8px;
+}
+
+.rating-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    background-color: #ffc107;
+}
+
+/* Flag Styles */
+.flag-item {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 1rem 0;
+}
+
+.flag-item:last-child {
+    border-bottom: none;
+}
+
+.flag-reason {
+    background-color: #f8f9fa;
+    padding: 0.75rem;
+    border-radius: 8px;
+    margin-top: 0.5rem;
+}
+
+/* Form Styles */
+.form-control:focus {
+    border-color: #2F160F;
+    box-shadow: 0 0 0 0.25rem rgba(47, 22, 15, 0.25);
+}
+
+.form-label {
+    font-weight: 500;
+    color: #333;
+}
+
+.form-text {
+    color: #666;
+}
+
+/* Summary Styles */
+.summary-card {
+    text-align: center;
+    padding: 1.5rem;
+}
+
+.summary-value {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #2F160F;
+    margin-bottom: 0.5rem;
+}
+
+.summary-label {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.venue-card {
+    transition: transform 0.2s;
+}
+
+.venue-card:hover {
+    transform: translateY(-5px);
+}
+
+/* Status Badges */
+.badge-approved {
+    background-color: #28a745;
+    color: white;
+}
+
+.badge-pending {
+    background-color: #ffc107;
+    color: #212529;
+}
+
+.badge-rejected {
+    background-color: #dc3545;
+    color: white;
+}
+
+.badge-flagged {
+    background-color: #fd7e14;
+    color: white;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 767.98px) {
+    .star-rating {
+        font-size: 1.5rem;
+    }
+
+    .page-title {
+        font-size: 1.75rem;
+    }
+
+    .summary-value {
+        font-size: 1.5rem;
+    }
+}

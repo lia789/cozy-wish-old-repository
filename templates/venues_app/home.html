@@ -1,0 +1,222 @@
+{% extends 'base.html' %}
+
+{% block title %}CozyWish - Book Beauty & Wellness Services{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Add any page-specific styles here */
+</style>
+{% endblock %}
+
+{% block hero_content %}
+<!-- Hero section and search filter -->
+<div class="container mt-5" style="padding-top: 120px;">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-10 text-center">
+            <h1 class="hero-title">Find & Book<br>Local Spa and Massage Services</h1>
+
+            <!-- Search Form -->
+            <form action="{% url 'venues_app:venue_list' %}" method="get">
+                <div class="search-container">
+                    <div class="row g-0 align-items-center">
+                        <div class="col position-relative">
+                            <div class="dropdown search-group">
+                                <i class="fas fa-search input-icon-left"></i>
+                                <input type="text" name="query" class="search-input form-control ps-5" data-bs-toggle="dropdown" placeholder="categories" aria-expanded="false" value="{{ search_form.query.value|default:'' }}">
+                                <div class="dropdown-menu treatment-dropdown">
+                                    <a class="dropdown-item" href="{% url 'venues_app:venue_list' %}">
+                                        <i class="fas fa-th"></i>
+                                        All treatments
+                                    </a>
+                                    <h6 class="dropdown-header">Top categories</h6>
+                                    {% for category in categories %}
+                                    <a class="dropdown-item" href="{% url 'venues_app:venue_list' %}?category={{ category.slug }}">
+                                        <i class="{{ category.icon_class|default:'fas fa-spa' }}"></i>
+                                        {{ category.name }}
+                                    </a>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="search-divider"></div>
+                        <div class="col position-relative">
+                            <div class="dropdown search-group">
+                                <i class="fas fa-map-marker-alt input-icon-left"></i>
+                                <input type="text" name="location" id="id_location" class="search-input form-control ps-5" data-bs-toggle="dropdown" placeholder="City, State, or County" aria-expanded="false" value="{{ search_form.location.value|default:'' }}" list="locationList" autocomplete="off">
+                                <datalist id="locationList"></datalist>
+                                <div class="dropdown-menu location-dropdown">
+                                    <a class="dropdown-item" href="#" id="use-current-location">
+                                        <i class="fas fa-location-arrow"></i>
+                                        Use current location
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <button type="submit" class="search-btn">Search</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+
+            <!-- Booking Counter -->
+            <div class="booking-count">
+                <strong>425,731</strong> appointments booked today
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<!-- Top Picks Card Section -->
+<div class="container mt-5">
+    <h2 class="mb-4">Top Picks</h2>
+
+    <div class="position-relative card-slider-container">
+        <div class="card-slider">
+            <div class="card-set row g-4 justify-content-center">
+                {% for venue in top_venues %}
+                <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12">
+                    <div class="card service-card">
+                        <a href="{% url 'venues_app:venue_detail' slug=venue.slug %}">
+                            <img src="{{ venue.get_primary_image|default:'https://via.placeholder.com/317x177' }}" class="card-img-top" alt="{{ venue.name }}">
+                        </a>
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <a href="{% url 'venues_app:venue_detail' slug=venue.slug %}" class="text-decoration-none text-dark">
+                                    {{ venue.name }}
+                                </a>
+                            </h5>
+                            <div class="rating">
+                                <span class="rating-score">{{ venue.get_average_rating }}★</span>
+                                <span class="review-count">({{ venue.get_review_count }})</span>
+                            </div>
+                            <p class="location">{{ venue.city }}, {{ venue.state }}</p>
+                            <span class="business-type">{{ venue.category.name|default:"Spa & Wellness" }}</span>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12 text-center">
+                    <p>No venues available yet. Check back soon!</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Trending Card Section -->
+<div class="container mt-5">
+    <h2 class="mb-4">Trending</h2>
+
+    <div class="position-relative card-slider-container">
+        <div class="card-slider">
+            <div class="card-set row g-4 justify-content-center">
+                {% for venue in trending_venues %}
+                <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12">
+                    <div class="card service-card">
+                        <a href="{% url 'venues_app:venue_detail' slug=venue.slug %}">
+                            <img src="{{ venue.get_primary_image|default:'https://via.placeholder.com/317x177' }}" class="card-img-top" alt="{{ venue.name }}">
+                        </a>
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <a href="{% url 'venues_app:venue_detail' slug=venue.slug %}" class="text-decoration-none text-dark">
+                                    {{ venue.name }}
+                                </a>
+                            </h5>
+                            <div class="rating">
+                                <span class="rating-score">{{ venue.get_average_rating }}★</span>
+                                <span class="review-count">({{ venue.get_review_count }})</span>
+                            </div>
+                            <p class="location">{{ venue.city }}, {{ venue.state }}</p>
+                            <span class="business-type">{{ venue.category.name|default:"Spa & Wellness" }}</span>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12 text-center">
+                    <p>No trending venues available yet. Check back soon!</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Discounted Venues Section -->
+<div class="container mt-5">
+    <h2 class="mb-4">Hot Deals</h2>
+
+    <div class="position-relative card-slider-container">
+        <div class="card-slider">
+            <div class="card-set row g-4 justify-content-center">
+                {% for venue in discounted_venues %}
+                <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12">
+                    <div class="card service-card">
+                        <a href="{% url 'venues_app:venue_detail' slug=venue.slug %}">
+                            <img src="{{ venue.get_primary_image|default:'https://via.placeholder.com/317x177' }}" class="card-img-top" alt="{{ venue.name }}">
+                        </a>
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <a href="{% url 'venues_app:venue_detail' slug=venue.slug %}" class="text-decoration-none text-dark">
+                                    {{ venue.name }}
+                                </a>
+                            </h5>
+                            <div class="rating">
+                                <span class="rating-score">{{ venue.get_average_rating }}★</span>
+                                <span class="review-count">({{ venue.get_review_count }})</span>
+                            </div>
+                            <p class="location">{{ venue.city }}, {{ venue.state }}</p>
+                            <span class="business-type">{{ venue.category.name|default:"Spa & Wellness" }}</span>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12 text-center">
+                    <p>No discounted venues available yet. Check back soon!</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if not user.is_customer %}
+<!-- Business Section -->
+<section class="business-section py-5 mt-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 content-col">
+                <h1 class="business-title">
+                    CozyWish<br><span class="business-subtitle">For Business</span>
+                </h1>
+                <p class="business-description">
+                    Supercharge your business for free with the world's top booking platform for salons and spas. Independently voted no. 1 by industry professionals.
+                </p>
+                <a href="{% url 'accounts_app:for_business' %}" class="btn btn-dark find-more-btn">Find out more</a>
+                <div class="rating-container mt-4">
+                    <h2 class="rating-title">Excellent 5/5</h2>
+                    <div class="star-rating">
+                        <span class="star">★</span>
+                        <span class="star">★</span>
+                        <span class="star">★</span>
+                        <span class="star">★</span>
+                        <span class="star">★</span>
+                    </div>
+                    <div class="review-text">
+                        Over 1250 reviews from our partners
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 image-col">
+                <div class="app-preview">
+                    <img src="https://via.placeholder.com/600x400" alt="App Interface" class="app-interface img-fluid rounded shadow-lg">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+{% endblock %}

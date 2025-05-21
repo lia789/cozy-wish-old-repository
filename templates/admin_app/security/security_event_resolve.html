@@ -1,0 +1,86 @@
+{% extends 'admin_app/base.html' %}
+
+{% block admin_content %}
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Resolve Security Event</h1>
+    <div>
+        <a href="{% url 'admin_app:security_event_detail' event_id=event.id %}" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm">
+            <i class="fas fa-arrow-left fa-sm text-white-50 me-1"></i> Back to Event Details
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Event Information</h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-4">
+                    <table class="table">
+                        <tr>
+                            <th style="width: 150px;">Event Type:</th>
+                            <td>{{ event.get_event_type_display }}</td>
+                        </tr>
+                        <tr>
+                            <th>Severity:</th>
+                            <td>
+                                {% if event.severity == 'info' %}
+                                <span class="badge bg-info">Info</span>
+                                {% elif event.severity == 'warning' %}
+                                <span class="badge bg-warning">Warning</span>
+                                {% elif event.severity == 'critical' %}
+                                <span class="badge bg-danger">Critical</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>User:</th>
+                            <td>
+                                {% if event.user %}
+                                {{ event.user.email }}
+                                {% else %}
+                                <span class="text-muted">Unknown</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Timestamp:</th>
+                            <td>{{ event.timestamp|date:"F j, Y, g:i:s a" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Description:</th>
+                            <td>{{ event.description }}</td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.resolution_notes.id_for_label }}" class="form-label">Resolution Notes</label>
+                        {{ form.resolution_notes }}
+                        {% if form.resolution_notes.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.resolution_notes.errors %}
+                            {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        {% if form.resolution_notes.help_text %}
+                        <div class="form-text">{{ form.resolution_notes.help_text }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{% url 'admin_app:security_event_detail' event_id=event.id %}" class="btn btn-secondary me-md-2">Cancel</a>
+                        <button type="submit" class="btn btn-success">Resolve Event</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,70 @@
+{% extends 'admin_app/base.html' %}
+
+{% block admin_content %}
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Delete User</h1>
+    <div>
+        <a href="{% url 'admin_app:user_detail' user_id=user_obj.id %}" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm">
+            <i class="fas fa-arrow-left fa-sm text-white-50 me-1"></i> Back to User
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-6 mx-auto">
+        <div class="card shadow mb-4 border-left-danger">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-danger">Confirm Deletion</h6>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Warning:</strong> This action cannot be undone. All data associated with this user will be permanently deleted.
+                </div>
+                
+                <div class="mb-4">
+                    <h5>User Information</h5>
+                    <table class="table">
+                        <tr>
+                            <th style="width: 150px;">Email:</th>
+                            <td>{{ user_obj.email }}</td>
+                        </tr>
+                        <tr>
+                            <th>Name:</th>
+                            <td>{{ user_obj.get_full_name|default:"-" }}</td>
+                        </tr>
+                        <tr>
+                            <th>User Type:</th>
+                            <td>
+                                {% if user_obj.is_superuser %}
+                                <span class="badge bg-danger">Superuser</span>
+                                {% elif user_obj.is_staff %}
+                                <span class="badge bg-primary">Staff</span>
+                                {% elif user_obj.is_service_provider %}
+                                <span class="badge bg-info">Service Provider</span>
+                                {% elif user_obj.is_customer %}
+                                <span class="badge bg-success">Customer</span>
+                                {% else %}
+                                <span class="badge bg-secondary">Unknown</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Date Joined:</th>
+                            <td>{{ user_obj.date_joined|date:"F j, Y" }}</td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{% url 'admin_app:user_detail' user_id=user_obj.id %}" class="btn btn-secondary me-md-2">Cancel</a>
+                        <button type="submit" class="btn btn-danger">Delete User</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

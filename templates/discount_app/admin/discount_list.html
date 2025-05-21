@@ -1,0 +1,330 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} - Admin Dashboard - CozyWish{% endblock %}
+
+{% block extra_css %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/discount_app/discount_app.css' %}">
+<link rel="stylesheet" href="{% static 'css/admin_app/admin_app.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-5 admin-bg">
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col-12">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{% url 'admin_app:admin_dashboard' %}">Admin Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="{% url 'discount_app:admin_discount_dashboard' %}">Discount Management</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">{{ title }}</li>
+                    </ol>
+                </nav>
+
+                <h1 class="page-title mb-3">
+                    {% if discount_type == 'venue' %}
+                    <i class="fas fa-store me-2"></i>
+                    {% elif discount_type == 'service' %}
+                    <i class="fas fa-spa me-2"></i>
+                    {% else %}
+                    <i class="fas fa-globe me-2"></i>
+                    {% endif %}
+                    {{ title }}
+                </h1>
+            </div>
+        </div>
+
+        {% if messages %}
+        <div class="messages mb-4">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="row">
+            <div class="col-lg-3 mb-4">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary-brand text-white">
+                        <h5 class="card-title mb-0">Filter Discounts</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="get" class="discount-filter-form">
+                            <div class="mb-3">
+                                <label for="{{ filter_form.search.id_for_label }}" class="form-label">Search</label>
+                                {{ filter_form.search }}
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="{{ filter_form.status.id_for_label }}" class="form-label">Status</label>
+                                {{ filter_form.status }}
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="{{ filter_form.discount_type.id_for_label }}" class="form-label">Discount Type</label>
+                                {{ filter_form.discount_type }}
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="{{ filter_form.min_value.id_for_label }}" class="form-label">Minimum Value</label>
+                                {{ filter_form.min_value }}
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="{{ filter_form.max_value.id_for_label }}" class="form-label">Maximum Value</label>
+                                {{ filter_form.max_value }}
+                            </div>
+
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-filter me-1"></i> Apply Filters
+                                </button>
+                            </div>
+                        </form>
+
+                        {% if request.GET %}
+                        <div class="d-grid mt-3">
+                            <a href="{% url 'discount_app:admin_discount_list' discount_type=discount_type %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-1"></i> Clear Filters
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="card shadow-sm mt-4">
+                    <div class="card-header bg-primary-brand text-white">
+                        <h5 class="card-title mb-0">Quick Actions</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            {% if discount_type == 'platform' %}
+                            <a href="{% url 'discount_app:admin_create_platform_discount' %}" class="btn btn-success">
+                                <i class="fas fa-plus me-1"></i> Create Platform Discount
+                            </a>
+                            {% endif %}
+
+                            <a href="{% url 'discount_app:admin_discount_dashboard' %}" class="btn btn-outline-primary">
+                                <i class="fas fa-chart-line me-1"></i> Discount Dashboard
+                            </a>
+
+                            <div class="btn-group">
+                                <a href="{% url 'discount_app:admin_discount_list' discount_type='venue' %}" class="btn btn-outline-secondary {% if discount_type == 'venue' %}active{% endif %}">
+                                    <i class="fas fa-store me-1"></i> Venue
+                                </a>
+                                <a href="{% url 'discount_app:admin_discount_list' discount_type='service' %}" class="btn btn-outline-secondary {% if discount_type == 'service' %}active{% endif %}">
+                                    <i class="fas fa-spa me-1"></i> Service
+                                </a>
+                                <a href="{% url 'discount_app:admin_discount_list' discount_type='platform' %}" class="btn btn-outline-secondary {% if discount_type == 'platform' %}active{% endif %}">
+                                    <i class="fas fa-globe me-1"></i> Platform
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-9">
+                <div class="card shadow-sm">
+                    <div class="card-header {% if discount_type == 'venue' %}bg-success{% elif discount_type == 'service' %}bg-info{% else %}bg-secondary{% endif %} text-white">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="card-title mb-0">{{ title }}</h5>
+                            <span class="badge bg-light text-dark">{{ discounts.paginator.count }} Discounts</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        {% if discounts %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Value</th>
+                                        {% if discount_type == 'venue' %}
+                                        <th>Venue</th>
+                                        {% elif discount_type == 'service' %}
+                                        <th>Service</th>
+                                        {% elif discount_type == 'platform' %}
+                                        <th>Category</th>
+                                        {% endif %}
+                                        <th>Valid Period</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for discount in discounts %}
+                                    <tr>
+                                        <td>
+                                            <a href="{% url 'discount_app:admin_discount_detail' discount_type=discount_type discount_id=discount.id %}">
+                                                {{ discount.name }}
+                                            </a>
+                                        </td>
+                                        <td>
+                                            {% if discount.discount_type == 'percentage' %}
+                                            <span class="badge bg-primary-brand">{{ discount.discount_value }}%</span>
+                                            {% else %}
+                                            <span class="badge bg-secondary">${{ discount.discount_value }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if discount_type == 'venue' %}
+                                            <a href="{% url 'venues_app:venue_detail' discount.venue.slug %}">
+                                                {{ discount.venue.name }}
+                                            </a>
+                                            {% elif discount_type == 'service' %}
+                                            <a href="{% url 'venues_app:service_detail' discount.service.id %}">
+                                                {{ discount.service.title }}
+                                            </a>
+                                            <small class="d-block text-muted">{{ discount.service.venue.name }}</small>
+                                            {% elif discount_type == 'platform' %}
+                                            {% if discount.category %}
+                                            {{ discount.category.name }}
+                                            {% else %}
+                                            <span class="text-muted">All Categories</span>
+                                            {% endif %}
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <small>{{ discount.start_date|date:"M d, Y" }}</small>
+                                            <small class="d-block text-muted">to</small>
+                                            <small>{{ discount.end_date|date:"M d, Y" }}</small>
+                                        </td>
+                                        <td>
+                                            {% if discount.get_status == 'active' %}
+                                            <span class="badge bg-success">Active</span>
+                                            {% elif discount.get_status == 'scheduled' %}
+                                            <span class="badge bg-warning text-dark">Scheduled</span>
+                                            {% elif discount.get_status == 'expired' %}
+                                            <span class="badge bg-danger">Expired</span>
+                                            {% else %}
+                                            <span class="badge bg-secondary">Cancelled</span>
+                                            {% endif %}
+
+                                            {% if discount_type != 'platform' %}
+                                            {% if not discount.is_approved %}
+                                            <span class="badge bg-warning text-dark">Pending Approval</span>
+                                            {% endif %}
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="btn-group">
+                                                <a href="{% url 'discount_app:admin_discount_detail' discount_type=discount_type discount_id=discount.id %}" class="btn btn-sm btn-outline-primary" title="View Details">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+
+                                                {% if discount_type != 'platform' and not discount.is_approved %}
+                                                <a href="{% url 'discount_app:admin_approve_discount' discount_type=discount_type discount_id=discount.id %}" class="btn btn-sm btn-outline-success" title="Approve/Reject">
+                                                    <i class="fas fa-check"></i>
+                                                </a>
+                                                {% endif %}
+
+                                                {% if discount_type == 'platform' %}
+                                                <a href="{% url 'discount_app:admin_edit_platform_discount' discount_id=discount.id %}" class="btn btn-sm btn-outline-secondary" title="Edit">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                {% endif %}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {% if discounts.has_other_pages %}
+                        <nav aria-label="Page navigation" class="mt-4">
+                            <ul class="pagination justify-content-center">
+                                {% if discounts.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="First">
+                                        <span aria-hidden="true">&laquo;&laquo;</span>
+                                    </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ discounts.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                                {% else %}
+                                <li class="page-item disabled">
+                                    <a class="page-link" href="#" aria-label="First">
+                                        <span aria-hidden="true">&laquo;&laquo;</span>
+                                    </a>
+                                </li>
+                                <li class="page-item disabled">
+                                    <a class="page-link" href="#" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                                {% endif %}
+
+                                {% for i in discounts.paginator.page_range %}
+                                {% if discounts.number == i %}
+                                <li class="page-item active"><a class="page-link" href="#">{{ i }}</a></li>
+                                {% elif i > discounts.number|add:'-3' and i < discounts.number|add:'3' %}
+                                <li class="page-item"><a class="page-link" href="?page={{ i }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ i }}</a></li>
+                                {% endif %}
+                                {% endfor %}
+
+                                {% if discounts.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ discounts.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ discounts.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Last">
+                                        <span aria-hidden="true">&raquo;&raquo;</span>
+                                    </a>
+                                </li>
+                                {% else %}
+                                <li class="page-item disabled">
+                                    <a class="page-link" href="#" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                                <li class="page-item disabled">
+                                    <a class="page-link" href="#" aria-label="Last">
+                                        <span aria-hidden="true">&raquo;&raquo;</span>
+                                    </a>
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                        {% endif %}
+
+                        {% else %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i> No discounts found matching your criteria.
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Add Bootstrap form classes to filter form inputs
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('{{ filter_form.search.id_for_label }}');
+        const statusSelect = document.getElementById('{{ filter_form.status.id_for_label }}');
+        const discountTypeSelect = document.getElementById('{{ filter_form.discount_type.id_for_label }}');
+        const minValueInput = document.getElementById('{{ filter_form.min_value.id_for_label }}');
+        const maxValueInput = document.getElementById('{{ filter_form.max_value.id_for_label }}');
+
+        if (searchInput) searchInput.classList.add('form-control');
+        if (statusSelect) statusSelect.classList.add('form-select');
+        if (discountTypeSelect) discountTypeSelect.classList.add('form-select');
+        if (minValueInput) minValueInput.classList.add('form-control');
+        if (maxValueInput) maxValueInput.classList.add('form-control');
+    });
+</script>
+{% endblock %}

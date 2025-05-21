@@ -1,0 +1,208 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Search Results - CozyWish{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/cms_app/cms_app.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-12 mb-4">
+            <div class="page-header text-center">
+                <h1 class="brand-text display-4 mb-2">Search Results</h1>
+                <p class="lead text-muted">Find content across our site</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+
+        <div class="card shadow-sm border-0 rounded-4 mb-4">
+            <div class="card-body p-4">
+                <form method="get" action="{% url 'cms_app:search' %}" class="search-form">
+                    <div class="input-group">
+                        {{ search_form.query }}
+                        <button class="btn btn-primary" type="submit">
+                            <i class="fas fa-search"></i> Search
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        {% if query %}
+        <div class="alert alert-info rounded-4 shadow-sm mb-4">
+            <div class="d-flex">
+                <i class="fas fa-info-circle me-3 fa-2x"></i>
+                <div>
+                    <h5 class="alert-heading">Search Results</h5>
+                    <p class="mb-0">Showing results for: <strong>{{ query }}</strong></p>
+                </div>
+            </div>
+        </div>
+
+        {% if results.pages %}
+        <div class="card shadow-sm border-0 rounded-4 mb-4">
+            <div class="card-header bg-primary text-white rounded-top-4">
+                <h5 class="mb-0 brand-text">Pages ({{ results.pages|length }})</h5>
+            </div>
+            <div class="card-body p-4">
+                <div class="list-group list-group-flush border-0">
+                    {% for page in results.pages %}
+                    <a href="{% url 'cms_app:page_detail' page.slug %}" class="list-group-item list-group-item-action border-0 rounded-3 mb-2 p-3">
+                        <h5 class="mb-2 brand-text">{{ page.title }}</h5>
+                        <p class="mb-0 text-muted">{{ page.content|striptags|truncatewords:25 }}</p>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if results.blog_posts %}
+        <div class="card shadow-sm border-0 rounded-4 mb-4">
+            <div class="card-header bg-primary text-white rounded-top-4">
+                <h5 class="mb-0 brand-text">Blog Posts ({{ results.blog_posts|length }})</h5>
+            </div>
+            <div class="card-body p-4">
+                <div class="list-group list-group-flush border-0">
+                    {% for post in results.blog_posts %}
+                    <a href="{% url 'cms_app:blog_detail' post.slug %}" class="list-group-item list-group-item-action border-0 rounded-3 mb-3 p-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h5 class="mb-0 brand-text">{{ post.title }}</h5>
+                            <small class="text-muted badge bg-light">{{ post.published_at|date:"M d, Y" }}</small>
+                        </div>
+                        <p class="mb-2 text-muted">{{ post.excerpt|default:post.content|striptags|truncatewords:25 }}</p>
+                        <div>
+                            {% for category in post.categories.all %}
+                            <span class="badge bg-accent text-primary rounded-pill px-3 py-2 me-1">{{ category.name }}</span>
+                            {% endfor %}
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if not results.pages and not results.blog_posts %}
+        <div class="alert alert-warning rounded-4 shadow-sm">
+            <div class="d-flex">
+                <i class="fas fa-exclamation-triangle me-3 fa-2x"></i>
+                <div>
+                    <h5 class="alert-heading">No Results Found</h5>
+                    <p class="mb-0">We couldn't find any content matching your search query. Please try different keywords or check out our search tips.</p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% endif %}
+    </div>
+
+    <div class="col-lg-4">
+        <!-- Search Tips -->
+        <div class="card shadow-sm border-0 rounded-4 mb-4">
+            <div class="card-header bg-primary text-white rounded-top-4">
+                <h5 class="mb-0 brand-text">Search Tips</h5>
+            </div>
+            <div class="card-body p-4">
+                <ul class="list-unstyled mb-0">
+                    <li class="d-flex align-items-center mb-3">
+                        <div class="icon-circle bg-primary text-white rounded-circle me-3" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <span>Use specific keywords</span>
+                    </li>
+                    <li class="d-flex align-items-center mb-3">
+                        <div class="icon-circle bg-primary text-white rounded-circle me-3" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-random"></i>
+                        </div>
+                        <span>Try different word variations</span>
+                    </li>
+                    <li class="d-flex align-items-center mb-3">
+                        <div class="icon-circle bg-primary text-white rounded-circle me-3" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-minus"></i>
+                        </div>
+                        <span>Keep searches simple</span>
+                    </li>
+                    <li class="d-flex align-items-center">
+                        <div class="icon-circle bg-primary text-white rounded-circle me-3" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-spell-check"></i>
+                        </div>
+                        <span>Check spelling</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Popular Searches -->
+        <div class="card shadow-sm border-0 rounded-4 mb-4">
+            <div class="card-header bg-primary text-white rounded-top-4">
+                <h5 class="mb-0 brand-text">Popular Searches</h5>
+            </div>
+            <div class="card-body p-4">
+                <div class="d-flex flex-wrap gap-2">
+                    <a href="{% url 'cms_app:search' %}?q=beauty" class="badge bg-accent text-primary text-decoration-none rounded-pill px-3 py-2">
+                        Beauty
+                    </a>
+                    <a href="{% url 'cms_app:search' %}?q=wellness" class="badge bg-accent text-primary text-decoration-none rounded-pill px-3 py-2">
+                        Wellness
+                    </a>
+                    <a href="{% url 'cms_app:search' %}?q=spa" class="badge bg-accent text-primary text-decoration-none rounded-pill px-3 py-2">
+                        Spa
+                    </a>
+                    <a href="{% url 'cms_app:search' %}?q=massage" class="badge bg-accent text-primary text-decoration-none rounded-pill px-3 py-2">
+                        Massage
+                    </a>
+                    <a href="{% url 'cms_app:search' %}?q=skincare" class="badge bg-accent text-primary text-decoration-none rounded-pill px-3 py-2">
+                        Skincare
+                    </a>
+                    <a href="{% url 'cms_app:search' %}?q=hair" class="badge bg-accent text-primary text-decoration-none rounded-pill px-3 py-2">
+                        Hair
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Announcements -->
+        {% if announcements %}
+        <div class="card shadow-sm border-0 rounded-4 mb-4">
+            <div class="card-header bg-primary text-white rounded-top-4">
+                <h5 class="mb-0 brand-text">Announcements</h5>
+            </div>
+            <div class="card-body p-4">
+                {% for announcement in announcements %}
+                <div class="alert alert-{{ announcement.announcement_type }} mb-3 rounded-3">
+                    <div class="d-flex">
+                        {% if announcement.announcement_type == 'info' %}
+                            <i class="fas fa-info-circle me-2 mt-1"></i>
+                        {% elif announcement.announcement_type == 'success' %}
+                            <i class="fas fa-check-circle me-2 mt-1"></i>
+                        {% elif announcement.announcement_type == 'warning' %}
+                            <i class="fas fa-exclamation-triangle me-2 mt-1"></i>
+                        {% elif announcement.announcement_type == 'danger' %}
+                            <i class="fas fa-exclamation-circle me-2 mt-1"></i>
+                        {% endif %}
+                        <div>
+                            <h6 class="alert-heading fw-bold">{{ announcement.title }}</h6>
+                            <p class="mb-0">{{ announcement.content }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/cms_app/cms_app.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+
+{% block title %}Booking Confirmation - CozyWish{% endblock %}
+
+{% block extra_css %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/booking_cart_app/booking_cart_app.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-5 radial-gradient-bg">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card shadow mb-4">
+                    <div class="card-body text-center py-5">
+                        <div class="mb-4">
+                            <div class="d-inline-block p-4 bg-success bg-opacity-10 rounded-circle">
+                                <i class="fas fa-check-circle fa-5x text-success"></i>
+                            </div>
+                        </div>
+                        <h2 class="page-title mb-3">Booking Confirmed!</h2>
+                        <p class="lead mb-4">Your booking has been successfully created and confirmed.</p>
+                        <div class="d-flex justify-content-center mb-4">
+                            <div class="bg-light rounded-pill px-4 py-2">
+                                <span class="text-muted">Booking ID:</span>
+                                <span class="fw-bold text-primary-brand">{{ booking.booking_id }}</span>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-column flex-md-row justify-content-center gap-2">
+                            <a href="{% url 'booking_cart_app:booking_detail' booking_id=booking.booking_id %}" class="btn btn-primary">
+                                <i class="fas fa-eye me-2"></i>View Booking Details
+                            </a>
+                            <a href="{% url 'booking_cart_app:booking_list' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-list me-2"></i>View All Bookings
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow mb-4">
+                    <div class="card-header bg-primary-brand">
+                        <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Booking Details</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <h6 class="text-muted mb-1">Venue</h6>
+                                    <p class="fw-bold mb-0">{{ booking.venue.name }}</p>
+                                </div>
+                                <div class="mb-3">
+                                    <h6 class="text-muted mb-1">Status</h6>
+                                    <p class="mb-0">
+                                        {% if booking.status == 'pending' %}
+                                        <span class="booking-status booking-status-pending">Pending</span>
+                                        {% elif booking.status == 'confirmed' %}
+                                        <span class="booking-status booking-status-confirmed">Confirmed</span>
+                                        {% elif booking.status == 'cancelled' %}
+                                        <span class="booking-status booking-status-cancelled">Cancelled</span>
+                                        {% elif booking.status == 'completed' %}
+                                        <span class="booking-status booking-status-completed">Completed</span>
+                                        {% elif booking.status == 'disputed' %}
+                                        <span class="booking-status booking-status-disputed">Disputed</span>
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <h6 class="text-muted mb-1">Booking Date</h6>
+                                    <p class="mb-0"><i class="far fa-calendar-alt me-1"></i>{{ booking.booking_date|date:"M d, Y" }} <i class="far fa-clock ms-2 me-1"></i>{{ booking.booking_date|time:"g:i A" }}</p>
+                                </div>
+                                <div class="mb-3">
+                                    <h6 class="text-muted mb-1">Total Price</h6>
+                                    <p class="fw-bold cart-total mb-0">${{ booking.total_price }}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h6 class="border-bottom pb-2 mb-3">Services</h6>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Service</th>
+                                        <th>Date</th>
+                                        <th>Time</th>
+                                        <th>Quantity</th>
+                                        <th>Price</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in booking_items %}
+                                    <tr>
+                                        <td class="fw-bold">{{ item.service_title }}</td>
+                                        <td><i class="far fa-calendar-alt me-1"></i>{{ item.date|date:"M d, Y" }}</td>
+                                        <td><i class="far fa-clock me-1"></i>{{ item.time_slot|time:"g:i A" }}</td>
+                                        <td>{{ item.quantity }}</td>
+                                        <td class="fw-bold">${{ item.service_price }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {% if booking.notes %}
+                        <h6 class="border-bottom pb-2 mb-3 mt-4">Notes</h6>
+                        <p class="mb-0">{{ booking.notes }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="card shadow mb-4">
+                    <div class="card-body">
+                        <div class="d-flex align-items-start">
+                            <i class="fas fa-info-circle text-primary-brand me-3 mt-1"></i>
+                            <div>
+                                <h6 class="mb-2">Important Information</h6>
+                                <ul class="ps-3 mb-0">
+                                    <li>You can cancel this booking up to 6 hours before the scheduled time</li>
+                                    <li>Please arrive 10-15 minutes before your appointment time</li>
+                                    <li>A confirmation email has been sent to your registered email address</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <a href="{% url 'venues_app:venue_list' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-search me-2"></i>Browse More Services
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

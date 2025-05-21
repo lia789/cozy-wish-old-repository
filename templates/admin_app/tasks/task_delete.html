@@ -1,0 +1,74 @@
+{% extends 'admin_app/base.html' %}
+
+{% block admin_content %}
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Delete Task</h1>
+    <div>
+        <a href="{% url 'admin_app:task_detail' task_id=task.id %}" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm">
+            <i class="fas fa-arrow-left fa-sm text-white-50 me-1"></i> Back to Task
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-6 mx-auto">
+        <div class="card shadow mb-4 border-left-danger">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-danger">Confirm Deletion</h6>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Warning:</strong> This action cannot be undone. The task will be permanently deleted.
+                </div>
+                
+                <div class="mb-4">
+                    <h5>Task Information</h5>
+                    <table class="table">
+                        <tr>
+                            <th style="width: 150px;">Title:</th>
+                            <td>{{ task.title }}</td>
+                        </tr>
+                        <tr>
+                            <th>Assigned To:</th>
+                            <td>
+                                {% if task.assigned_to %}
+                                {{ task.assigned_to.email }}
+                                {% else %}
+                                <span class="text-muted">Unassigned</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Status:</th>
+                            <td>
+                                {% if task.status == 'pending' %}
+                                <span class="badge bg-warning">Pending</span>
+                                {% elif task.status == 'in_progress' %}
+                                <span class="badge bg-info">In Progress</span>
+                                {% elif task.status == 'completed' %}
+                                <span class="badge bg-success">Completed</span>
+                                {% elif task.status == 'cancelled' %}
+                                <span class="badge bg-danger">Cancelled</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Created:</th>
+                            <td>{{ task.created_at|date:"F j, Y" }}</td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{% url 'admin_app:task_detail' task_id=task.id %}" class="btn btn-secondary me-md-2">Cancel</a>
+                        <button type="submit" class="btn btn-danger">Delete Task</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

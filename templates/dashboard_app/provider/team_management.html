@@ -1,0 +1,201 @@
+{% extends 'dashboard_app/base_dashboard.html' %}
+{% load static %}
+{% load dashboard_tags %}
+
+{% block title %}Team Management - CozyWish{% endblock %}
+
+{% block dashboard_title %}Team Management{% endblock %}
+
+{% block sidebar_content %}
+<!-- Main Navigation -->
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'dashboard_app:provider_dashboard' %}">
+        <i class="fas fa-home"></i> Dashboard
+    </a>
+</li>
+
+<!-- Venue Management Section -->
+<div class="sidebar-section-header">Venue Management</div>
+{% if venues %}
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'venues_app:provider_venue_detail' slug=venues.0.slug %}">
+        <i class="fas fa-edit"></i> Manage Venue
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'venues_app:service_create' %}">
+        <i class="fas fa-plus"></i> Add Service
+    </a>
+</li>
+{% else %}
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'venues_app:create_venue' %}">
+        <i class="fas fa-plus"></i> Create Venue
+    </a>
+</li>
+{% endif %}
+
+<!-- Bookings Section -->
+<div class="sidebar-section-header">Bookings</div>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'dashboard_app:provider_todays_bookings' %}">
+        <i class="fas fa-calendar"></i> Today's Bookings
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'booking_cart_app:provider_booking_list' %}">
+        <i class="fas fa-list"></i> All Bookings
+    </a>
+</li>
+
+<!-- Analytics Section -->
+<div class="sidebar-section-header">Analytics</div>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'dashboard_app:provider_revenue_reports' %}">
+        <i class="fas fa-chart-line"></i> Revenue Reports
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'dashboard_app:provider_service_performance' %}">
+        <i class="fas fa-chart-bar"></i> Service Performance
+    </a>
+</li>
+
+<!-- Team Section -->
+<div class="sidebar-section-header">Team</div>
+<li class="nav-item">
+    <a class="nav-link active" href="{% url 'dashboard_app:provider_team_management' %}">
+        <i class="fas fa-users"></i> Team Management
+    </a>
+</li>
+{% endblock %}
+
+{% block dashboard_actions %}
+<div class="btn-group me-2">
+    <a href="{% url 'accounts_app:staff_add' %}" class="btn btn-sm btn-primary">
+        <i class="fas fa-user-plus"></i> Add Team Member
+    </a>
+</div>
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card dashboard-card mb-4">
+            <div class="dashboard-card-header">
+                <h5 class="mb-0">Your Team</h5>
+            </div>
+            <div class="dashboard-card-body">
+                {% if team_members %}
+                <div class="row">
+                    {% for member in team_members %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100">
+                            <div class="text-center pt-4">
+                                {% if member.profile_image %}
+                                <img src="{{ member.profile_image.url }}" alt="{{ member.name }}" class="rounded-circle" width="120" height="120" style="object-fit: cover;">
+                                {% else %}
+                                <div class="rounded-circle bg-light d-flex align-items-center justify-content-center mx-auto" style="width: 120px; height: 120px;">
+                                    <i class="fas fa-user fa-3x text-muted"></i>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="card-body text-center">
+                                <h5 class="card-title">{{ member.name }}</h5>
+                                <p class="card-text text-muted">{{ member.position }}</p>
+                                <div class="d-flex justify-content-center mt-3">
+                                    <a href="{% url 'accounts_app:staff_edit' member.id %}" class="btn btn-sm btn-outline-primary me-2">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </a>
+                                    <a href="{% url 'accounts_app:staff_delete' member.id %}" class="btn btn-sm btn-outline-danger">
+                                        <i class="fas fa-trash"></i> Remove
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="card-footer bg-transparent">
+                                <div class="d-flex justify-content-between">
+                                    <small class="text-muted"><i class="fas fa-envelope me-1"></i> {{ member.email }}</small>
+                                    <small class="text-muted"><i class="fas fa-phone me-1"></i> {{ member.phone }}</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="alert alert-info mb-0">
+                    <i class="fas fa-info-circle me-2"></i>
+                    You don't have any team members yet.
+                    <a href="{% url 'accounts_app:staff_add' %}" class="alert-link">Add your first team member</a> to get started.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if team_members %}
+<div class="row">
+    <div class="col-md-6">
+        <div class="card dashboard-card">
+            <div class="dashboard-card-header">
+                <h5 class="mb-0">Team Structure</h5>
+            </div>
+            <div class="dashboard-card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Position</th>
+                                <th>Count</th>
+                                <th>Percentage</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for position, count in positions.items %}
+                            <tr>
+                                <td>{{ position }}</td>
+                                <td>{{ count }}</td>
+                                <td>
+                                    <div class="progress" style="height: 10px;">
+                                        <div class="progress-bar bg-primary" role="progressbar" style="width: {{ count|percentage:team_members.count }}%;" aria-valuenow="{{ count|percentage:team_members.count }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card dashboard-card">
+            <div class="dashboard-card-header">
+                <h5 class="mb-0">Team Activity</h5>
+            </div>
+            <div class="dashboard-card-body">
+                <div class="list-group">
+                    {% for activity in recent_activities %}
+                    <div class="list-group-item">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">{{ activity.title }}</h6>
+                            <small>{{ activity.timestamp|date:"M d, Y" }}</small>
+                        </div>
+                        <p class="mb-1">{{ activity.description }}</p>
+                        <small>{{ activity.member.name }}</small>
+                    </div>
+                    {% empty %}
+                    <div class="alert alert-info mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        No recent team activity.
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

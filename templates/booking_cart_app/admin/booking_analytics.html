@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+
+{% block title %}Booking Analytics - Admin - CozyWish{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1>Booking Analytics</h1>
+                <a href="{% url 'booking_cart_app:admin_booking_list' %}" class="btn btn-outline-primary">
+                    <i class="fas fa-list me-2"></i>View All Bookings
+                </a>
+            </div>
+            
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-body text-center">
+                            <h6 class="text-muted mb-2">Total Revenue</h6>
+                            <h3 class="mb-0">${{ total_revenue }}</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-body text-center">
+                            <h6 class="text-muted mb-2">Confirmed Revenue</h6>
+                            <h3 class="mb-0">${{ revenue_by_status.confirmed }}</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-body text-center">
+                            <h6 class="text-muted mb-2">Completed Revenue</h6>
+                            <h3 class="mb-0">${{ revenue_by_status.completed }}</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-body text-center">
+                            <h6 class="text-muted mb-2">Cancelled Revenue</h6>
+                            <h3 class="mb-0">${{ revenue_by_status.cancelled }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0">Booking Status</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Status</th>
+                                            <th>Count</th>
+                                            <th>Revenue</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><span class="badge bg-warning">Pending</span></td>
+                                            <td>{{ booking_counts.pending }}</td>
+                                            <td>${{ revenue_by_status.pending }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="badge bg-success">Confirmed</span></td>
+                                            <td>{{ booking_counts.confirmed }}</td>
+                                            <td>${{ revenue_by_status.confirmed }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="badge bg-info">Completed</span></td>
+                                            <td>{{ booking_counts.completed }}</td>
+                                            <td>${{ revenue_by_status.completed }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="badge bg-danger">Cancelled</span></td>
+                                            <td>{{ booking_counts.cancelled }}</td>
+                                            <td>${{ revenue_by_status.cancelled }}</td>
+                                        </tr>
+                                    </tbody>
+                                    <tfoot class="table-light">
+                                        <tr>
+                                            <td><strong>Total</strong></td>
+                                            <td>{{ booking_counts.pending|add:booking_counts.confirmed|add:booking_counts.completed|add:booking_counts.cancelled }}</td>
+                                            <td>${{ total_revenue }}</td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0">Top Venues by Revenue</h5>
+                        </div>
+                        <div class="card-body">
+                            {% if top_venues %}
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Venue</th>
+                                            <th>Revenue</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for venue in top_venues %}
+                                        <tr>
+                                            <td>
+                                                <a href="{% url 'venues_app:venue_detail' slug=venue.slug %}" class="text-decoration-none">
+                                                    {{ venue.name }}
+                                                </a>
+                                            </td>
+                                            <td>${{ venue.revenue|default:0 }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% else %}
+                            <div class="text-center py-5">
+                                <p class="text-muted">No venue data available.</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>
+                <strong>Note:</strong> This is a basic analytics dashboard for the MVP version. More detailed analytics will be available in future updates.
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

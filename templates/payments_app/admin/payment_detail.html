@@ -1,0 +1,258 @@
+{% extends 'base.html' %}
+
+{% block title %}Payment Details - Admin - CozyWish{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'venues_app:home' %}">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'payments_app:admin_payment_list' %}">Payment Management</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Payment Details</li>
+                </ol>
+            </nav>
+            
+            <h1 class="mb-4">Payment Details</h1>
+            
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Transaction Information</h5>
+                    <div>
+                        <span class="badge {% if transaction.status == 'completed' %}bg-success{% elif transaction.status == 'pending' %}bg-warning{% elif transaction.status == 'failed' %}bg-danger{% elif transaction.status == 'refunded' %}bg-info{% endif %} me-2">
+                            {{ transaction.get_status_display }}
+                        </span>
+                        {% if transaction.status == 'completed' %}
+                        <a href="{% url 'payments_app:admin_refund_payment' transaction_id=transaction.transaction_id %}" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-undo me-2"></i>Process Refund
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6>Transaction ID</h6>
+                            <p>{{ transaction.transaction_id }}</p>
+                            <h6>Customer</h6>
+                            <p>{{ transaction.user.email }}</p>
+                            <h6>Payment Method</h6>
+                            <p>{{ transaction.get_payment_method_display }}</p>
+                            <h6>Payment Details</h6>
+                            <p>{{ transaction.payment_method_details }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Date</h6>
+                            <p>{{ transaction.created_at|date:"M d, Y H:i" }}</p>
+                            <h6>Last Updated</h6>
+                            <p>{{ transaction.updated_at|date:"M d, Y H:i" }}</p>
+                            <h6>Amount</h6>
+                            <p class="fw-bold">${{ transaction.amount }}</p>
+                            {% if transaction.notes %}
+                            <h6>Notes</h6>
+                            <p>{{ transaction.notes }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Booking Information</h5>
+                    <span class="badge {% if booking.status == 'confirmed' %}bg-success{% elif booking.status == 'pending' %}bg-warning{% elif booking.status == 'cancelled' %}bg-danger{% elif booking.status == 'completed' %}bg-info{% endif %}">
+                        {{ booking.get_status_display }}
+                    </span>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6>Booking ID</h6>
+                            <p>{{ booking.booking_id }}</p>
+                            <h6>Customer</h6>
+                            <p>{{ booking.user.email }}</p>
+                            <h6>Venue</h6>
+                            <p>{{ booking.venue.name }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Booking Date</h6>
+                            <p>{{ booking.booking_date|date:"M d, Y H:i" }}</p>
+                            <h6>Total Price</h6>
+                            <p class="fw-bold">${{ booking.total_price }}</p>
+                            {% if booking.notes %}
+                            <h6>Notes</h6>
+                            <p>{{ booking.notes }}</p>
+                            {% endif %}
+                            {% if booking.cancellation_reason %}
+                            <h6>Cancellation Reason</h6>
+                            <p>{{ booking.cancellation_reason }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <h6>Services</h6>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Service</th>
+                                    <th>Date</th>
+                                    <th>Time</th>
+                                    <th>Quantity</th>
+                                    <th>Price</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in booking.items.all %}
+                                <tr>
+                                    <td>{{ item.service_title }}</td>
+                                    <td>{{ item.date|date:"M d, Y" }}</td>
+                                    <td>{{ item.time_slot|time:"g:i A" }}</td>
+                                    <td>{{ item.quantity }}</td>
+                                    <td>${{ item.service_price }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot class="table-light">
+                                <tr>
+                                    <td colspan="4" class="text-end fw-bold">Total:</td>
+                                    <td class="fw-bold">${{ booking.total_price }}</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                    
+                    <div class="d-grid">
+                        <a href="{% url 'booking_cart_app:admin_booking_detail' booking_id=booking.booking_id %}" class="btn btn-outline-primary">
+                            <i class="fas fa-calendar-check me-2"></i>View Booking Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            {% if invoice %}
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Invoice Information</h5>
+                    <span class="badge {% if invoice.status == 'paid' %}bg-success{% elif invoice.status == 'pending' %}bg-warning{% elif invoice.status == 'cancelled' %}bg-danger{% endif %}">
+                        {{ invoice.get_status_display }}
+                    </span>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6>Invoice Number</h6>
+                            <p>{{ invoice.invoice_number }}</p>
+                            <h6>Issue Date</h6>
+                            <p>{{ invoice.issue_date|date:"M d, Y H:i" }}</p>
+                            <h6>Due Date</h6>
+                            <p>{{ invoice.due_date|date:"M d, Y H:i" }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Amount</h6>
+                            <p class="fw-bold">${{ invoice.amount }}</p>
+                            {% if invoice.status == 'paid' %}
+                            <h6>Paid Date</h6>
+                            <p>{{ invoice.paid_date|date:"M d, Y H:i" }}</p>
+                            {% endif %}
+                            {% if invoice.notes %}
+                            <h6>Notes</h6>
+                            <p>{{ invoice.notes }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
+            <div class="d-flex justify-content-between">
+                <a href="{% url 'payments_app:admin_payment_list' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Payment List
+                </a>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Admin Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        {% if transaction.status == 'completed' %}
+                        <a href="{% url 'payments_app:admin_refund_payment' transaction_id=transaction.transaction_id %}" class="btn btn-outline-primary">
+                            <i class="fas fa-undo me-2"></i>Process Refund
+                        </a>
+                        {% endif %}
+                        <a href="{% url 'booking_cart_app:admin_update_booking_status' booking_id=booking.booking_id %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-edit me-2"></i>Update Booking Status
+                        </a>
+                        <a href="mailto:{{ transaction.user.email }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-envelope me-2"></i>Contact Customer
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Payment Receipt</h5>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <img src="https://via.placeholder.com/150" alt="CozyWish Logo" class="img-fluid mb-3" style="max-width: 150px;">
+                        <h5>CozyWish</h5>
+                        <p class="text-muted small mb-0">Your Wellness Booking Platform</p>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Transaction ID:</span>
+                        <span>{{ transaction.transaction_id|truncatechars:8 }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Date:</span>
+                        <span>{{ transaction.created_at|date:"M d, Y" }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Customer:</span>
+                        <span>{{ transaction.user.email }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Payment Method:</span>
+                        <span>{{ transaction.get_payment_method_display }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Status:</span>
+                        <span>{{ transaction.get_status_display }}</span>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Subtotal:</span>
+                        <span>${{ transaction.amount }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Tax:</span>
+                        <span>$0.00</span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between mb-0">
+                        <span class="fw-bold">Total:</span>
+                        <span class="fw-bold">${{ transaction.amount }}</span>
+                    </div>
+                </div>
+                <div class="card-footer bg-white text-center">
+                    <button class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-print me-2"></i>Print Receipt
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %}Cancel Booking - CozyWish{% endblock %}
+
+{% block extra_css %}
+{% load static %}
+{% load widget_tweaks %}
+<link rel="stylesheet" href="{% static 'css/booking_cart_app/booking_cart_app.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-5 radial-gradient-bg">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <!-- Breadcrumb -->
+                <nav aria-label="breadcrumb" class="mb-4">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{% url 'venues_app:home' %}" class="text-primary-brand">Home</a></li>
+                        <li class="breadcrumb-item"><a href="{% url 'booking_cart_app:booking_list' %}" class="text-primary-brand">My Bookings</a></li>
+                        <li class="breadcrumb-item"><a href="{% url 'booking_cart_app:booking_detail' booking_id=booking.booking_id %}" class="text-primary-brand">Booking Details</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Cancel Booking</li>
+                    </ol>
+                </nav>
+
+                <div class="card shadow mb-4">
+                    <div class="card-header bg-danger text-white">
+                        <h4 class="mb-0"><i class="fas fa-times-circle me-2"></i>Cancel Booking</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-warning mb-4">
+                            <div class="d-flex">
+                                <i class="fas fa-exclamation-triangle me-3 mt-1"></i>
+                                <div>
+                                    <strong>Warning:</strong> You are about to cancel your booking. This action cannot be undone. If you cancel within 6 hours of your appointment, you may be subject to a cancellation fee.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <h5 class="border-bottom pb-2 mb-3">Booking Details</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <h6 class="text-muted mb-1">Booking ID</h6>
+                                        <p class="fw-bold mb-0">{{ booking.booking_id }}</p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <h6 class="text-muted mb-1">Venue</h6>
+                                        <p class="fw-bold mb-0">{{ booking.venue.name }}</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <h6 class="text-muted mb-1">Date & Time</h6>
+                                        <p class="mb-0"><i class="far fa-calendar-alt me-1"></i>{{ booking.booking_date|date:"M d, Y" }} <i class="far fa-clock ms-2 me-1"></i>{{ booking.booking_date|time:"g:i A" }}</p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <h6 class="text-muted mb-1">Total Price</h6>
+                                        <p class="fw-bold cart-total mb-0">${{ booking.total_price }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label for="{{ form.reason.id_for_label }}" class="form-label">Reason for Cancellation</label>
+                                {% render_field form.reason class="form-control" rows="4" placeholder="Please provide a reason for cancelling this booking..." %}
+                                <div class="form-text">This information helps us improve our services.</div>
+                                {% if form.reason.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.reason.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            {% if form.non_field_errors %}
+                            <div class="alert alert-danger mt-3">
+                                <i class="fas fa-exclamation-circle me-2"></i>
+                                {{ form.non_field_errors }}
+                            </div>
+                            {% endif %}
+
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                                <a href="{% url 'booking_cart_app:booking_detail' booking_id=booking.booking_id %}" class="btn btn-outline-secondary me-md-2">
+                                    <i class="fas fa-arrow-left me-2"></i>Keep My Booking
+                                </a>
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="fas fa-times-circle me-2"></i>Cancel Booking
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

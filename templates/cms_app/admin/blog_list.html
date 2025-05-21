@@ -1,0 +1,345 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Manage Blog Posts - CozyWish Admin{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/cms_app/cms_app.css' %}">
+<link rel="stylesheet" href="{% static 'css/cms_app/cms_admin.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Admin Header -->
+    <div class="admin-header rounded-4 mb-4 p-4 text-center">
+        <h1 class="display-5 mb-2">Manage Blog Posts</h1>
+        <p class="lead mb-0">Create, edit, and manage blog content for your website</p>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <!-- Action Bar -->
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+                <div class="d-flex gap-2">
+                    <a href="{% url 'cms_app:admin_blog_create' %}" class="btn btn-primary rounded-pill">
+                        <i class="fas fa-plus me-2"></i> Create New Post
+                    </a>
+                    <a href="{% url 'cms_app:admin_blog_category_list' %}" class="btn btn-outline-primary rounded-pill">
+                        <i class="fas fa-tags me-2"></i> Manage Categories
+                    </a>
+                </div>
+                <div>
+                    <a href="{% url 'cms_app:admin_blog_pending' %}" class="btn btn-warning rounded-pill">
+                        <i class="fas fa-clock me-2"></i> Pending Approval
+                        <span class="badge bg-dark ms-1">{{ pending_count|default:0 }}</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="stats-card stats-card-primary">
+                        <div class="stats-icon">
+                            <i class="fas fa-newspaper"></i>
+                        </div>
+                        <div class="stats-title">Total Posts</div>
+                        <div class="stats-value">{{ posts.count }}</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card stats-card-success">
+                        <div class="stats-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stats-title">Published</div>
+                        <div class="stats-value">{{ published_count|default:0 }}</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card stats-card-warning">
+                        <div class="stats-icon">
+                            <i class="fas fa-pencil-alt"></i>
+                        </div>
+                        <div class="stats-title">Drafts</div>
+                        <div class="stats-value">{{ draft_count|default:0 }}</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card stats-card-info">
+                        <div class="stats-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stats-title">Pending</div>
+                        <div class="stats-value">{{ pending_count|default:0 }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Blog Posts Table -->
+            <div class="admin-card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">All Blog Posts</h5>
+                    <div class="d-flex gap-2">
+                        <form method="get" class="d-flex">
+                            <select name="status" class="form-select form-select-sm me-2" onchange="this.form.submit()">
+                                <option value="">All Statuses</option>
+                                <option value="draft" {% if status_filter == 'draft' %}selected{% endif %}>Draft</option>
+                                <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending Approval</option>
+                                <option value="published" {% if status_filter == 'published' %}selected{% endif %}>Published</option>
+                                <option value="archived" {% if status_filter == 'archived' %}selected{% endif %}>Archived</option>
+                            </select>
+                            <select name="category" class="form-select form-select-sm" onchange="this.form.submit()">
+                                <option value="">All Categories</option>
+                                {% for category in categories %}
+                                <option value="{{ category.id }}" {% if category_filter == category.id|stringformat:"i" %}selected{% endif %}>{{ category.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </form>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+
+                    {% if posts %}
+                    <div class="table-responsive">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Author</th>
+                                    <th>Status</th>
+                                    <th>Categories</th>
+                                    <th>Created</th>
+                                    <th>Published</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for post in posts %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            {% if post.featured_image %}
+                                            <div class="me-2" style="width: 40px; height: 40px; overflow: hidden; border-radius: 4px;">
+                                                <img src="{{ post.featured_image.url }}" alt="{{ post.title }}" class="img-fluid" style="width: 40px; height: 40px; object-fit: cover;">
+                                            </div>
+                                            {% else %}
+                                            <div class="me-2 bg-light d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; border-radius: 4px;">
+                                                <i class="fas fa-file-alt text-muted"></i>
+                                            </div>
+                                            {% endif %}
+                                            <div>
+                                                <div class="fw-bold">{{ post.title }}</div>
+                                                <small class="text-muted">{{ post.slug }}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>{{ post.author.get_full_name|default:post.author.email }}</td>
+                                    <td>
+                                        {% if post.status == 'draft' %}
+                                        <span class="status-badge status-badge-draft">Draft</span>
+                                        {% elif post.status == 'pending' %}
+                                        <span class="status-badge status-badge-pending">Pending</span>
+                                        {% elif post.status == 'published' %}
+                                        <span class="status-badge status-badge-published">Published</span>
+                                        {% elif post.status == 'archived' %}
+                                        <span class="status-badge status-badge-archived">Archived</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% for category in post.categories.all %}
+                                        <span class="badge bg-accent text-primary rounded-pill px-2 py-1 me-1">{{ category.name }}</span>
+                                        {% empty %}
+                                        <span class="text-muted">None</span>
+                                        {% endfor %}
+                                    </td>
+                                    <td>{{ post.created_at|date:"M d, Y" }}</td>
+                                    <td>
+                                        {% if post.published_at %}
+                                        {{ post.published_at|date:"M d, Y" }}
+                                        {% else %}
+                                        <span class="text-muted">Not published</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            {% if post.status == 'published' %}
+                                            <a href="{% url 'cms_app:blog_detail' post.slug %}" class="action-btn action-btn-view" data-bs-toggle="tooltip" title="View" target="_blank">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            {% endif %}
+
+                                            {% if post.status == 'pending' %}
+                                            <a href="{% url 'cms_app:admin_blog_approve' post.slug %}" class="action-btn action-btn-approve" data-bs-toggle="tooltip" title="Approve">
+                                                <i class="fas fa-check"></i>
+                                            </a>
+                                            {% endif %}
+
+                                            <a href="{% url 'cms_app:admin_blog_update' post.slug %}" class="action-btn action-btn-edit" data-bs-toggle="tooltip" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="{% url 'cms_app:admin_blog_delete' post.slug %}" class="action-btn action-btn-delete" data-bs-toggle="tooltip" title="Delete">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="p-4 text-center">
+                        <div class="mb-3">
+                            <i class="fas fa-newspaper fa-3x text-muted"></i>
+                        </div>
+                        <h5>No Blog Posts Found</h5>
+                        <p class="text-muted mb-3">There are no blog posts matching your criteria.</p>
+                        <a href="{% url 'cms_app:admin_blog_create' %}" class="btn btn-primary rounded-pill">
+                            <i class="fas fa-plus me-2"></i> Create New Post
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            {% if posts.paginator.num_pages > 1 %}
+            <nav aria-label="Blog pagination" class="mt-4">
+                <ul class="pagination admin-pagination justify-content-center">
+                    {% if posts.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}" aria-label="First">
+                            <i class="fas fa-angle-double-left"></i>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ posts.previous_page_number }}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}" aria-label="Previous">
+                            <i class="fas fa-angle-left"></i>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" aria-label="First">
+                            <i class="fas fa-angle-double-left"></i>
+                        </a>
+                    </li>
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" aria-label="Previous">
+                            <i class="fas fa-angle-left"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    {% for i in posts.paginator.page_range %}
+                        {% if posts.number == i %}
+                        <li class="page-item active"><a class="page-link" href="#">{{ i }}</a></li>
+                        {% elif i > posts.number|add:'-3' and i < posts.number|add:'3' %}
+                        <li class="page-item"><a class="page-link" href="?page={{ i }}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}">{{ i }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if posts.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ posts.next_page_number }}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}" aria-label="Next">
+                            <i class="fas fa-angle-right"></i>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ posts.paginator.num_pages }}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}" aria-label="Last">
+                            <i class="fas fa-angle-double-right"></i>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" aria-label="Next">
+                            <i class="fas fa-angle-right"></i>
+                        </a>
+                    </li>
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" aria-label="Last">
+                            <i class="fas fa-angle-double-right"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+
+            <!-- Blog Management Tips -->
+            <div class="card shadow-sm border-0 rounded-4 mb-4">
+                <div class="card-header bg-primary text-white rounded-top-4">
+                    <h5 class="mb-0 brand-text">Blog Management Tips</h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="fw-bold mb-3">Content Guidelines</h6>
+                            <ul class="list-group list-group-flush border-0">
+                                <li class="list-group-item bg-light rounded-3 mb-2 px-3 py-2 d-flex align-items-center">
+                                    <i class="fas fa-check-circle text-success me-2"></i>
+                                    Ensure content is relevant to the platform's audience
+                                </li>
+                                <li class="list-group-item bg-light rounded-3 mb-2 px-3 py-2 d-flex align-items-center">
+                                    <i class="fas fa-check-circle text-success me-2"></i>
+                                    Check for grammar and spelling errors
+                                </li>
+                                <li class="list-group-item bg-light rounded-3 mb-2 px-3 py-2 d-flex align-items-center">
+                                    <i class="fas fa-check-circle text-success me-2"></i>
+                                    Verify that all links are working
+                                </li>
+                                <li class="list-group-item bg-light rounded-3 mb-2 px-3 py-2 d-flex align-items-center">
+                                    <i class="fas fa-check-circle text-success me-2"></i>
+                                    Ensure images are properly credited
+                                </li>
+                                <li class="list-group-item bg-light rounded-3 mb-0 px-3 py-2 d-flex align-items-center">
+                                    <i class="fas fa-check-circle text-success me-2"></i>
+                                    Categorize posts appropriately
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="fw-bold mb-3">Approval Process</h6>
+                            <ul class="list-group list-group-flush border-0">
+                                <li class="list-group-item bg-light rounded-3 mb-2 px-3 py-2 d-flex align-items-center">
+                                    <i class="fas fa-check-circle text-success me-2"></i>
+                                    Review content for accuracy and quality
+                                </li>
+                                <li class="list-group-item bg-light rounded-3 mb-2 px-3 py-2 d-flex align-items-center">
+                                    <i class="fas fa-check-circle text-success me-2"></i>
+                                    Ensure content aligns with platform guidelines
+                                </li>
+                                <li class="list-group-item bg-light rounded-3 mb-2 px-3 py-2 d-flex align-items-center">
+                                    <i class="fas fa-check-circle text-success me-2"></i>
+                                    Check for appropriate categorization
+                                </li>
+                                <li class="list-group-item bg-light rounded-3 mb-2 px-3 py-2 d-flex align-items-center">
+                                    <i class="fas fa-check-circle text-success me-2"></i>
+                                    Verify SEO elements are properly set
+                                </li>
+                                <li class="list-group-item bg-light rounded-3 mb-0 px-3 py-2 d-flex align-items-center">
+                                    <i class="fas fa-check-circle text-success me-2"></i>
+                                    Provide feedback to authors if rejecting content
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/cms_app/cms_app.js' %}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize tooltips
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    });
+</script>
+{% endblock %}

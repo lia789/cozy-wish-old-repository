@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Delete Announcement - CozyWish Admin{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/cms_app/cms_app.css' %}">
+<link rel="stylesheet" href="{% static 'css/cms_app/cms_admin.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Admin Header -->
+    <div class="admin-header rounded-4 mb-4 p-4 text-center">
+        <h1 class="display-5 mb-2">Delete Announcement</h1>
+        <p class="lead mb-0">Permanently remove this announcement from your website</p>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-6 mx-auto">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="{% url 'cms_app:admin_announcement_list' %}">Announcements</a></li>
+                        <li class="breadcrumb-item active">Delete</li>
+                    </ol>
+                </nav>
+                <a href="{% url 'cms_app:admin_announcement_list' %}" class="btn btn-outline-primary rounded-pill">
+                    <i class="fas fa-arrow-left me-2"></i> Back to Announcements
+                </a>
+            </div>
+            
+            <div class="admin-card">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0 brand-text">Confirm Deletion</h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="alert alert-warning rounded-4 mb-4">
+                        <div class="d-flex">
+                            <i class="fas fa-exclamation-triangle me-3 fa-2x"></i>
+                            <div>
+                                <h5 class="alert-heading">Warning!</h5>
+                                <p class="mb-0">You are about to delete the announcement <strong>"{{ announcement.title }}"</strong>.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h6 class="mb-3">Announcement Details:</h6>
+                        <ul class="list-group list-group-flush border-0 mb-3">
+                            <li class="list-group-item bg-light rounded-3 mb-2 px-3 py-2 d-flex justify-content-between">
+                                <span>Title:</span>
+                                <span class="fw-bold">{{ announcement.title }}</span>
+                            </li>
+                            <li class="list-group-item bg-light rounded-3 mb-2 px-3 py-2 d-flex justify-content-between">
+                                <span>Type:</span>
+                                <span class="fw-bold">{{ announcement.get_announcement_type_display }}</span>
+                            </li>
+                            <li class="list-group-item bg-light rounded-3 mb-2 px-3 py-2 d-flex justify-content-between">
+                                <span>Status:</span>
+                                <span class="fw-bold">{% if announcement.is_active %}Active{% else %}Inactive{% endif %}</span>
+                            </li>
+                            <li class="list-group-item bg-light rounded-3 mb-2 px-3 py-2 d-flex justify-content-between">
+                                <span>Start Date:</span>
+                                <span class="fw-bold">{{ announcement.start_date|date:"F j, Y" }}</span>
+                            </li>
+                            <li class="list-group-item bg-light rounded-3 mb-0 px-3 py-2 d-flex justify-content-between">
+                                <span>End Date:</span>
+                                <span class="fw-bold">{{ announcement.end_date|date:"F j, Y" }}</span>
+                            </li>
+                        </ul>
+                        
+                        <div class="alert alert-{{ announcement.announcement_type }} rounded-3 mb-3">
+                            <div class="d-flex">
+                                {% if announcement.announcement_type == 'info' %}
+                                    <i class="fas fa-info-circle me-2 mt-1"></i>
+                                {% elif announcement.announcement_type == 'success' %}
+                                    <i class="fas fa-check-circle me-2 mt-1"></i>
+                                {% elif announcement.announcement_type == 'warning' %}
+                                    <i class="fas fa-exclamation-triangle me-2 mt-1"></i>
+                                {% elif announcement.announcement_type == 'danger' %}
+                                    <i class="fas fa-exclamation-circle me-2 mt-1"></i>
+                                {% endif %}
+                                <div>
+                                    <h6 class="alert-heading fw-bold">{{ announcement.title }}</h6>
+                                    <p class="mb-0">{{ announcement.content }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-danger rounded-3">
+                            <p class="mb-0"><strong>This action cannot be undone.</strong> The announcement will be permanently removed from your website.</p>
+                        </div>
+                    </div>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'cms_app:admin_announcement_list' %}" class="btn btn-outline-secondary rounded-pill">
+                                <i class="fas fa-times me-2"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-danger rounded-pill">
+                                <i class="fas fa-trash-alt me-2"></i> Delete Permanently
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/cms_app/cms_app.js' %}"></script>
+{% endblock %}

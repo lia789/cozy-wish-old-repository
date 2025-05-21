@@ -1,0 +1,311 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} - CozyWish{% endblock %}
+
+{% block extra_css %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/discount_app/discount_app.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-5 radial-gradient-bg">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card shadow">
+                    <div class="card-header bg-primary-brand text-white">
+                        <h2 class="h4 mb-0">{{ title }}</h2>
+                    </div>
+                    <div class="card-body">
+                        {% if messages %}
+                        <div class="messages mb-4">
+                            {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+
+                        <form method="post" class="discount-form">
+                            {% csrf_token %}
+
+                            {% if form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                {% for error in form.non_field_errors %}
+                                {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="{{ form.name.id_for_label }}" class="form-label">Discount Name*</label>
+                                        {{ form.name }}
+                                        {% if form.name.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.name.errors %}
+                                            {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                        <small class="form-text text-muted">A short, descriptive name for your discount.</small>
+                                    </div>
+                                </div>
+
+                                {% if form.venue %}
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="{{ form.venue.id_for_label }}" class="form-label">Venue*</label>
+                                        {{ form.venue }}
+                                        {% if form.venue.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.venue.errors %}
+                                            {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                        <small class="form-text text-muted">Select the venue this discount applies to.</small>
+                                    </div>
+                                </div>
+                                {% endif %}
+
+                                {% if form.service %}
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="{{ form.service.id_for_label }}" class="form-label">Service*</label>
+                                        {{ form.service }}
+                                        {% if form.service.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.service.errors %}
+                                            {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                        <small class="form-text text-muted">Select the service this discount applies to.</small>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label for="{{ form.description.id_for_label }}" class="form-label">Description*</label>
+                                {{ form.description }}
+                                {% if form.description.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.description.errors %}
+                                    {{ error }}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                                <small class="form-text text-muted">Provide details about this discount (100-200 characters recommended).</small>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="{{ form.discount_type.id_for_label }}" class="form-label">Discount Type*</label>
+                                        {{ form.discount_type }}
+                                        {% if form.discount_type.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.discount_type.errors %}
+                                            {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                        <small class="form-text text-muted">Choose between percentage or fixed amount discount.</small>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="{{ form.discount_value.id_for_label }}" class="form-label">Discount Value*</label>
+                                        <div class="input-group">
+                                            {{ form.discount_value }}
+                                            <span class="input-group-text discount-symbol">%</span>
+                                        </div>
+                                        {% if form.discount_value.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.discount_value.errors %}
+                                            {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                        <small class="form-text text-muted">For percentage: 1-100. For fixed amount: dollar value.</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="{{ form.start_date.id_for_label }}" class="form-label">Start Date*</label>
+                                        {{ form.start_date }}
+                                        {% if form.start_date.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.start_date.errors %}
+                                            {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                        <small class="form-text text-muted">When the discount will become active.</small>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="{{ form.end_date.id_for_label }}" class="form-label">End Date*</label>
+                                        {{ form.end_date }}
+                                        {% if form.end_date.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.end_date.errors %}
+                                            {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                        <small class="form-text text-muted">When the discount will expire.</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {% if form.min_booking_value %}
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="{{ form.min_booking_value.id_for_label }}" class="form-label">Minimum Booking Value</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">$</span>
+                                            {{ form.min_booking_value }}
+                                        </div>
+                                        {% if form.min_booking_value.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.min_booking_value.errors %}
+                                            {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                        <small class="form-text text-muted">Minimum booking amount required (optional).</small>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="{{ form.max_discount_amount.id_for_label }}" class="form-label">Maximum Discount Amount</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">$</span>
+                                            {{ form.max_discount_amount }}
+                                        </div>
+                                        {% if form.max_discount_amount.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.max_discount_amount.errors %}
+                                            {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                        <small class="form-text text-muted">Maximum discount amount (optional, for percentage discounts).</small>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i> All discounts require admin approval before becoming active. You'll be notified once your discount is approved.
+                            </div>
+
+                            <div class="d-flex justify-content-between mt-4">
+                                <a href="{% url 'discount_app:service_provider_discounts' %}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-arrow-left me-1"></i> Cancel
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-1"></i> Save Discount
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add Bootstrap form classes
+        const formInputs = document.querySelectorAll('.discount-form input, .discount-form select, .discount-form textarea');
+        formInputs.forEach(input => {
+            if (input.type !== 'hidden' && input.type !== 'submit') {
+                input.classList.add('form-control');
+            }
+        });
+
+        // Update discount symbol based on discount type
+        const discountTypeSelect = document.getElementById('{{ form.discount_type.id_for_label }}');
+        const discountSymbol = document.querySelector('.discount-symbol');
+
+        if (discountTypeSelect && discountSymbol) {
+            function updateDiscountSymbol() {
+                if (discountTypeSelect.value === 'percentage') {
+                    discountSymbol.textContent = '%';
+                } else {
+                    discountSymbol.textContent = '$';
+                }
+            }
+
+            // Set initial value
+            updateDiscountSymbol();
+
+            // Update on change
+            discountTypeSelect.addEventListener('change', updateDiscountSymbol);
+        }
+
+        {% if form.service %}
+        // If venue changes, update service options
+        const venueSelect = document.getElementById('{{ form.venue.id_for_label }}');
+        const serviceSelect = document.getElementById('{{ form.service.id_for_label }}');
+
+        if (venueSelect && serviceSelect) {
+            venueSelect.addEventListener('change', function() {
+                const venueId = this.value;
+                if (venueId) {
+                    // Fetch services for the selected venue
+                    fetch(`/venues/api/services/?venue_id=${venueId}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            // Clear current options
+                            serviceSelect.innerHTML = '<option value="">Select a service</option>';
+
+                            // Add new options
+                            data.forEach(service => {
+                                const option = document.createElement('option');
+                                option.value = service.id;
+                                option.textContent = service.title;
+                                serviceSelect.appendChild(option);
+                            });
+
+                            // Enable the service select
+                            serviceSelect.disabled = false;
+                        })
+                        .catch(error => console.error('Error fetching services:', error));
+                } else {
+                    // Disable and clear service select if no venue selected
+                    serviceSelect.disabled = true;
+                    serviceSelect.innerHTML = '<option value="">Select a venue first</option>';
+                }
+            });
+
+            // Initialize on page load
+            if (venueSelect.value) {
+                serviceSelect.disabled = false;
+            } else {
+                serviceSelect.disabled = true;
+                serviceSelect.innerHTML = '<option value="">Select a venue first</option>';
+            }
+        }
+        {% endif %}
+    });
+</script>
+{% endblock %}

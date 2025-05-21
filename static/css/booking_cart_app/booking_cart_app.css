@@ -1,0 +1,287 @@
+/* Booking Cart App Styles */
+
+/* Simple Background */
+.radial-gradient-bg {
+    background-color: #f8f9fa;
+}
+
+/* Brand Colors */
+.bg-primary-brand {
+    background-color: #2F160F !important;
+    color: white;
+}
+
+.text-primary-brand {
+    color: #2F160F !important;
+}
+
+.btn-primary {
+    background-color: #2F160F;
+    border-color: #2F160F;
+}
+
+.btn-primary:hover, .btn-primary:focus {
+    background-color: #1a0d09;
+    border-color: #1a0d09;
+}
+
+.btn-outline-primary {
+    color: #2F160F;
+    border-color: #2F160F;
+}
+
+.btn-outline-primary:hover, .btn-outline-primary:focus {
+    background-color: #2F160F;
+    border-color: #2F160F;
+    color: white;
+}
+
+/* Page Headers */
+.page-header {
+    margin-bottom: 2rem;
+}
+
+.page-title {
+    font-family: 'Yeseva One', serif;
+    color: #2F160F;
+    margin-bottom: 0.5rem;
+}
+
+/* Cards */
+.card {
+    border-radius: 10px;
+    border: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+}
+
+.card-header {
+    background-color: #fff;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 1rem 1.25rem;
+}
+
+.card-header.bg-primary-brand {
+    background-color: #2F160F !important;
+    color: white;
+}
+
+/* Cart Styles */
+.cart-item {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 1rem 0;
+}
+
+.cart-item:last-child {
+    border-bottom: none;
+}
+
+.cart-item-image {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.cart-item-title {
+    font-weight: 500;
+    color: #2F160F;
+    margin-bottom: 0.25rem;
+}
+
+.cart-item-venue {
+    color: #666;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.cart-item-details {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.cart-item-price {
+    font-weight: 600;
+    color: #2F160F;
+}
+
+.cart-item-discounted-price {
+    font-weight: 600;
+    color: #dc3545;
+}
+
+.cart-item-original-price {
+    text-decoration: line-through;
+    color: #999;
+    font-size: 0.9rem;
+}
+
+.cart-summary {
+    background-color: #f8f9fa;
+    padding: 1rem;
+    border-radius: 8px;
+}
+
+.cart-total {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #2F160F;
+}
+
+/* Booking Styles */
+.booking-card {
+    transition: transform 0.2s;
+}
+
+.booking-card:hover {
+    transform: translateY(-5px);
+}
+
+.booking-status {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.booking-status-pending {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.booking-status-confirmed {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.booking-status-cancelled {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.booking-status-completed {
+    background-color: #d1ecf1;
+    color: #0c5460;
+}
+
+.booking-status-disputed {
+    background-color: #e2e3e5;
+    color: #383d41;
+}
+
+.booking-date {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.booking-venue {
+    font-weight: 500;
+    color: #2F160F;
+}
+
+.booking-service {
+    color: #333;
+}
+
+.booking-price {
+    font-weight: 600;
+    color: #2F160F;
+}
+
+/* Service Availability Styles */
+.availability-calendar {
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.availability-date {
+    background-color: #f8f9fa;
+    padding: 0.5rem;
+    text-align: center;
+    font-weight: 500;
+}
+
+.availability-time-slot {
+    padding: 0.5rem;
+    border-bottom: 1px solid #eee;
+}
+
+.availability-time-slot:last-child {
+    border-bottom: none;
+}
+
+.availability-status {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 0.5rem;
+}
+
+.availability-status-available {
+    background-color: #28a745;
+}
+
+.availability-status-limited {
+    background-color: #ffc107;
+}
+
+.availability-status-unavailable {
+    background-color: #dc3545;
+}
+
+/* Form Styles */
+.form-control:focus {
+    border-color: #2F160F;
+    box-shadow: 0 0 0 0.25rem rgba(47, 22, 15, 0.25);
+}
+
+.form-label {
+    font-weight: 500;
+    color: #333;
+}
+
+.form-text {
+    color: #666;
+}
+
+/* Analytics Styles */
+.analytics-card {
+    text-align: center;
+    padding: 1.5rem;
+}
+
+.analytics-value {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #2F160F;
+    margin-bottom: 0.5rem;
+}
+
+.analytics-label {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.analytics-chart {
+    height: 300px;
+    margin-bottom: 1rem;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 767.98px) {
+    .cart-item-image {
+        width: 60px;
+        height: 60px;
+    }
+
+    .page-title {
+        font-size: 1.75rem;
+    }
+
+    .analytics-value {
+        font-size: 1.5rem;
+    }
+}

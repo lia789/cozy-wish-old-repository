@@ -1,0 +1,19 @@
+INFO 2025-05-14 18:34:38,983 autoreload Watching for file changes with StatReloader
+INFO 2025-05-14 18:34:43,125 basehttp "GET / HTTP/1.1" 200 32777
+INFO 2025-05-14 18:34:48,737 basehttp "GET /venues/?query=&location= HTTP/1.1" 200 40020
+INFO 2025-05-14 18:34:48,901 basehttp "GET /static/js/venues.js HTTP/1.1" 304 0
+INFO 2025-05-14 18:34:52,894 basehttp "GET /venues/?query=&location= HTTP/1.1" 200 40020
+INFO 2025-05-14 18:34:52,959 basehttp "GET /static/css/venues_app/venues_app.css HTTP/1.1" 200 1434
+INFO 2025-05-14 18:34:52,974 basehttp "GET /static/js/venues.js HTTP/1.1" 200 4392
+INFO 2025-05-14 18:34:52,974 basehttp "GET /static/js/location_search.js HTTP/1.1" 200 7241
+INFO 2025-05-14 18:34:52,967 basehttp "GET /static/css/style.css HTTP/1.1" 200 12613
+INFO 2025-05-14 18:34:52,986 basehttp "GET /static/debug_toolbar/css/toolbar.css HTTP/1.1" 200 29444
+INFO 2025-05-14 18:34:52,988 basehttp "GET /static/js/messages.js HTTP/1.1" 200 644
+INFO 2025-05-14 18:34:53,013 basehttp "GET /static/debug_toolbar/js/toolbar.js HTTP/1.1" 200 14803
+INFO 2025-05-14 18:34:53,210 basehttp "GET /static/debug_toolbar/css/print.css HTTP/1.1" 200 43
+WARNING 2025-05-14 18:34:53,346 log Not Found: /favicon.ico
+WARNING 2025-05-14 18:34:53,346 basehttp "GET /favicon.ico HTTP/1.1" 404 19043
+INFO 2025-05-14 18:50:30,019 basehttp "GET /venues/?query=&location= HTTP/1.1" 200 40020
+INFO 2025-05-18 16:08:55,081 autoreload Watching for file changes with StatReloader
+INFO 2025-05-18 16:09:58,641 autoreload Watching for file changes with StatReloader
+INFO 2025-05-18 16:10:47,475 autoreload Watching for file changes with StatReloader

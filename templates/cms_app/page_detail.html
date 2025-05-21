@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+{% load static structured_data cms_tags %}
+
+{% block title %}{{ page.title }} - CozyWish{% endblock %}
+
+{% block meta %}
+{% if page.meta_description %}
+<meta name="description" content="{{ page.meta_description }}">
+{% endif %}
+{% if page.meta_keywords %}
+<meta name="keywords" content="{{ page.meta_keywords }}">
+{% endif %}
+{% page_structured_data page %}
+{% organization_structured_data %}
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/cms_app/cms_app.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0 rounded-4 mb-4">
+                <div class="card-body p-4 p-md-5">
+                    <h1 class="brand-text display-5 mb-4">{{ page.title }}</h1>
+                    <div class="cms-content">
+                        {{ page.content|safe }}
+                    </div>
+
+                    {% if request.user.is_staff %}
+                    <div class="mt-5 pt-4 border-top">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">
+                                Last updated: {{ page.updated_at|date:"F j, Y" }}
+                            </small>
+                            <a href="{% url 'cms_app:admin_page_update' page.slug %}" class="btn btn-sm btn-outline-primary rounded-pill">
+                                <i class="fas fa-edit me-1"></i> Edit Page
+                            </a>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+    <div class="col-lg-4">
+        {% if announcements %}
+        <div class="card shadow-sm border-0 rounded-4 mb-4">
+            <div class="card-header bg-primary text-white rounded-top-4">
+                <h5 class="mb-0 brand-text">Announcements</h5>
+            </div>
+            <div class="card-body p-4">
+                {% for announcement in announcements %}
+                <div class="alert alert-{{ announcement.announcement_type }} mb-3 rounded-3">
+                    <div class="d-flex">
+                        {% if announcement.announcement_type == 'info' %}
+                            <i class="fas fa-info-circle me-2 mt-1"></i>
+                        {% elif announcement.announcement_type == 'success' %}
+                            <i class="fas fa-check-circle me-2 mt-1"></i>
+                        {% elif announcement.announcement_type == 'warning' %}
+                            <i class="fas fa-exclamation-triangle me-2 mt-1"></i>
+                        {% elif announcement.announcement_type == 'danger' %}
+                            <i class="fas fa-exclamation-circle me-2 mt-1"></i>
+                        {% endif %}
+                        <div>
+                            <h6 class="alert-heading fw-bold">{{ announcement.title }}</h6>
+                            <p class="mb-0">{{ announcement.content }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="card shadow-sm border-0 rounded-4 mb-4">
+            <div class="card-header bg-primary text-white rounded-top-4">
+                <h5 class="mb-0 brand-text">Contact Us</h5>
+            </div>
+            <div class="card-body p-4">
+                <p class="mb-3"><i class="fas fa-envelope me-2"></i> {{ site_config.contact_email }}</p>
+                {% if site_config.contact_phone %}
+                <p class="mb-3"><i class="fas fa-phone me-2"></i> {{ site_config.contact_phone }}</p>
+                {% endif %}
+                {% if site_config.contact_address %}
+                <p class="mb-4"><i class="fas fa-map-marker-alt me-2"></i> {{ site_config.contact_address|linebreaksbr }}</p>
+                {% endif %}
+
+                <div class="mt-3 d-flex gap-2">
+                    {% if site_config.facebook_url %}
+                    <a href="{{ site_config.facebook_url }}" class="btn btn-outline-primary rounded-circle" style="width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center;" target="_blank">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    {% endif %}
+
+                    {% if site_config.twitter_url %}
+                    <a href="{{ site_config.twitter_url }}" class="btn btn-outline-primary rounded-circle" style="width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center;" target="_blank">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    {% endif %}
+
+                    {% if site_config.instagram_url %}
+                    <a href="{{ site_config.instagram_url }}" class="btn btn-outline-primary rounded-circle" style="width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center;" target="_blank">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    {% endif %}
+
+                    {% if site_config.linkedin_url %}
+                    <a href="{{ site_config.linkedin_url }}" class="btn btn-outline-primary rounded-circle" style="width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center;" target="_blank">
+                        <i class="fab fa-linkedin-in"></i>
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm border-0 rounded-4 mb-4">
+            <div class="card-header bg-primary text-white rounded-top-4">
+                <h5 class="mb-0 brand-text">Recent Blog Posts</h5>
+            </div>
+            <div class="card-body p-4">
+                {% get_recent_posts 5 as recent_posts %}
+                {% if recent_posts %}
+                    <ul class="list-unstyled mb-0">
+                        {% for post in recent_posts %}
+                            <li class="mb-3 pb-3 {% if not forloop.last %}border-bottom{% endif %}">
+                                <a href="{% url 'cms_app:blog_detail' post.slug %}" class="text-decoration-none">
+                                    <h6 class="mb-1 text-primary">{{ post.title }}</h6>
+                                </a>
+                                <small class="text-muted">{{ post.published_at|date:"F j, Y" }}</small>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="mb-0">No blog posts available.</p>
+                {% endif %}
+
+                <div class="mt-3 text-center">
+                    <a href="{% url 'cms_app:blog_list' %}" class="btn btn-outline-primary rounded-pill">
+                        <i class="fas fa-book me-1"></i> View All Posts
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/cms_app/cms_app.js' %}"></script>
+{% endblock %}

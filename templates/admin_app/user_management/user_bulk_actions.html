@@ -1,0 +1,194 @@
+{% extends 'admin_app/base.html' %}
+
+{% block admin_content %}
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Bulk User Actions</h1>
+    <div>
+        <a href="{% url 'admin_app:user_list' %}" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm">
+            <i class="fas fa-arrow-left fa-sm text-white-50 me-1"></i> Back to Users
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">Select Users and Action</h6>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.action.id_for_label }}" class="form-label">Action</label>
+                                {{ form.action }}
+                                {% if form.action.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.action.errors %}
+                                    {{ error }}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="mb-3" id="groupField" style="display: none;">
+                                <label for="{{ form.group.id_for_label }}" class="form-label">Group</label>
+                                {{ form.group }}
+                                {% if form.group.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.group.errors %}
+                                    {{ error }}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                                {% if form.group.help_text %}
+                                <div class="form-text">{{ form.group.help_text }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <strong>Note:</strong> The selected action will be applied to all checked users. Please review your selection carefully before proceeding.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="usersTable" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="selectAll">
+                                            <label class="form-check-label" for="selectAll">
+                                                Select All
+                                            </label>
+                                        </div>
+                                    </th>
+                                    <th>Email</th>
+                                    <th>Name</th>
+                                    <th>Type</th>
+                                    <th>Status</th>
+                                    <th>Joined</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in users %}
+                                <tr>
+                                    <td>
+                                        <div class="form-check">
+                                            <input class="form-check-input user-checkbox" type="checkbox" name="selected_users" value="{{ user.id }}" id="user{{ user.id }}">
+                                            <label class="form-check-label" for="user{{ user.id }}"></label>
+                                        </div>
+                                    </td>
+                                    <td>{{ user.email }}</td>
+                                    <td>{{ user.get_full_name|default:"-" }}</td>
+                                    <td>
+                                        {% if user.is_superuser %}
+                                        <span class="badge bg-danger">Superuser</span>
+                                        {% elif user.is_staff %}
+                                        <span class="badge bg-primary">Staff</span>
+                                        {% elif user.is_service_provider %}
+                                        <span class="badge bg-info">Provider</span>
+                                        {% elif user.is_customer %}
+                                        <span class="badge bg-success">Customer</span>
+                                        {% else %}
+                                        <span class="badge bg-secondary">Unknown</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if user.is_active %}
+                                        <span class="badge bg-success">Active</span>
+                                        {% else %}
+                                        <span class="badge bg-danger">Inactive</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ user.date_joined|date:"M d, Y" }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                        <a href="{% url 'admin_app:user_list' %}" class="btn btn-secondary me-md-2">Cancel</a>
+                        <button type="submit" class="btn btn-primary" id="applyAction">Apply Action</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block admin_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Select All checkbox
+        const selectAllCheckbox = document.getElementById('selectAll');
+        const userCheckboxes = document.querySelectorAll('.user-checkbox');
+        
+        selectAllCheckbox.addEventListener('change', function() {
+            userCheckboxes.forEach(checkbox => {
+                checkbox.checked = selectAllCheckbox.checked;
+            });
+        });
+        
+        // Update Select All checkbox when individual checkboxes change
+        userCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const allChecked = Array.from(userCheckboxes).every(cb => cb.checked);
+                const anyChecked = Array.from(userCheckboxes).some(cb => cb.checked);
+                
+                selectAllCheckbox.checked = allChecked;
+                selectAllCheckbox.indeterminate = anyChecked && !allChecked;
+            });
+        });
+        
+        // Show/hide group field based on action
+        const actionSelect = document.getElementById('id_action');
+        const groupField = document.getElementById('groupField');
+        
+        actionSelect.addEventListener('change', function() {
+            if (actionSelect.value === 'add_to_group' || actionSelect.value === 'remove_from_group') {
+                groupField.style.display = 'block';
+            } else {
+                groupField.style.display = 'none';
+            }
+        });
+        
+        // Trigger change event to set initial state
+        actionSelect.dispatchEvent(new Event('change'));
+        
+        // Validate form before submission
+        const form = document.querySelector('form');
+        const applyButton = document.getElementById('applyAction');
+        
+        form.addEventListener('submit', function(event) {
+            const selectedUsers = document.querySelectorAll('.user-checkbox:checked');
+            
+            if (selectedUsers.length === 0) {
+                event.preventDefault();
+                alert('Please select at least one user.');
+                return false;
+            }
+            
+            const action = actionSelect.value;
+            const groupSelect = document.getElementById('id_group');
+            
+            if ((action === 'add_to_group' || action === 'remove_from_group') && !groupSelect.value) {
+                event.preventDefault();
+                alert('Please select a group for this action.');
+                return false;
+            }
+            
+            return true;
+        });
+    });
+</script>
+{% endblock %}

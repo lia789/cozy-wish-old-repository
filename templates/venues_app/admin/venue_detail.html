@@ -1,0 +1,215 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin - {{ venue.name }} - CozyWish{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'venues_app:admin_venue_list' %}">Venues</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ venue.name }}</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1>{{ venue.name }}</h1>
+                <span class="badge {% if venue.approval_status == 'approved' %}bg-success{% elif venue.approval_status == 'pending' %}bg-warning{% else %}bg-danger{% endif %} fs-6">
+                    {{ venue.approval_status|title }}
+                </span>
+            </div>
+
+            {% if venue.approval_status == 'rejected' %}
+            <div class="alert alert-danger mb-4">
+                <h5 class="alert-heading">Rejection Reason:</h5>
+                <p class="mb-0">{{ venue.rejection_reason }}</p>
+            </div>
+            {% endif %}
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Venue Details</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <p class="mb-1 fw-bold">Owner</p>
+                            <p>{{ venue.owner.email }}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <p class="mb-1 fw-bold">Category</p>
+                            <p>{{ venue.category.name|default:"Not set" }}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <p class="mb-1 fw-bold">Venue Type</p>
+                            <p>{{ venue.get_venue_type_display }}</p>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <p class="mb-1 fw-bold">Address</p>
+                        <p>{{ venue.get_full_address }}</p>
+                    </div>
+
+                    <div class="mb-3">
+                        <p class="mb-1 fw-bold">About</p>
+                        <p>{{ venue.about }}</p>
+                    </div>
+
+                    <div class="mb-0">
+                        <p class="mb-1 fw-bold">Tags</p>
+                        <div>
+                            {% for tag in venue.tags.all %}
+                            <span class="badge bg-light text-dark me-1">{{ tag.name }}</span>
+                            {% empty %}
+                            <span class="text-muted">No tags</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Services</h5>
+                </div>
+                <div class="card-body">
+                    {% if services %}
+                    <div class="list-group">
+                        {% for service in services %}
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">{{ service.title }}</h6>
+                                    <p class="mb-1 small text-muted">{{ service.short_description|truncatechars:100 }}</p>
+                                </div>
+                                <div class="text-end">
+                                    <div class="d-flex flex-column align-items-end">
+                                        {% if service.discounted_price %}
+                                        <span class="text-decoration-line-through text-muted">${{ service.price }}</span>
+                                        <span class="fw-bold text-danger">${{ service.discounted_price }}</span>
+                                        <span class="badge bg-danger">{{ service.get_discount_percentage }}% OFF</span>
+                                        {% else %}
+                                        <span class="fw-bold">${{ service.price }}</span>
+                                        {% endif %}
+                                        <small class="text-muted">{{ service.duration }} min</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="mb-0">No services added yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Images</h5>
+                </div>
+                <div class="card-body">
+                    {% if images %}
+                    <div class="row g-3">
+                        {% for image in images %}
+                        <div class="col-md-4">
+                            <img src="{{ image.image.url|default:'https://via.placeholder.com/300x200' }}" class="img-fluid rounded" alt="{{ venue.name }} - Image {{ image.image_order }}">
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="mb-0">No images uploaded yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        {% if venue.approval_status == 'pending' %}
+                        <a href="{% url 'venues_app:admin_venue_approval' slug=venue.slug %}" class="btn btn-primary">
+                            <i class="fas fa-check-circle me-2"></i> Review Venue
+                        </a>
+                        {% endif %}
+
+                        {% if venue.approval_status == 'approved' %}
+                        <a href="{% url 'venues_app:venue_detail' slug=venue.slug %}" class="btn btn-outline-primary">
+                            <i class="fas fa-eye me-2"></i> View Public Page
+                        </a>
+                        {% endif %}
+
+                        <a href="{% url 'admin:venues_app_venue_change' venue.id %}" class="btn btn-outline-primary">
+                            <i class="fas fa-edit me-2"></i> Edit in Django Admin
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Venue Information</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>Status</span>
+                            <span>{% if venue.is_active %}Active{% else %}Inactive{% endif %}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>Created</span>
+                            <span>{{ venue.created_at|date:"M d, Y" }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>Last Updated</span>
+                            <span>{{ venue.updated_at|date:"M d, Y" }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>Services</span>
+                            <span>{{ venue.services.count }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>Reviews</span>
+                            <span>{{ venue.reviews.count }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>Average Rating</span>
+                            <span>{{ venue.get_average_rating }}</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Opening Hours</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        {% for hour in opening_hours %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>{{ hour.get_day_display }}</span>
+                            <span>
+                                {% if hour.is_closed %}
+                                <span class="text-danger">Closed</span>
+                                {% else %}
+                                {{ hour.open_time|time:"g:i A" }} - {{ hour.close_time|time:"g:i A" }}
+                                {% endif %}
+                            </span>
+                        </li>
+                        {% empty %}
+                        <li class="list-group-item">No opening hours set</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

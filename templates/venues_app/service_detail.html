@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ service.title }} - {{ venue.name }} - CozyWish{% endblock %}
+
+{% block extra_css %}
+{% load static %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-5 radial-gradient-bg">
+    <div class="container">
+    <div class="row">
+        <!-- Service Details -->
+        <div class="col-lg-8">
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'venues_app:home' %}" class="text-decoration-none">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'venues_app:venue_list' %}" class="text-decoration-none">Venues</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'venues_app:venue_detail' slug=venue.slug %}" class="text-decoration-none">{{ venue.name }}</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ service.title }}</li>
+                </ol>
+            </nav>
+
+            <!-- Service Header -->
+            <div class="venue-header mb-4">
+                <h1 class="mb-2 brand-text">{{ service.title }}</h1>
+                <div class="d-flex align-items-center mb-2">
+                    <div class="rating me-3">
+                        <span class="rating-score">{{ venue.get_average_rating }}★</span>
+                        <span class="review-count">({{ venue.get_review_count }})</span>
+                    </div>
+                    <span class="venue-name">{{ venue.name }}</span>
+                </div>
+            </div>
+
+            <!-- Service Image -->
+            <div class="service-image mb-4">
+                <img src="{{ venue.get_primary_image|default:'https://via.placeholder.com/800x450' }}" class="img-fluid rounded" alt="{{ service.title }}">
+            </div>
+
+            <!-- Service Details -->
+            <div class="card mb-4 shadow">
+                <div class="card-header bg-primary-brand text-white">
+                    <h5 class="mb-0">Service Details</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <h6>Price</h6>
+                            <div>
+                                {% if service.discounted_price %}
+                                <span class="text-decoration-line-through text-muted">${{ service.price }}</span>
+                                <span class="fw-bold text-danger">${{ service.discounted_price }}</span>
+                                <span class="badge bg-danger">{{ service.get_discount_percentage }}% OFF</span>
+                                {% else %}
+                                <span class="fw-bold">${{ service.price }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <h6>Duration</h6>
+                            <p>{{ service.duration }} minutes</p>
+                        </div>
+                        <div class="col-md-4">
+                            <h6>Category</h6>
+                            <p>{{ venue.category.name|default:"Spa & Wellness" }}</p>
+                        </div>
+                    </div>
+                    <h6>Description</h6>
+                    <p>{{ service.short_description }}</p>
+                </div>
+            </div>
+
+            <!-- Booking Button -->
+            <div class="text-center mb-4">
+                {% if user.is_authenticated and user.is_customer %}
+                <a href="{% url 'booking_cart_app:add_to_cart' service_id=service.id %}" class="btn btn-primary btn-lg shadow">
+                    <i class="fas fa-shopping-cart me-2"></i>Add to Cart
+                </a>
+                {% else %}
+                <a href="{% url 'accounts_app:login' %}?next={% url 'booking_cart_app:add_to_cart' service_id=service.id %}" class="btn btn-primary btn-lg shadow">
+                    <i class="fas fa-sign-in-alt me-2"></i>Login to Book
+                </a>
+                {% endif %}
+            </div>
+
+            <!-- Venue Information -->
+            <div class="card mb-4 shadow">
+                <div class="card-header bg-primary-brand text-white">
+                    <h5 class="mb-0">About {{ venue.name }}</h5>
+                </div>
+                <div class="card-body">
+                    <p>{{ venue.about }}</p>
+                    <a href="{% url 'venues_app:venue_detail' slug=venue.slug %}" class="btn btn-outline-primary">
+                        <i class="fas fa-store me-2"></i>View Venue Details
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Opening Hours -->
+            <div class="card mb-4 shadow">
+                <div class="card-header bg-primary-brand text-white">
+                    <h5 class="mb-0">Opening Hours</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="opening-hours-list">
+                        {% for hour in opening_hours %}
+                        <li class="opening-hours-item">
+                            <span class="opening-hours-day">{{ hour.get_day_display }}</span>
+                            {% if hour.is_closed %}
+                            <span class="opening-hours-closed">Closed</span>
+                            {% else %}
+                            <span class="opening-hours-time">{{ hour.open_time|time:"g:i A" }} - {{ hour.close_time|time:"g:i A" }}</span>
+                            {% endif %}
+                        </li>
+                        {% empty %}
+                        <li class="opening-hours-item">
+                            <span class="text-muted">No opening hours available</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Location Map -->
+            <div class="card mb-4 shadow">
+                <div class="card-header bg-primary-brand text-white">
+                    <h5 class="mb-0">Location</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-2">{{ venue.get_full_address }}</p>
+                    <div id="venue-map" style="height: 300px;" class="rounded mb-3"></div>
+                    <a href="https://www.google.com/maps/dir/?api=1&destination={{ venue.latitude }},{{ venue.longitude }}" target="_blank" class="btn btn-outline-primary w-100">
+                        <i class="fas fa-directions me-2"></i>Get Directions
+                    </a>
+                </div>
+            </div>
+
+            <!-- Contact Information -->
+            <div class="card mb-4 shadow">
+                <div class="card-header bg-primary-brand text-white">
+                    <h5 class="mb-0">Contact</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-2"><i class="fas fa-envelope me-2"></i> {{ venue.owner.email }}</p>
+                    {% if venue.owner.provider_profile.phone_number %}
+                    <p class="mb-0"><i class="fas fa-phone me-2"></i> {{ venue.owner.provider_profile.phone_number }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize map if coordinates are available
+        {% if venue.latitude and venue.longitude %}
+        const venueMap = L.map('venue-map').setView([{{ venue.latitude }}, {{ venue.longitude }}], 15);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(venueMap);
+
+        // Add marker for venue
+        L.marker([{{ venue.latitude }}, {{ venue.longitude }}])
+            .addTo(venueMap)
+            .bindPopup('{{ venue.name }}')
+            .openPopup();
+        {% endif %}
+    });
+</script>
+{% endblock %}

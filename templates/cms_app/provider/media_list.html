@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %}My Media - CozyWish{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>My Media</h1>
+            <a href="{% url 'cms_app:provider_media_upload' %}" class="btn btn-primary">
+                <i class="fas fa-upload me-2"></i> Upload Media
+            </a>
+        </div>
+        
+        <div class="card shadow-sm">
+            <div class="card-body">
+                {% if media_items %}
+                <div class="row">
+                    {% for media in media_items %}
+                    <div class="col-md-3 mb-4">
+                        <div class="card h-100">
+                            {% if media.file_type == 'image' %}
+                            <img src="{{ media.file.url }}" class="card-img-top" alt="{{ media.title }}">
+                            {% elif media.file_type == 'document' %}
+                            <div class="card-img-top bg-light text-center py-5">
+                                <i class="fas fa-file-alt fa-3x text-primary"></i>
+                            </div>
+                            {% elif media.file_type == 'video' %}
+                            <div class="card-img-top bg-light text-center py-5">
+                                <i class="fas fa-file-video fa-3x text-primary"></i>
+                            </div>
+                            {% else %}
+                            <div class="card-img-top bg-light text-center py-5">
+                                <i class="fas fa-file fa-3x text-primary"></i>
+                            </div>
+                            {% endif %}
+                            <div class="card-body">
+                                <h6 class="card-title">{{ media.title }}</h6>
+                                <p class="card-text small text-muted">
+                                    <i class="fas fa-calendar-alt me-1"></i> {{ media.created_at|date:"M d, Y" }}
+                                </p>
+                                {% if media.description %}
+                                <p class="card-text small">{{ media.description|truncatechars:50 }}</p>
+                                {% endif %}
+                            </div>
+                            <div class="card-footer bg-white">
+                                <div class="d-flex justify-content-between">
+                                    <a href="{{ media.file.url }}" class="btn btn-sm btn-outline-primary" target="_blank">
+                                        <i class="fas fa-eye me-1"></i> View
+                                    </a>
+                                    <a href="{% url 'cms_app:provider_media_delete' media.id %}" class="btn btn-sm btn-outline-danger">
+                                        <i class="fas fa-trash me-1"></i> Delete
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    You haven't uploaded any media yet.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="card shadow-sm mt-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Media Guidelines</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Supported File Types</h6>
+                        <ul>
+                            <li><strong>Images:</strong> JPG, PNG, GIF (max 5MB)</li>
+                            <li><strong>Documents:</strong> PDF, DOC, DOCX (max 10MB)</li>
+                            <li><strong>Videos:</strong> MP4, MOV (max 50MB)</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Best Practices</h6>
+                        <ul>
+                            <li>Use descriptive file names</li>
+                            <li>Add alt text for images for better accessibility</li>
+                            <li>Optimize images before uploading</li>
+                            <li>Use high-quality media for professional appearance</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="alert alert-warning mt-3 mb-0">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Please ensure you have the right to use and share any media you upload. Do not upload copyrighted material without permission.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

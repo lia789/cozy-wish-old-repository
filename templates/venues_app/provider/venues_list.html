@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+
+{% block title %}My Venues - CozyWish{% endblock %}
+
+{% block extra_css %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/venues_app/venues_app.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-5 radial-gradient-bg">
+    <div class="container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="brand-text">My Venues</h1>
+            <p class="lead">Manage your venues and services on CozyWish</p>
+        </div>
+    </div>
+
+    {% if not venues %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-end">
+                <a href="{% url 'venues_app:create_venue' %}" class="btn btn-primary shadow">
+                    <i class="fas fa-plus me-2"></i>Add New Venue
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Dashboard Stats -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card shadow mb-4">
+                <div class="card-body text-center">
+                    <div class="fs-1 mb-3 text-primary">
+                        <i class="fas fa-store"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">Total Venues</h5>
+                    <div class="fs-2 fw-bold">{{ venues.count }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow mb-4">
+                <div class="card-body text-center">
+                    <div class="fs-1 mb-3 text-primary">
+                        <i class="fas fa-spa"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">Total Services</h5>
+                    <div class="fs-2 fw-bold">{{ total_services|default:"0" }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow mb-4">
+                <div class="card-body text-center">
+                    <div class="fs-1 mb-3 text-primary">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">Total Bookings</h5>
+                    <div class="fs-2 fw-bold">{{ total_bookings|default:"0" }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow mb-4">
+                <div class="card-body text-center">
+                    <div class="fs-1 mb-3 text-primary">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">Avg. Rating</h5>
+                    <div class="fs-2 fw-bold">{{ avg_rating|default:"0.0" }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Venues List -->
+    <div class="row">
+        {% if venues %}
+            {% for venue in venues %}
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card service-card h-100 shadow">
+                    <div class="position-relative">
+                        <img src="{{ venue.get_primary_image|default:'https://via.placeholder.com/317x177' }}" class="card-img-top" alt="{{ venue.name }}">
+                        <div class="position-absolute top-0 end-0 m-2">
+                            <span class="badge {% if venue.approval_status == 'approved' %}bg-success{% elif venue.approval_status == 'pending' %}bg-warning text-dark{% else %}bg-danger{% endif %}">
+                                {{ venue.get_approval_status_display }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">{{ venue.name }}</h5>
+                        <div class="rating mb-2">
+                            <span class="rating-score">{{ venue.get_average_rating }}★</span>
+                            <span class="review-count">({{ venue.get_review_count }})</span>
+                        </div>
+                        <p class="location mb-2">
+                            <i class="fas fa-map-marker-alt me-1"></i> {{ venue.city }}, {{ venue.state }}
+                        </p>
+                        <p class="text-muted small mb-3">
+                            <i class="fas fa-spa me-1"></i> {{ venue.services.count }} services
+                        </p>
+
+                        {% if venue.approval_status == 'rejected' %}
+                        <div class="alert alert-danger mt-3 mb-3">
+                            <strong>Rejection Reason:</strong> {{ venue.rejection_reason }}
+                        </div>
+                        {% endif %}
+
+                        <div class="d-grid gap-2">
+                            <a href="{% url 'venues_app:provider_venue_detail' slug=venue.slug %}" class="btn btn-outline-primary">
+                                <i class="fas fa-edit me-2"></i>Manage
+                            </a>
+                            {% if venue.approval_status == 'approved' %}
+                            <a href="{% url 'venues_app:venue_detail' slug=venue.slug %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-eye me-2"></i>Public View
+                            </a>
+                            {% endif %}
+                            <a href="{% url 'venues_app:delete_venue' slug=venue.slug %}" class="btn btn-outline-danger">
+                                <i class="fas fa-trash-alt me-2"></i>Delete
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <div class="alert alert-info shadow-sm">
+                    <p class="mb-0">You don't have any venues yet. <a href="{% url 'venues_app:create_venue' %}" class="alert-link">Create your first venue</a> to get started.</p>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+    </div>
+</div>
+{% endblock %}

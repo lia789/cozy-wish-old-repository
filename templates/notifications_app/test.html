@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}Notifications Test{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Notifications App Test</h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-success">
+                        <h5>{{ message }}</h5>
+                    </div>
+                    
+                    <p>This is a test page for the notifications app. The app has been successfully installed and configured.</p>
+                    
+                    <h5 class="mt-4">Available Features:</h5>
+                    <ul>
+                        <li>User notifications</li>
+                        <li>Notification preferences</li>
+                        <li>System announcements</li>
+                        <li>Admin notification management</li>
+                    </ul>
+                    
+                    <h5 class="mt-4">Test Links:</h5>
+                    <div class="list-group">
+                        <a href="{% url 'notifications_app:notification_list' %}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-list me-2"></i> Notification List
+                        </a>
+                        <a href="{% url 'notifications_app:notification_preferences' %}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-cog me-2"></i> Notification Preferences
+                        </a>
+                        <a href="{% url 'notifications_app:admin_notification_dashboard' %}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-tachometer-alt me-2"></i> Admin Dashboard
+                        </a>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a href="/" class="btn btn-secondary">Back to Home</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,181 @@
+{% extends 'dashboard_app/base_dashboard.html' %}
+{% load static %}
+{% load dashboard_tags %}
+
+{% block title %}Booking History - CozyWish{% endblock %}
+
+{% block dashboard_title %}Booking History{% endblock %}
+
+{% block sidebar_content %}
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'dashboard_app:customer_dashboard' %}">
+        <i class="fas fa-tachometer-alt"></i> Dashboard
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link active" href="{% url 'dashboard_app:customer_booking_history' %}">
+        <i class="fas fa-history"></i> Booking History
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'dashboard_app:customer_active_bookings' %}">
+        <i class="fas fa-calendar-check"></i> Active Bookings
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'dashboard_app:customer_favorite_venues' %}">
+        <i class="fas fa-heart"></i> Favorite Venues
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'dashboard_app:customer_profile_management' %}">
+        <i class="fas fa-user-cog"></i> Profile Management
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'dashboard_app:customer_review_history' %}">
+        <i class="fas fa-star"></i> Review History
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'dashboard_app:dashboard_preferences' %}">
+        <i class="fas fa-cog"></i> Dashboard Preferences
+    </a>
+</li>
+{% endblock %}
+
+{% block dashboard_actions %}
+<div class="btn-group me-2">
+    <a href="{% url 'booking_cart_app:cart' %}" class="btn btn-sm btn-primary">
+        <i class="fas fa-shopping-cart"></i> View Cart
+    </a>
+    <a href="{% url 'venues_app:venue_search' %}" class="btn btn-sm btn-outline-primary">
+        <i class="fas fa-search"></i> Find Services
+    </a>
+</div>
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="card dashboard-card mb-4">
+    <div class="dashboard-card-header">
+        <h5 class="mb-0">Filter Bookings</h5>
+    </div>
+    <div class="dashboard-card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-4">
+                <label for="{{ form.period.id_for_label }}" class="form-label">Time Period</label>
+                {{ form.period }}
+            </div>
+            <div class="col-md-3">
+                <label for="{{ form.start_date.id_for_label }}" class="form-label">Start Date</label>
+                {{ form.start_date }}
+            </div>
+            <div class="col-md-3">
+                <label for="{{ form.end_date.id_for_label }}" class="form-label">End Date</label>
+                {{ form.end_date }}
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">Apply Filter</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card dashboard-card">
+    <div class="dashboard-card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Booking History</h5>
+        <span class="text-muted">{{ start_date|date:"M d, Y" }} - {{ end_date|date:"M d, Y" }}</span>
+    </div>
+    <div class="dashboard-card-body">
+        {% if bookings %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Booking ID</th>
+                        <th>Venue</th>
+                        <th>Date</th>
+                        <th>Services</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking in bookings %}
+                    <tr>
+                        <td>{{ booking.booking_id|truncatechars:8 }}</td>
+                        <td>{{ booking.venue.name }}</td>
+                        <td>{{ booking.booking_date|date:"M d, Y" }}</td>
+                        <td>
+                            {% for item in booking.items.all|slice:":2" %}
+                                {{ item.service.name }}{% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+                            {% if booking.items.count > 2 %}
+                                and {{ booking.items.count|add:"-2" }} more
+                            {% endif %}
+                        </td>
+                        <td>${{ booking.total_price }}</td>
+                        <td>
+                            <span class="badge {% if booking.status == 'pending' %}bg-warning{% elif booking.status == 'confirmed' %}bg-success{% elif booking.status == 'cancelled' %}bg-danger{% elif booking.status == 'completed' %}bg-info{% endif %}">
+                                {{ booking.get_status_display }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="btn-group">
+                                <a href="{% url 'booking_cart_app:booking_detail' booking.booking_id %}" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                {% if booking.status == 'confirmed' %}
+                                <a href="{% url 'booking_cart_app:cancel_booking' booking.booking_id %}" class="btn btn-sm btn-outline-danger">
+                                    <i class="fas fa-times"></i>
+                                </a>
+                                {% endif %}
+                                {% if booking.status == 'completed' and not booking.has_review %}
+                                <a href="{% url 'review_app:add_review' booking.venue.id %}" class="btn btn-sm btn-outline-warning">
+                                    <i class="fas fa-star"></i> Review
+                                </a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="alert alert-info mb-0">
+            <i class="fas fa-info-circle me-2"></i>
+            You don't have any bookings in the selected time period.
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const periodSelect = document.getElementById('{{ form.period.id_for_label }}');
+        const startDateInput = document.getElementById('{{ form.start_date.id_for_label }}');
+        const endDateInput = document.getElementById('{{ form.end_date.id_for_label }}');
+
+        // Show/hide date inputs based on period selection
+        function toggleDateInputs() {
+            if (periodSelect.value === 'custom') {
+                startDateInput.parentElement.style.display = 'block';
+                endDateInput.parentElement.style.display = 'block';
+            } else {
+                startDateInput.parentElement.style.display = 'none';
+                endDateInput.parentElement.style.display = 'none';
+            }
+        }
+
+        // Initial toggle
+        toggleDateInputs();
+
+        // Toggle on change
+        periodSelect.addEventListener('change', toggleDateInputs);
+    });
+</script>
+{% endblock %}

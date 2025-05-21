@@ -1,0 +1,310 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Manage Announcements - CozyWish Admin{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/cms_app/cms_app.css' %}">
+<link rel="stylesheet" href="{% static 'css/cms_app/cms_admin.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Admin Header -->
+    <div class="admin-header rounded-4 mb-4 p-4 text-center">
+        <h1 class="display-5 mb-2">Manage Announcements</h1>
+        <p class="lead mb-0">Create and manage site-wide announcements for your users</p>
+    </div>
+    
+    <div class="row">
+        <div class="col-12">
+            <!-- Action Bar -->
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+                <div class="d-flex gap-2">
+                    <a href="{% url 'cms_app:admin_announcement_create' %}" class="btn btn-primary rounded-pill">
+                        <i class="fas fa-plus me-2"></i> Create Announcement
+                    </a>
+                </div>
+                <div>
+                    <form method="get" class="search-form">
+                        <div class="input-group">
+                            <input type="search" name="q" class="form-control" placeholder="Search announcements..." value="{{ request.GET.q|default:'' }}">
+                            <button class="btn btn-primary" type="submit">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Stats Cards -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="stats-card stats-card-primary">
+                        <div class="stats-icon">
+                            <i class="fas fa-bullhorn"></i>
+                        </div>
+                        <div class="stats-title">Total</div>
+                        <div class="stats-value">{{ announcements.count }}</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card stats-card-success">
+                        <div class="stats-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stats-title">Active</div>
+                        <div class="stats-value">{{ active_count }}</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card stats-card-info">
+                        <div class="stats-icon">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <div class="stats-title">Scheduled</div>
+                        <div class="stats-value">{{ scheduled_count }}</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card stats-card-danger">
+                        <div class="stats-icon">
+                            <i class="fas fa-times-circle"></i>
+                        </div>
+                        <div class="stats-title">Expired</div>
+                        <div class="stats-value">{{ expired_count }}</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Announcements Table -->
+            <div class="admin-card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">All Announcements</h5>
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-filter me-1"></i> Filter
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item {% if not status_filter %}active{% endif %}" href="{% url 'cms_app:admin_announcement_list' %}">All</a></li>
+                            <li><a class="dropdown-item {% if status_filter == 'active' %}active{% endif %}" href="{% url 'cms_app:admin_announcement_list' %}?status=active">Active</a></li>
+                            <li><a class="dropdown-item {% if status_filter == 'scheduled' %}active{% endif %}" href="{% url 'cms_app:admin_announcement_list' %}?status=scheduled">Scheduled</a></li>
+                            <li><a class="dropdown-item {% if status_filter == 'expired' %}active{% endif %}" href="{% url 'cms_app:admin_announcement_list' %}?status=expired">Expired</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    {% if announcements %}
+                    <div class="table-responsive">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Type</th>
+                                    <th>Status</th>
+                                    <th>Start Date</th>
+                                    <th>End Date</th>
+                                    <th>Created By</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for announcement in announcements %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="me-2 text-{{ announcement.announcement_type }}" style="width: 24px; text-align: center;">
+                                                {% if announcement.announcement_type == 'info' %}
+                                                    <i class="fas fa-info-circle"></i>
+                                                {% elif announcement.announcement_type == 'success' %}
+                                                    <i class="fas fa-check-circle"></i>
+                                                {% elif announcement.announcement_type == 'warning' %}
+                                                    <i class="fas fa-exclamation-triangle"></i>
+                                                {% elif announcement.announcement_type == 'danger' %}
+                                                    <i class="fas fa-exclamation-circle"></i>
+                                                {% endif %}
+                                            </div>
+                                            <div>{{ announcement.title }}</div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-{{ announcement.announcement_type }} {% if announcement.announcement_type == 'warning' %}text-dark{% endif %}">
+                                            {{ announcement.get_announcement_type_display }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if announcement.is_active %}
+                                            <span class="status-badge status-badge-published">Active</span>
+                                        {% elif announcement.start_date > today %}
+                                            <span class="status-badge status-badge-draft">Scheduled</span>
+                                        {% elif announcement.end_date < today %}
+                                            <span class="status-badge status-badge-archived">Expired</span>
+                                        {% else %}
+                                            <span class="status-badge status-badge-draft">Inactive</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ announcement.start_date|date:"M j, Y" }}</td>
+                                    <td>{{ announcement.end_date|date:"M j, Y" }}</td>
+                                    <td>{{ announcement.created_by.get_full_name|default:announcement.created_by.email }}</td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <a href="{% url 'cms_app:admin_announcement_update' announcement.id %}" class="action-btn action-btn-edit" data-bs-toggle="tooltip" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="{% url 'cms_app:admin_announcement_delete' announcement.id %}" class="action-btn action-btn-delete" data-bs-toggle="tooltip" title="Delete">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="p-4 text-center">
+                        <div class="mb-3">
+                            <i class="fas fa-bullhorn fa-3x text-muted"></i>
+                        </div>
+                        <h5>No Announcements Found</h5>
+                        <p class="text-muted mb-3">There are no announcements matching your criteria.</p>
+                        <a href="{% url 'cms_app:admin_announcement_create' %}" class="btn btn-primary rounded-pill">
+                            <i class="fas fa-plus me-2"></i> Create Announcement
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Pagination -->
+            {% if announcements.paginator.num_pages > 1 %}
+            <nav aria-label="Announcement pagination" class="mt-4">
+                <ul class="pagination admin-pagination justify-content-center">
+                    {% if announcements.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" aria-label="First">
+                            <i class="fas fa-angle-double-left"></i>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ announcements.previous_page_number }}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" aria-label="Previous">
+                            <i class="fas fa-angle-left"></i>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" aria-label="First">
+                            <i class="fas fa-angle-double-left"></i>
+                        </a>
+                    </li>
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" aria-label="Previous">
+                            <i class="fas fa-angle-left"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                    
+                    {% for i in announcements.paginator.page_range %}
+                        {% if announcements.number == i %}
+                        <li class="page-item active"><a class="page-link" href="#">{{ i }}</a></li>
+                        {% elif i > announcements.number|add:'-3' and i < announcements.number|add:'3' %}
+                        <li class="page-item"><a class="page-link" href="?page={{ i }}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">{{ i }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if announcements.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ announcements.next_page_number }}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" aria-label="Next">
+                            <i class="fas fa-angle-right"></i>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ announcements.paginator.num_pages }}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" aria-label="Last">
+                            <i class="fas fa-angle-double-right"></i>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" aria-label="Next">
+                            <i class="fas fa-angle-right"></i>
+                        </a>
+                    </li>
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" aria-label="Last">
+                            <i class="fas fa-angle-double-right"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+            
+            <!-- Announcement Tips -->
+            <div class="card shadow-sm border-0 rounded-4 mb-4">
+                <div class="card-header bg-primary text-white rounded-top-4">
+                    <h5 class="mb-0 brand-text">Announcement Tips</h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="fw-bold mb-3">Best Practices</h6>
+                            <ul class="list-group list-group-flush border-0">
+                                <li class="list-group-item bg-light rounded-3 mb-2 px-3 py-2 d-flex align-items-center">
+                                    <i class="fas fa-check-circle text-success me-2"></i>
+                                    Keep announcements brief and to the point
+                                </li>
+                                <li class="list-group-item bg-light rounded-3 mb-2 px-3 py-2 d-flex align-items-center">
+                                    <i class="fas fa-check-circle text-success me-2"></i>
+                                    Use appropriate announcement types
+                                </li>
+                                <li class="list-group-item bg-light rounded-3 mb-2 px-3 py-2 d-flex align-items-center">
+                                    <i class="fas fa-check-circle text-success me-2"></i>
+                                    Set appropriate start and end dates
+                                </li>
+                                <li class="list-group-item bg-light rounded-3 mb-0 px-3 py-2 d-flex align-items-center">
+                                    <i class="fas fa-check-circle text-success me-2"></i>
+                                    Limit active announcements to avoid overwhelming users
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="fw-bold mb-3">Announcement Types</h6>
+                            <ul class="list-group list-group-flush border-0">
+                                <li class="list-group-item bg-light rounded-3 mb-2 px-3 py-2 d-flex align-items-center">
+                                    <i class="fas fa-info-circle text-info me-2"></i>
+                                    <strong>Info:</strong> General information and updates
+                                </li>
+                                <li class="list-group-item bg-light rounded-3 mb-2 px-3 py-2 d-flex align-items-center">
+                                    <i class="fas fa-check-circle text-success me-2"></i>
+                                    <strong>Success:</strong> Positive news and achievements
+                                </li>
+                                <li class="list-group-item bg-light rounded-3 mb-2 px-3 py-2 d-flex align-items-center">
+                                    <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                                    <strong>Warning:</strong> Important notices that need attention
+                                </li>
+                                <li class="list-group-item bg-light rounded-3 mb-0 px-3 py-2 d-flex align-items-center">
+                                    <i class="fas fa-exclamation-circle text-danger me-2"></i>
+                                    <strong>Danger:</strong> Critical alerts and emergencies
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/cms_app/cms_app.js' %}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize tooltips
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    });
+</script>
+{% endblock %}

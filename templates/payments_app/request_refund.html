@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Request Refund - CozyWish{% endblock %}
+
+{% block extra_css %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/payments_app/payments_app.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-5 radial-gradient-bg">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <!-- Breadcrumb -->
+                <nav aria-label="breadcrumb" class="mb-4">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{% url 'venues_app:home' %}">Home</a></li>
+                        <li class="breadcrumb-item"><a href="{% url 'payments_app:payment_history' %}">Payment History</a></li>
+                        <li class="breadcrumb-item"><a href="{% url 'payments_app:payment_detail' transaction_id=transaction.transaction_id %}">Payment Details</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Request Refund</li>
+                    </ol>
+                </nav>
+                
+                <div class="page-header">
+                    <h1 class="page-title">Request Refund</h1>
+                    <p class="text-muted">Request a refund for your payment</p>
+                </div>
+                
+                <div class="card payment-form mb-4">
+                    <div class="card-body">
+                        <div class="payment-form-section">
+                            <h5 class="payment-form-section-title">Transaction Details</h5>
+                            
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <h6>Transaction ID</h6>
+                                    <p>{{ transaction.transaction_id }}</p>
+                                    <h6>Payment Method</h6>
+                                    <p>{{ transaction.get_payment_method_display }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6>Date</h6>
+                                    <p>{{ transaction.created_at|date:"M d, Y H:i" }}</p>
+                                    <h6>Amount</h6>
+                                    <p class="fw-bold">${{ transaction.amount }}</p>
+                                </div>
+                            </div>
+                            
+                            <div class="alert alert-warning mb-4">
+                                <div class="d-flex">
+                                    <div class="me-3">
+                                        <i class="fas fa-exclamation-triangle fa-2x text-warning"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="alert-heading">Refund Policy</h6>
+                                        <p class="mb-0">Please note that refunds are subject to our refund policy. Refunds may take 5-7 business days to process depending on your payment method.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <form method="post">
+                                {% csrf_token %}
+                                
+                                <div class="mb-4">
+                                    <h5 class="payment-form-section-title">Refund Reason</h5>
+                                    {{ form|crispy }}
+                                </div>
+                                
+                                <div class="d-flex justify-content-between">
+                                    <a href="{% url 'payments_app:payment_detail' transaction_id=transaction.transaction_id %}" class="btn btn-outline-primary">
+                                        <i class="fas fa-arrow-left me-2"></i>Back to Payment Details
+                                    </a>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-undo me-2"></i>Request Refund
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="card mb-4">
+                    <div class="card-header bg-primary-brand">
+                        <h5 class="mb-0 text-white">Booking Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <h6>Booking ID</h6>
+                            <p>{{ transaction.booking.booking_id }}</p>
+                            <h6>Venue</h6>
+                            <p>{{ transaction.booking.venue.name }}</p>
+                            <h6>Service</h6>
+                            <p>{{ transaction.booking.service.name }}</p>
+                            <h6>Booking Date</h6>
+                            <p>{{ transaction.booking.booking_date|date:"M d, Y H:i" }}</p>
+                            <h6>Status</h6>
+                            <p>
+                                <span class="badge transaction-status transaction-status-{{ transaction.booking.status }}">
+                                    {{ transaction.booking.get_status_display }}
+                                </span>
+                            </p>
+                        </div>
+                        
+                        <div class="d-grid">
+                            <a href="{% url 'booking_cart_app:booking_detail' booking_id=transaction.booking.booking_id %}" class="btn btn-outline-primary">
+                                <i class="fas fa-calendar-check me-2"></i>View Booking Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card mb-4">
+                    <div class="card-header bg-primary-brand">
+                        <h5 class="mb-0 text-white">Need Help?</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex mb-3">
+                            <div class="me-3">
+                                <i class="fas fa-headset fa-2x text-primary-brand"></i>
+                            </div>
+                            <div>
+                                <h6>Customer Support</h6>
+                                <p class="mb-0">If you have any questions about refunds, our support team is here to help.</p>
+                            </div>
+                        </div>
+                        <div class="d-grid">
+                            <a href="#" class="btn btn-outline-primary">
+                                <i class="fas fa-headset me-2"></i>Contact Support
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

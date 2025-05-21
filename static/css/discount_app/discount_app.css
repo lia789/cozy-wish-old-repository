@@ -1,0 +1,284 @@
+/* Discount App Styles */
+
+/* Brand Colors */
+:root {
+    --primary-color: #2F160F;
+    --primary-light: #5a3d36;
+    --primary-dark: #1a0d09;
+    --accent-color: #fae1d7;
+    --accent-light: #fdf3ef;
+    --accent-dark: #f5c7b6;
+    --text-color: #333333;
+    --text-muted: #666666;
+    --border-color: rgba(0,0,0,0.1);
+    --success-color: #28a745;
+    --success-light: #d4edda;
+    --info-color: #17a2b8;
+    --info-light: #d1ecf1;
+    --warning-color: #ffc107;
+    --warning-light: #fff3cd;
+    --danger-color: #dc3545;
+    --danger-light: #f8d7da;
+}
+
+/* Discount Card Styles */
+.discount-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: none;
+    overflow: hidden;
+}
+
+.discount-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.discount-value {
+    text-align: center;
+}
+
+/* Background Colors */
+.bg-success-light {
+    background-color: rgba(40, 167, 69, 0.1);
+}
+
+.bg-warning-light {
+    background-color: rgba(255, 193, 7, 0.1);
+}
+
+.bg-danger-light {
+    background-color: rgba(220, 53, 69, 0.1);
+}
+
+.bg-info-light {
+    background-color: rgba(23, 162, 184, 0.1);
+}
+
+.bg-secondary-light {
+    background-color: rgba(108, 117, 125, 0.1);
+}
+
+/* Discount Value Display */
+.discount-value-display {
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+}
+
+/* Filter Form */
+.discount-filter-form label {
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+}
+
+/* Simple Background */
+.radial-gradient-bg {
+    background-color: #f8f9fa;
+    min-height: 100vh;
+}
+
+.radial-gradient-bg .card {
+    color: #212529;
+}
+
+/* Admin Background */
+.admin-bg {
+    background-color: #f8f9fa;
+    min-height: 100vh;
+}
+
+/* Page Title */
+.page-title {
+    font-family: 'Yeseva One', serif;
+    font-weight: 700;
+    color: var(--primary-color);
+    letter-spacing: 0.5px;
+}
+
+.admin-bg .page-title {
+    color: #343a40;
+    text-shadow: none;
+}
+
+/* Breadcrumb */
+.breadcrumb {
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 0.75rem 1rem;
+    border-radius: 0.25rem;
+}
+
+.admin-bg .breadcrumb {
+    background-color: transparent;
+    padding: 0;
+}
+
+.breadcrumb-item a {
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+}
+
+.breadcrumb-item.active {
+    color: rgba(255, 255, 255, 1);
+}
+
+.admin-bg .breadcrumb-item a {
+    color: #007bff;
+}
+
+.admin-bg .breadcrumb-item.active {
+    color: #6c757d;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 767.98px) {
+    .discount-value-display {
+        margin-bottom: 1.5rem;
+    }
+}
+
+/* Custom Badge Styles */
+.badge {
+    font-weight: 500;
+    padding: 0.35em 0.65em;
+}
+
+/* Custom Button Styles */
+.btn {
+    border-radius: 50rem;
+    padding: 0.6rem 1.5rem;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-light);
+    border-color: var(--primary-light);
+    box-shadow: 0 5px 15px rgba(47, 22, 15, 0.2);
+}
+
+.btn-outline-primary {
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: #fff;
+    box-shadow: 0 5px 15px rgba(47, 22, 15, 0.2);
+}
+
+/* Custom Card Styles */
+.card {
+    border: none;
+    border-radius: 1rem;
+    box-shadow: 0 10px 25px rgba(47, 22, 15, 0.08);
+    overflow: hidden;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(47, 22, 15, 0.12);
+}
+
+.card-header {
+    border-bottom: none;
+    padding: 1rem 1.25rem;
+}
+
+.card-footer {
+    background-color: #f8f9fa;
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 1rem 1.25rem;
+}
+
+/* Custom Table Styles */
+.table th {
+    font-weight: 600;
+    border-top: none;
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(0, 123, 255, 0.05);
+}
+
+/* Custom Form Styles */
+.form-control:focus, .form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.25rem rgba(47, 22, 15, 0.25);
+}
+
+.form-text {
+    color: #6c757d;
+}
+
+/* Custom Alert Styles */
+.alert {
+    border: none;
+    border-radius: 0.5rem;
+}
+
+/* Custom Pagination Styles */
+.pagination .page-link {
+    border: none;
+    color: var(--primary-color);
+    padding: 0.5rem 0.75rem;
+    margin: 0 0.25rem;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: #fff;
+}
+
+.pagination .page-item.disabled .page-link {
+    color: #6c757d;
+    background-color: transparent;
+}
+
+/* Custom Progress Bar Styles */
+.progress {
+    height: 0.5rem;
+    border-radius: 1rem;
+    background-color: #e9ecef;
+}
+
+.progress-bar {
+    border-radius: 1rem;
+    background-color: var(--primary-color);
+}
+
+/* Brand text styling */
+.brand-text {
+    font-family: 'Yeseva One', serif;
+    color: var(--primary-color);
+    letter-spacing: 0.5px;
+}
+
+/* Background colors */
+.bg-primary-brand {
+    background-color: var(--primary-color) !important;
+    color: white;
+}
+
+.bg-accent-light {
+    background-color: var(--accent-light) !important;
+}
+
+/* Text colors */
+.text-primary-brand {
+    color: var(--primary-color) !important;
+}

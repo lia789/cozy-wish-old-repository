@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - CozyWish{% endblock %}
+
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="{% static 'css/dashboard_app/dashboard_app.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="radial-gradient-bg">
+    <div class="container-fluid dashboard-container">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 d-md-block dashboard-sidebar">
+                <div class="position-sticky">
+                    <div class="text-center sidebar-brand">
+                        <h4 class="brand-text mb-0">CozyWish</h4>
+                        <p class="text-muted">Dashboard</p>
+                    </div>
+                    <ul class="nav flex-column px-2">
+                        {% block sidebar_content %}
+                        <!-- Sidebar content will be provided by child templates -->
+                        {% endblock %}
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Main content -->
+            <div class="col-md-9 col-lg-10 dashboard-content">
+                {% if messages %}
+                <div class="row mb-4">
+                    <div class="col-12">
+                        {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-4">
+                    <h1 class="h2 brand-text">{% block dashboard_title %}Dashboard{% endblock %}</h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        {% block dashboard_actions %}
+                        <!-- Dashboard actions will be provided by child templates -->
+                        {% endblock %}
+                    </div>
+                </div>
+
+                {% block dashboard_content %}
+                <!-- Dashboard content will be provided by child templates -->
+                {% endblock %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Common dashboard JavaScript functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+
+        // Initialize popovers
+        var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+        var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+            return new bootstrap.Popover(popoverTriggerEl);
+        });
+
+        // Mobile sidebar toggle
+        const sidebarToggle = document.querySelector('.sidebar-toggle');
+        if (sidebarToggle) {
+            sidebarToggle.addEventListener('click', function() {
+                document.querySelector('.dashboard-sidebar').classList.toggle('show');
+            });
+        }
+
+        // Apply theme preference if available
+        const theme = localStorage.getItem('dashboard-theme');
+        if (theme === 'dark') {
+            document.body.classList.add('dark-theme');
+        } else if (theme === 'auto') {
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.body.classList.add('dark-theme');
+            }
+
+            // Watch for changes
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+                if (e.matches) {
+                    document.body.classList.add('dark-theme');
+                } else {
+                    document.body.classList.remove('dark-theme');
+                }
+            });
+        }
+    });
+</script>
+{% block dashboard_js %}
+<!-- Dashboard-specific JavaScript will be provided by child templates -->
+{% endblock %}
+{% endblock %}

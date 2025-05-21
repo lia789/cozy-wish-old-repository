@@ -1,0 +1,226 @@
+{% extends 'dashboard_app/base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Admin Dashboard - CozyWish{% endblock %}
+
+{% block dashboard_title %}Admin Dashboard{% endblock %}
+
+{% block sidebar_content %}
+<li class="nav-item">
+    <a class="nav-link active" href="{% url 'dashboard_app:admin_dashboard' %}">
+        <i class="fas fa-tachometer-alt"></i> Dashboard
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'dashboard_app:admin_platform_overview' %}">
+        <i class="fas fa-chart-pie"></i> Platform Overview
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'dashboard_app:admin_user_statistics' %}">
+        <i class="fas fa-users"></i> User Statistics
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'dashboard_app:admin_booking_analytics' %}">
+        <i class="fas fa-chart-bar"></i> Booking Analytics
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'dashboard_app:admin_revenue_tracking' %}">
+        <i class="fas fa-dollar-sign"></i> Revenue Tracking
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'dashboard_app:admin_system_health' %}">
+        <i class="fas fa-heartbeat"></i> System Health
+    </a>
+</li>
+
+{% endblock %}
+
+{% block dashboard_actions %}
+<div class="btn-group me-2">
+
+    <a href="{% url 'admin:index' %}" class="btn btn-sm btn-outline-primary">
+        <i class="fas fa-cog"></i> Django Admin
+    </a>
+</div>
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="dashboard-stat">
+            <div class="dashboard-stat-value">{{ total_users }}</div>
+            <div class="dashboard-stat-label">Total Users</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="dashboard-stat">
+            <div class="dashboard-stat-value">{{ total_venues }}</div>
+            <div class="dashboard-stat-label">Total Venues</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="dashboard-stat">
+            <div class="dashboard-stat-value">{{ total_bookings }}</div>
+            <div class="dashboard-stat-label">Total Bookings</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="dashboard-stat">
+            <div class="dashboard-stat-value">${{ total_revenue }}</div>
+            <div class="dashboard-stat-label">Total Revenue</div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card dashboard-card">
+            <div class="dashboard-card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">User Statistics</h5>
+                <a href="{% url 'dashboard_app:admin_user_statistics' %}" class="btn btn-sm btn-outline-primary">View Details</a>
+            </div>
+            <div class="dashboard-card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="text-center mb-3">
+                            <h6 class="mb-1">Customers</h6>
+                            <div class="h3">{{ customer_count }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center mb-3">
+                            <h6 class="mb-1">Providers</h6>
+                            <div class="h3">{{ provider_count }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center mb-3">
+                            <h6 class="mb-1">Staff</h6>
+                            <div class="h3">{{ staff_count }}</div>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <h6 class="mb-3">Venue Status</h6>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="text-center mb-3">
+                            <h6 class="mb-1">Pending</h6>
+                            <div class="h3">{{ pending_venues }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center mb-3">
+                            <h6 class="mb-1">Approved</h6>
+                            <div class="h3">{{ approved_venues }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center mb-3">
+                            <h6 class="mb-1">Rejected</h6>
+                            <div class="h3">{{ rejected_venues }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card dashboard-card">
+            <div class="dashboard-card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Booking Statistics</h5>
+                <a href="{% url 'dashboard_app:admin_booking_analytics' %}" class="btn btn-sm btn-outline-primary">View Details</a>
+            </div>
+            <div class="dashboard-card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="text-center mb-3">
+                            <h6 class="mb-1">Pending</h6>
+                            <div class="h3">{{ pending_bookings }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center mb-3">
+                            <h6 class="mb-1">Confirmed</h6>
+                            <div class="h3">{{ confirmed_bookings }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center mb-3">
+                            <h6 class="mb-1">Cancelled</h6>
+                            <div class="h3">{{ cancelled_bookings }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center mb-3">
+                            <h6 class="mb-1">Completed</h6>
+                            <div class="h3">{{ completed_bookings }}</div>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <h6 class="mb-3">Recent Bookings</h6>
+                <div class="list-group">
+                    {% for booking in recent_bookings|slice:":5" %}
+                    <div class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">{{ booking.user.get_full_name }}</h6>
+                            <small>{{ booking.booking_date|date:"M d, Y" }}</small>
+                        </div>
+                        <p class="mb-1">{{ booking.venue.name }} - ${{ booking.total_price }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small>Booking #{{ booking.booking_id|truncatechars:8 }}</small>
+                            <span class="badge {% if booking.status == 'pending' %}bg-warning{% elif booking.status == 'confirmed' %}bg-success{% elif booking.status == 'cancelled' %}bg-danger{% elif booking.status == 'completed' %}bg-info{% endif %}">
+                                {{ booking.get_status_display }}
+                            </span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card dashboard-card">
+            <div class="dashboard-card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Recent Reviews</h5>
+                <a href="#" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+            <div class="dashboard-card-body">
+                {% if recent_reviews %}
+                <div class="list-group">
+                    {% for review in recent_reviews|slice:":5" %}
+                    <div class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">{{ review.user.get_full_name }}</h6>
+                            <small>{{ review.created_at|date:"M d, Y" }}</small>
+                        </div>
+                        <div class="mb-1">
+                            {% for i in "12345" %}
+                            <i class="fas fa-star {% if forloop.counter <= review.rating %}text-warning{% else %}text-muted{% endif %}"></i>
+                            {% endfor %}
+                        </div>
+                        <p class="mb-1">{{ review.comment|truncatechars:100 }}</p>
+                        <small>{{ review.venue.name }}</small>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="alert alert-info mb-0">
+                    <i class="fas fa-info-circle me-2"></i>
+                    There are no reviews yet.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

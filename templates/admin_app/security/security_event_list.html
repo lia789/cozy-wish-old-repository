@@ -1,0 +1,320 @@
+{% extends 'admin_app/base.html' %}
+
+{% block admin_content %}
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Security Events</h1>
+</div>
+
+<!-- Filters -->
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">Filters</h6>
+    </div>
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-3">
+                <label for="event_type" class="form-label">Event Type</label>
+                <select name="event_type" id="event_type" class="form-select">
+                    <option value="" {% if not event_type %}selected{% endif %}>All Event Types</option>
+                    {% for type_value, type_label in event_types %}
+                    <option value="{{ type_value }}" {% if event_type == type_value %}selected{% endif %}>{{ type_label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="severity" class="form-label">Severity</label>
+                <select name="severity" id="severity" class="form-select">
+                    <option value="" {% if not severity %}selected{% endif %}>All Severities</option>
+                    {% for severity_value, severity_label in severity_levels %}
+                    <option value="{{ severity_value }}" {% if severity == severity_value %}selected{% endif %}>{{ severity_label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="status" class="form-label">Status</label>
+                <select name="status" id="status" class="form-select">
+                    <option value="" {% if not status %}selected{% endif %}>All Statuses</option>
+                    <option value="resolved" {% if status == 'resolved' %}selected{% endif %}>Resolved</option>
+                    <option value="unresolved" {% if status == 'unresolved' %}selected{% endif %}>Unresolved</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="user" class="form-label">User</label>
+                <select name="user" id="user" class="form-select">
+                    <option value="" {% if not user_id %}selected{% endif %}>All Users</option>
+                    {% for u in users %}
+                    <option value="{{ u.id }}" {% if user_id == u.id|stringformat:"i" %}selected{% endif %}>{{ u.email }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="start_date" class="form-label">Start Date</label>
+                <input type="date" name="start_date" id="start_date" class="form-control" value="{{ start_date|date:'Y-m-d' }}">
+            </div>
+            <div class="col-md-3">
+                <label for="end_date" class="form-label">End Date</label>
+                <input type="date" name="end_date" id="end_date" class="form-control" value="{{ end_date|date:'Y-m-d' }}">
+            </div>
+            <div class="col-md-6 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary me-2">Apply Filters</button>
+                <a href="{% url 'admin_app:security_event_list' %}" class="btn btn-secondary">Reset</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Security Events Table -->
+<div class="card shadow mb-4">
+    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+        <h6 class="m-0 font-weight-bold text-primary">Security Events ({{ total_count }})</h6>
+    </div>
+    <div class="card-body">
+        {% if events %}
+        <div class="table-responsive">
+            <table class="table table-bordered" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Event Type</th>
+                        <th>User</th>
+                        <th>Severity</th>
+                        <th>Timestamp</th>
+                        <th>IP Address</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for event in events %}
+                    <tr>
+                        <td>{{ event.get_event_type_display }}</td>
+                        <td>
+                            {% if event.user %}
+                            <a href="{% url 'admin_app:user_detail' user_id=event.user.id %}">
+                                {{ event.user.email }}
+                            </a>
+                            {% else %}
+                            <span class="text-muted">Unknown</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if event.severity == 'info' %}
+                            <span class="badge bg-info">Info</span>
+                            {% elif event.severity == 'warning' %}
+                            <span class="badge bg-warning">Warning</span>
+                            {% elif event.severity == 'critical' %}
+                            <span class="badge bg-danger">Critical</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ event.timestamp|date:"M d, Y H:i:s" }}</td>
+                        <td>{{ event.ip_address|default:"Unknown" }}</td>
+                        <td>
+                            {% if event.is_resolved %}
+                            <span class="badge bg-success">Resolved</span>
+                            {% else %}
+                            <span class="badge bg-danger">Unresolved</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="btn-group">
+                                <a href="{% url 'admin_app:security_event_detail' event_id=event.id %}" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                {% if not event.is_resolved %}
+                                <a href="{% url 'admin_app:security_event_resolve' event_id=event.id %}" class="btn btn-sm btn-success">
+                                    <i class="fas fa-check"></i>
+                                </a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Pagination -->
+        {% if events.paginator.num_pages > 1 %}
+        <nav aria-label="Page navigation" class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% if events.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1{% if request.GET.urlencode %}&{{ request.GET.urlencode }}{% endif %}" aria-label="First">
+                        <span aria-hidden="true">&laquo;&laquo;</span>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ events.previous_page_number }}{% if request.GET.urlencode %}&{{ request.GET.urlencode }}{% endif %}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <a class="page-link" href="#" aria-label="First">
+                        <span aria-hidden="true">&laquo;&laquo;</span>
+                    </a>
+                </li>
+                <li class="page-item disabled">
+                    <a class="page-link" href="#" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                {% endif %}
+                
+                {% for i in events.paginator.page_range %}
+                    {% if events.number == i %}
+                    <li class="page-item active"><a class="page-link" href="#">{{ i }}</a></li>
+                    {% elif i > events.number|add:'-3' and i < events.number|add:'3' %}
+                    <li class="page-item"><a class="page-link" href="?page={{ i }}{% if request.GET.urlencode %}&{{ request.GET.urlencode }}{% endif %}">{{ i }}</a></li>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if events.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ events.next_page_number }}{% if request.GET.urlencode %}&{{ request.GET.urlencode }}{% endif %}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ events.paginator.num_pages }}{% if request.GET.urlencode %}&{{ request.GET.urlencode }}{% endif %}" aria-label="Last">
+                        <span aria-hidden="true">&raquo;&raquo;</span>
+                    </a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <a class="page-link" href="#" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+                <li class="page-item disabled">
+                    <a class="page-link" href="#" aria-label="Last">
+                        <span aria-hidden="true">&raquo;&raquo;</span>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+        
+        {% else %}
+        <div class="text-center py-4">
+            <i class="fas fa-shield-alt fa-3x text-muted mb-3"></i>
+            <p class="mb-0">No security events found matching your criteria.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Security Stats -->
+<div class="row">
+    <!-- Event Types Chart -->
+    <div class="col-xl-6 col-lg-6">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Event Types Distribution</h6>
+            </div>
+            <div class="card-body">
+                <div class="chart-pie pt-4 pb-2">
+                    <canvas id="eventTypesChart"></canvas>
+                </div>
+                <div class="mt-4 text-center small">
+                    {% for type_value, type_label in event_types %}
+                    <span class="me-2">
+                        <i class="fas fa-circle text-{{ forloop.counter0|divisibleby:4|yesno:'primary,success,info,warning,danger,secondary' }}"></i> {{ type_label }}
+                    </span>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Severity Distribution Chart -->
+    <div class="col-xl-6 col-lg-6">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Severity Distribution</h6>
+            </div>
+            <div class="card-body">
+                <div class="chart-pie pt-4 pb-2">
+                    <canvas id="severityChart"></canvas>
+                </div>
+                <div class="mt-4 text-center small">
+                    <span class="me-2">
+                        <i class="fas fa-circle text-info"></i> Info
+                    </span>
+                    <span class="me-2">
+                        <i class="fas fa-circle text-warning"></i> Warning
+                    </span>
+                    <span class="me-2">
+                        <i class="fas fa-circle text-danger"></i> Critical
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block admin_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Event Types Chart
+        const eventTypesData = {{ event_types_data|safe }};
+        const eventTypesCtx = document.getElementById('eventTypesChart').getContext('2d');
+        new Chart(eventTypesCtx, {
+            type: 'doughnut',
+            data: {
+                labels: eventTypesData.labels,
+                datasets: [{
+                    data: eventTypesData.data,
+                    backgroundColor: [
+                        '#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b', '#858796'
+                    ],
+                    hoverBackgroundColor: [
+                        '#2e59d9', '#17a673', '#2c9faf', '#dda20a', '#be2617', '#60616f'
+                    ],
+                    hoverBorderColor: "rgba(234, 236, 244, 1)",
+                }]
+            },
+            options: {
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                cutout: '70%',
+            }
+        });
+        
+        // Severity Chart
+        const severityData = {{ severity_data|safe }};
+        const severityCtx = document.getElementById('severityChart').getContext('2d');
+        new Chart(severityCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Info', 'Warning', 'Critical'],
+                datasets: [{
+                    data: [severityData.info, severityData.warning, severityData.critical],
+                    backgroundColor: [
+                        '#36b9cc', '#f6c23e', '#e74a3b'
+                    ],
+                    hoverBackgroundColor: [
+                        '#2c9faf', '#dda20a', '#be2617'
+                    ],
+                    hoverBorderColor: "rgba(234, 236, 244, 1)",
+                }]
+            },
+            options: {
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                cutout: '70%',
+            }
+        });
+    });
+</script>
+{% endblock %}

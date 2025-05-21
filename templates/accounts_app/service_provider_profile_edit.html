@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Service Provider Profile{% endblock %}
+
+{% block extra_css %}
+{% load static %}
+{% load widget_tweaks %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/accounts_app.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h3 class="mb-0"><i class="fas fa-user-edit me-2"></i>Edit Service Provider Profile</h3>
+                </div>
+                    <div class="card-body p-4">
+                        <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                            {% csrf_token %}
+
+                            {% if messages %}
+                            <div class="alert alert-success mb-4">
+                                <i class="fas fa-check-circle me-2"></i>
+                                {% for message in messages %}
+                                    {{ message }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+
+                            <h5 class="mb-3"><i class="fas fa-phone me-2"></i>Contact Information</h5>
+                            <div class="card mb-4 shadow-sm">
+                                <div class="card-body">
+                                    <div class="row mb-3">
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label for="{{ form.phone_number.id_for_label }}" class="form-label">Phone Number</label>
+                                                {{ form.phone_number|add_class:"form-control" }}
+                                                {% if form.phone_number.errors %}
+                                                    <div class="invalid-feedback">
+                                                        {% for error in form.phone_number.errors %}
+                                                            {{ error }}
+                                                        {% endfor %}
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <h5 class="mb-3"><i class="fas fa-user-tie me-2"></i>Contact Person Information</h5>
+                            <div class="card mb-4 shadow-sm">
+                                <div class="card-body">
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="{{ form.contact_person_name.id_for_label }}" class="form-label">Contact Person Name</label>
+                                                {{ form.contact_person_name|add_class:"form-control" }}
+                                                {% if form.contact_person_name.errors %}
+                                                    <div class="invalid-feedback">
+                                                        {% for error in form.contact_person_name.errors %}
+                                                            {{ error }}
+                                                        {% endfor %}
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="{{ form.contact_person_email.id_for_label }}" class="form-label">Contact Person Email</label>
+                                                {{ form.contact_person_email|add_class:"form-control" }}
+                                                {% if form.contact_person_email.errors %}
+                                                    <div class="invalid-feedback">
+                                                        {% for error in form.contact_person_email.errors %}
+                                                            {{ error }}
+                                                        {% endfor %}
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-between">
+                                <a href="{% url 'accounts_app:service_provider_profile' slug=object.slug %}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-arrow-left me-2"></i>Back to Profile
+                                </a>
+                                <div>
+                                    <button type="reset" class="btn btn-outline-secondary me-2">
+                                        <i class="fas fa-undo me-2"></i>Reset
+                                    </button>
+                                    <button type="submit" class="btn btn-secondary">
+                                        <i class="fas fa-save me-2"></i>Save Changes
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

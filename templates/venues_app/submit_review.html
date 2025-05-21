@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+
+{% block title %}Submit Review - {{ venue.name }} - CozyWish{% endblock %}
+
+{% block extra_css %}
+{% load static %}
+{% load widget_tweaks %}
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-5 radial-gradient-bg">
+    <div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'venues_app:home' %}" class="text-decoration-none">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'venues_app:venue_list' %}" class="text-decoration-none">Venues</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'venues_app:venue_detail' slug=venue.slug %}" class="text-decoration-none">{{ venue.name }}</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Submit Review</li>
+                </ol>
+            </nav>
+
+            <div class="card shadow">
+                <div class="card-header bg-primary-brand text-white">
+                    <h5 class="mb-0">{% if existing_review %}Edit{% else %}Submit{% endif %} Review for {{ venue.name }}</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{% url 'venues_app:submit_review' venue_slug=venue.slug %}">
+                        {% csrf_token %}
+
+                        <div class="mb-3">
+                            <label for="{{ form.rating.id_for_label }}" class="form-label">Rating</label>
+                            <div class="star-rating-input">
+                                <div class="d-flex">
+                                    {% for i in '12345' %}
+                                    <div class="star-container me-2">
+                                        <input type="radio" name="{{ form.rating.name }}" id="star{{ i }}" value="{{ i }}" class="d-none" {% if form.rating.value|stringformat:"s" == i %}checked{% endif %}>
+                                        <label for="star{{ i }}" class="star-label fs-1" style="color: {% if form.rating.value|stringformat:'s' >= i %}var(--primary-color){% else %}#ccc{% endif %}; cursor: pointer;">★</label>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% if form.rating.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.rating.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.comment.id_for_label }}" class="form-label">Your Review</label>
+                            <textarea name="{{ form.comment.name }}" id="{{ form.comment.id_for_label }}" class="form-control {% if form.comment.errors %}is-invalid{% endif %}" rows="5" placeholder="Share your experience with this venue...">{{ form.comment.value|default:'' }}</textarea>
+                            {% if form.comment.errors %}
+                            <div class="invalid-feedback">
+                                {{ form.comment.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% url 'venues_app:venue_detail' slug=venue.slug %}" class="btn btn-outline-primary">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-paper-plane me-2"></i>{% if existing_review %}Update{% else %}Submit{% endif %} Review
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Star rating functionality
+        const starLabels = document.querySelectorAll('.star-label');
+        const starInputs = document.querySelectorAll('input[name="{{ form.rating.name }}"]');
+
+        // Add event listeners to star labels
+        starLabels.forEach((label, index) => {
+            label.addEventListener('mouseenter', () => {
+                // Highlight stars on hover
+                for (let i = 0; i <= index; i++) {
+                    starLabels[i].style.color = 'var(--primary-color)';
+                }
+                for (let i = index + 1; i < starLabels.length; i++) {
+                    starLabels[i].style.color = '#ccc';
+                }
+            });
+
+            label.addEventListener('mouseleave', () => {
+                // Reset to selected state
+                updateStars();
+            });
+        });
+
+        function updateStars() {
+            // Find the selected rating
+            let selectedIndex = -1;
+            starInputs.forEach((input, index) => {
+                if (input.checked) {
+                    selectedIndex = index;
+                }
+            });
+
+            // Update star colors
+            starLabels.forEach((label, index) => {
+                if (index <= selectedIndex) {
+                    label.style.color = 'var(--primary-color)';
+                } else {
+                    label.style.color = '#ccc';
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

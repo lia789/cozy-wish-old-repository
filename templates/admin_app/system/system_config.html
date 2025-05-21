@@ -1,0 +1,202 @@
+{% extends 'admin_app/base.html' %}
+
+{% block admin_content %}
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">System Configuration</h1>
+</div>
+
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">System Settings</h6>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.non_field_errors %}
+                        {{ error }}
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    
+                    <div class="mb-4">
+                        <h6 class="font-weight-bold">System Status</h6>
+                        
+                        <div class="mb-3">
+                            <div class="form-check form-switch">
+                                {{ form.maintenance_mode }}
+                                <label class="form-check-label" for="{{ form.maintenance_mode.id_for_label }}">
+                                    Maintenance Mode
+                                </label>
+                            </div>
+                            {% if form.maintenance_mode.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.maintenance_mode.errors %}
+                                {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                            {% if form.maintenance_mode.help_text %}
+                            <div class="form-text">{{ form.maintenance_mode.help_text }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.maintenance_message.id_for_label }}" class="form-label">Maintenance Message</label>
+                            {{ form.maintenance_message }}
+                            {% if form.maintenance_message.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.maintenance_message.errors %}
+                                {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                            {% if form.maintenance_message.help_text %}
+                            <div class="form-text">{{ form.maintenance_message.help_text }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="form-check form-switch">
+                                {{ form.registration_enabled }}
+                                <label class="form-check-label" for="{{ form.registration_enabled.id_for_label }}">
+                                    Registration Enabled
+                                </label>
+                            </div>
+                            {% if form.registration_enabled.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.registration_enabled.errors %}
+                                {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                            {% if form.registration_enabled.help_text %}
+                            <div class="form-text">{{ form.registration_enabled.help_text }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h6 class="font-weight-bold">Security Settings</h6>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.max_login_attempts.id_for_label }}" class="form-label">Max Login Attempts</label>
+                            {{ form.max_login_attempts }}
+                            {% if form.max_login_attempts.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.max_login_attempts.errors %}
+                                {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                            {% if form.max_login_attempts.help_text %}
+                            <div class="form-text">{{ form.max_login_attempts.help_text }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.login_lockout_duration.id_for_label }}" class="form-label">Login Lockout Duration (minutes)</label>
+                            {{ form.login_lockout_duration }}
+                            {% if form.login_lockout_duration.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.login_lockout_duration.errors %}
+                                {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                            {% if form.login_lockout_duration.help_text %}
+                            <div class="form-text">{{ form.login_lockout_duration.help_text }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.password_expiry_days.id_for_label }}" class="form-label">Password Expiry (days)</label>
+                            {{ form.password_expiry_days }}
+                            {% if form.password_expiry_days.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.password_expiry_days.errors %}
+                                {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                            {% if form.password_expiry_days.help_text %}
+                            <div class="form-text">{{ form.password_expiry_days.help_text }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.session_timeout_minutes.id_for_label }}" class="form-label">Session Timeout (minutes)</label>
+                            {{ form.session_timeout_minutes }}
+                            {% if form.session_timeout_minutes.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.session_timeout_minutes.errors %}
+                                {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                            {% if form.session_timeout_minutes.help_text %}
+                            <div class="form-text">{{ form.session_timeout_minutes.help_text }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="form-check form-switch">
+                                {{ form.enable_two_factor_auth }}
+                                <label class="form-check-label" for="{{ form.enable_two_factor_auth.id_for_label }}">
+                                    Enable Two-Factor Authentication
+                                </label>
+                            </div>
+                            {% if form.enable_two_factor_auth.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.enable_two_factor_auth.errors %}
+                                {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                            {% if form.enable_two_factor_auth.help_text %}
+                            <div class="form-text">{{ form.enable_two_factor_auth.help_text }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <button type="submit" class="btn btn-primary">Save Configuration</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Configuration History</h6>
+            </div>
+            <div class="card-body">
+                <table class="table">
+                    <tr>
+                        <th style="width: 200px;">Last Updated:</th>
+                        <td>{{ config.updated_at|date:"F j, Y, g:i a" }}</td>
+                    </tr>
+                    <tr>
+                        <th>Last Updated By:</th>
+                        <td>
+                            {% if config.last_updated_by %}
+                            {{ config.last_updated_by.email }}
+                            {% else %}
+                            <span class="text-muted">Unknown</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Created:</th>
+                        <td>{{ config.created_at|date:"F j, Y, g:i a" }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

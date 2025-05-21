@@ -1,0 +1,539 @@
+{% extends 'admin_app/base.html' %}
+
+{% block admin_content %}
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">User Details</h1>
+    <div>
+        <a href="{% url 'admin_app:user_edit' user_id=user_obj.id %}" class="d-none d-sm-inline-block btn btn-sm btn-info shadow-sm me-2">
+            <i class="fas fa-edit fa-sm text-white-50 me-1"></i> Edit User
+        </a>
+        <a href="{% url 'admin_app:user_delete' user_id=user_obj.id %}" class="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm me-2">
+            <i class="fas fa-trash fa-sm text-white-50 me-1"></i> Delete User
+        </a>
+        <a href="{% url 'admin_app:user_list' %}" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm">
+            <i class="fas fa-arrow-left fa-sm text-white-50 me-1"></i> Back to Users
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <!-- User Information -->
+    <div class="col-lg-4">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">User Information</h6>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-4">
+                    <img class="img-profile rounded-circle" src="https://via.placeholder.com/150" width="150" height="150">
+                    <h4 class="mt-3">{{ user_obj.get_full_name|default:user_obj.email }}</h4>
+                    <p class="text-muted">{{ user_obj.email }}</p>
+                    <div>
+                        {% if user_obj.is_superuser %}
+                        <span class="badge bg-danger">Superuser</span>
+                        {% endif %}
+                        
+                        {% if user_obj.is_staff %}
+                        <span class="badge bg-primary">Staff</span>
+                        {% endif %}
+                        
+                        {% if user_obj.is_service_provider %}
+                        <span class="badge bg-info">Service Provider</span>
+                        {% endif %}
+                        
+                        {% if user_obj.is_customer %}
+                        <span class="badge bg-success">Customer</span>
+                        {% endif %}
+                        
+                        {% if user_obj.is_active %}
+                        <span class="badge bg-success">Active</span>
+                        {% else %}
+                        <span class="badge bg-danger">Inactive</span>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <h6 class="font-weight-bold">Account Information</h6>
+                    <table class="table table-borderless">
+                        <tr>
+                            <th>Email:</th>
+                            <td>{{ user_obj.email }}</td>
+                        </tr>
+                        <tr>
+                            <th>First Name:</th>
+                            <td>{{ user_obj.first_name|default:"-" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Last Name:</th>
+                            <td>{{ user_obj.last_name|default:"-" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Date Joined:</th>
+                            <td>{{ user_obj.date_joined|date:"F j, Y, g:i a" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Last Login:</th>
+                            <td>
+                                {% if user_obj.last_login %}
+                                {{ user_obj.last_login|date:"F j, Y, g:i a" }}
+                                {% else %}
+                                <span class="text-muted">Never</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <div class="mb-3">
+                    <h6 class="font-weight-bold">Permissions</h6>
+                    <table class="table table-borderless">
+                        <tr>
+                            <th>Active:</th>
+                            <td>
+                                {% if user_obj.is_active %}
+                                <i class="fas fa-check-circle text-success"></i>
+                                {% else %}
+                                <i class="fas fa-times-circle text-danger"></i>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Staff:</th>
+                            <td>
+                                {% if user_obj.is_staff %}
+                                <i class="fas fa-check-circle text-success"></i>
+                                {% else %}
+                                <i class="fas fa-times-circle text-danger"></i>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Superuser:</th>
+                            <td>
+                                {% if user_obj.is_superuser %}
+                                <i class="fas fa-check-circle text-success"></i>
+                                {% else %}
+                                <i class="fas fa-times-circle text-danger"></i>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Customer:</th>
+                            <td>
+                                {% if user_obj.is_customer %}
+                                <i class="fas fa-check-circle text-success"></i>
+                                {% else %}
+                                <i class="fas fa-times-circle text-danger"></i>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Service Provider:</th>
+                            <td>
+                                {% if user_obj.is_service_provider %}
+                                <i class="fas fa-check-circle text-success"></i>
+                                {% else %}
+                                <i class="fas fa-times-circle text-danger"></i>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <div>
+                    <h6 class="font-weight-bold">Groups</h6>
+                    {% if user_obj.groups.all %}
+                    <ul class="list-group">
+                        {% for group in user_obj.groups.all %}
+                        <li class="list-group-item">{{ group.name }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p class="text-muted">No groups assigned</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Profile Information -->
+    <div class="col-lg-8">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Profile Information</h6>
+            </div>
+            <div class="card-body">
+                {% if user_obj.is_customer and profile %}
+                <!-- Customer Profile -->
+                <div class="mb-4">
+                    <h6 class="font-weight-bold">Customer Profile</h6>
+                    <table class="table">
+                        <tr>
+                            <th style="width: 200px;">Gender:</th>
+                            <td>{{ profile.gender|default:"-" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Date of Birth:</th>
+                            <td>
+                                {% if profile.date_of_birth %}
+                                {{ profile.date_of_birth|date:"F Y" }}
+                                {% else %}
+                                -
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Phone Number:</th>
+                            <td>{{ profile.phone_number|default:"-" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Address:</th>
+                            <td>{{ profile.address|default:"-" }}</td>
+                        </tr>
+                        <tr>
+                            <th>City:</th>
+                            <td>{{ profile.city|default:"-" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Zip:</th>
+                            <td>{{ profile.zip|default:"-" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Area:</th>
+                            <td>{{ profile.area|default:"-" }}</td>
+                        </tr>
+                    </table>
+                </div>
+                {% elif user_obj.is_service_provider and profile %}
+                <!-- Service Provider Profile -->
+                <div class="mb-4">
+                    <h6 class="font-weight-bold">Service Provider Profile</h6>
+                    <table class="table">
+                        <tr>
+                            <th style="width: 200px;">Venue Name:</th>
+                            <td>{{ profile.venue_name|default:"-" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Phone:</th>
+                            <td>{{ profile.phone|default:"-" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Address:</th>
+                            <td>{{ profile.address|default:"-" }}</td>
+                        </tr>
+                        <tr>
+                            <th>City:</th>
+                            <td>{{ profile.city|default:"-" }}</td>
+                        </tr>
+                        <tr>
+                            <th>State:</th>
+                            <td>{{ profile.state|default:"-" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Zip:</th>
+                            <td>{{ profile.zip|default:"-" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Contact Person:</th>
+                            <td>{{ profile.contact_person_name|default:"-" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Contact Email:</th>
+                            <td>{{ profile.contact_person_email|default:"-" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Contact Phone:</th>
+                            <td>{{ profile.contact_person_phone|default:"-" }}</td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <!-- Venues -->
+                {% if venues %}
+                <div class="mb-4">
+                    <h6 class="font-weight-bold">Venues</h6>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Location</th>
+                                    <th>Status</th>
+                                    <th>Created</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for venue in venues %}
+                                <tr>
+                                    <td>
+                                        <a href="{% url 'admin_app:venue_detail' venue_id=venue.id %}">
+                                            {{ venue.name }}
+                                        </a>
+                                    </td>
+                                    <td>{{ venue.city }}, {{ venue.state }}</td>
+                                    <td>
+                                        {% if venue.approval_status == 'approved' %}
+                                        <span class="badge bg-success">Approved</span>
+                                        {% elif venue.approval_status == 'pending' %}
+                                        <span class="badge bg-warning">Pending</span>
+                                        {% elif venue.approval_status == 'rejected' %}
+                                        <span class="badge bg-danger">Rejected</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ venue.created_at|date:"M d, Y" }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Staff Members -->
+                {% if staff %}
+                <div class="mb-4">
+                    <h6 class="font-weight-bold">Staff Members</h6>
+                    <div class="row">
+                        {% for member in staff %}
+                        <div class="col-md-4 mb-3">
+                            <div class="card">
+                                <div class="card-body text-center">
+                                    <img src="{{ member.profile_image.url|default:'https://via.placeholder.com/100' }}" class="rounded-circle mb-2" width="80" height="80">
+                                    <h6 class="card-title mb-0">{{ member.name }}</h6>
+                                    <p class="text-muted small">{{ member.designation }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                {% else %}
+                <div class="text-center py-4">
+                    <i class="fas fa-user-circle fa-3x text-muted mb-3"></i>
+                    <p class="mb-0">No profile information available.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Tabs for additional information -->
+        <ul class="nav nav-tabs" id="userTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="bookings-tab" data-bs-toggle="tab" data-bs-target="#bookings" type="button" role="tab" aria-controls="bookings" aria-selected="true">Bookings</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews" type="button" role="tab" aria-controls="reviews" aria-selected="false">Reviews</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="activities-tab" data-bs-toggle="tab" data-bs-target="#activities" type="button" role="tab" aria-controls="activities" aria-selected="false">Activities</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="security-tab" data-bs-toggle="tab" data-bs-target="#security" type="button" role="tab" aria-controls="security" aria-selected="false">Security</button>
+            </li>
+        </ul>
+        
+        <div class="tab-content" id="userTabsContent">
+            <!-- Bookings Tab -->
+            <div class="tab-pane fade show active" id="bookings" role="tabpanel" aria-labelledby="bookings-tab">
+                <div class="card shadow mb-4 border-top-0 rounded-top-0">
+                    <div class="card-body">
+                        {% if bookings %}
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Venue</th>
+                                        <th>Date</th>
+                                        <th>Status</th>
+                                        <th>Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for booking in bookings %}
+                                    <tr>
+                                        <td>{{ booking.id }}</td>
+                                        <td>{{ booking.venue.name }}</td>
+                                        <td>{{ booking.booking_date|date:"M d, Y" }}</td>
+                                        <td>
+                                            {% if booking.status == 'pending' %}
+                                            <span class="badge bg-warning">Pending</span>
+                                            {% elif booking.status == 'confirmed' %}
+                                            <span class="badge bg-success">Confirmed</span>
+                                            {% elif booking.status == 'completed' %}
+                                            <span class="badge bg-info">Completed</span>
+                                            {% elif booking.status == 'cancelled' %}
+                                            <span class="badge bg-danger">Cancelled</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>${{ booking.total_price|floatformat:2 }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                            <p class="mb-0">No bookings found for this user.</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Reviews Tab -->
+            <div class="tab-pane fade" id="reviews" role="tabpanel" aria-labelledby="reviews-tab">
+                <div class="card shadow mb-4 border-top-0 rounded-top-0">
+                    <div class="card-body">
+                        {% if reviews %}
+                        <div class="reviews-list">
+                            {% for review in reviews %}
+                            <div class="review mb-4 pb-4 {% if not forloop.last %}border-bottom{% endif %}">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <div>
+                                        <a href="{% url 'venues_app:venue_detail' venue_id=review.venue.id %}">{{ review.venue.name }}</a>
+                                        <div class="text-warning">
+                                            {% for i in "12345" %}
+                                            <i class="fas fa-star {% if forloop.counter <= review.rating %}text-warning{% else %}text-muted{% endif %}"></i>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <small class="text-muted me-3">{{ review.created_at|date:"F j, Y" }}</small>
+                                        {% if review.is_flagged %}
+                                        <span class="badge bg-warning">Flagged</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <p>{{ review.comment }}</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-star fa-3x text-muted mb-3"></i>
+                            <p class="mb-0">No reviews found for this user.</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Activities Tab -->
+            <div class="tab-pane fade" id="activities" role="tabpanel" aria-labelledby="activities-tab">
+                <div class="card shadow mb-4 border-top-0 rounded-top-0">
+                    <div class="card-body">
+                        {% if activities %}
+                        <div class="activity-timeline">
+                            {% for activity in activities %}
+                            <div class="activity-item d-flex mb-3">
+                                <div class="activity-icon me-3">
+                                    {% if activity.action_type == 'create' %}
+                                    <i class="fas fa-plus-circle text-success"></i>
+                                    {% elif activity.action_type == 'update' %}
+                                    <i class="fas fa-edit text-info"></i>
+                                    {% elif activity.action_type == 'delete' %}
+                                    <i class="fas fa-trash-alt text-danger"></i>
+                                    {% elif activity.action_type == 'view' %}
+                                    <i class="fas fa-eye text-primary"></i>
+                                    {% elif activity.action_type == 'approve' %}
+                                    <i class="fas fa-check-circle text-success"></i>
+                                    {% elif activity.action_type == 'reject' %}
+                                    <i class="fas fa-times-circle text-danger"></i>
+                                    {% elif activity.action_type == 'login' %}
+                                    <i class="fas fa-sign-in-alt text-primary"></i>
+                                    {% elif activity.action_type == 'logout' %}
+                                    <i class="fas fa-sign-out-alt text-primary"></i>
+                                    {% else %}
+                                    <i class="fas fa-cog text-secondary"></i>
+                                    {% endif %}
+                                </div>
+                                <div class="activity-content">
+                                    <div class="d-flex justify-content-between">
+                                        <span class="fw-bold">{{ activity.action_type|title }}</span>
+                                        <small class="text-muted">{{ activity.timestamp|date:"M d, H:i" }}</small>
+                                    </div>
+                                    <p class="mb-0 small">
+                                        {% if activity.target_model %}
+                                        {{ activity.target_model }}
+                                        {% if activity.target_id %}
+                                        #{{ activity.target_id }}
+                                        {% endif %}
+                                        {% endif %}
+                                        {% if activity.description %}
+                                        - {{ activity.description }}
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-history fa-3x text-muted mb-3"></i>
+                            <p class="mb-0">No activities found for this user.</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Security Tab -->
+            <div class="tab-pane fade" id="security" role="tabpanel" aria-labelledby="security-tab">
+                <div class="card shadow mb-4 border-top-0 rounded-top-0">
+                    <div class="card-body">
+                        {% if security_events %}
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Event Type</th>
+                                        <th>Severity</th>
+                                        <th>Timestamp</th>
+                                        <th>IP Address</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for event in security_events %}
+                                    <tr>
+                                        <td>{{ event.get_event_type_display }}</td>
+                                        <td>
+                                            {% if event.severity == 'info' %}
+                                            <span class="badge bg-info">Info</span>
+                                            {% elif event.severity == 'warning' %}
+                                            <span class="badge bg-warning">Warning</span>
+                                            {% elif event.severity == 'critical' %}
+                                            <span class="badge bg-danger">Critical</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ event.timestamp|date:"M d, Y H:i" }}</td>
+                                        <td>{{ event.ip_address|default:"Unknown" }}</td>
+                                        <td>
+                                            {% if event.is_resolved %}
+                                            <span class="badge bg-success">Resolved</span>
+                                            {% else %}
+                                            <span class="badge bg-danger">Unresolved</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-shield-alt fa-3x text-muted mb-3"></i>
+                            <p class="mb-0">No security events found for this user.</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

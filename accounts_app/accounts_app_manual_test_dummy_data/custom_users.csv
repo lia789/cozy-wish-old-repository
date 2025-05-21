@@ -1,0 +1,14 @@
+email,password,is_customer,is_service_provider,is_staff,is_superuser,is_active,email_verified
+customer1@example.com,password123,True,False,False,False,True,True
+customer2@example.com,password123,True,False,False,False,True,True
+customer3@example.com,password123,True,False,False,False,True,True
+customer4@example.com,password123,True,False,False,False,True,False
+customer5@example.com,password123,True,False,False,False,True,False
+provider1@example.com,password123,False,True,False,False,True,True
+provider2@example.com,password123,False,True,False,False,True,True
+provider3@example.com,password123,False,True,False,False,True,True
+provider4@example.com,password123,False,True,False,False,True,False
+provider5@example.com,password123,False,True,False,False,True,False
+staff1@example.com,password123,False,False,True,False,True,True
+staff2@example.com,password123,False,False,True,False,True,True
+admin@example.com,password123,False,False,True,True,True,True

@@ -1,0 +1,210 @@
+{% extends 'admin_base.html' %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block admin_extra_css %}
+<link rel="stylesheet" href="{% static 'css/notifications_app/notifications_app.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-5 radial-gradient-bg">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'notifications_app:admin_notification_dashboard' %}">Notification Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'notifications_app:admin_manage_categories' %}">Notification Categories</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ title }}</li>
+        </ol>
+    </nav>
+
+    <div class="admin-section-card">
+        <div class="card-header">
+            <h6 class="mb-0">{{ title }}</h6>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+
+                <div class="mb-3">
+                    <label for="{{ form.name.id_for_label }}" class="form-label">Name</label>
+                    {{ form.name }}
+                    {% if form.name.errors %}
+                    <div class="invalid-feedback d-block">
+                        {% for error in form.name.errors %}
+                        {{ error }}
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-3">
+                    <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+                    {{ form.description }}
+                    {% if form.description.errors %}
+                    <div class="invalid-feedback d-block">
+                        {% for error in form.description.errors %}
+                        {{ error }}
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="{{ form.icon.id_for_label }}" class="form-label">Icon</label>
+                        {{ form.icon }}
+                        {% if form.icon.help_text %}
+                        <div class="form-text">{{ form.icon.help_text }}</div>
+                        {% endif %}
+                        {% if form.icon.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.icon.errors %}
+                            {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="{{ form.color.id_for_label }}" class="form-label">Color</label>
+                        {{ form.color }}
+                        {% if form.color.help_text %}
+                        <div class="form-text">{{ form.color.help_text }}</div>
+                        {% endif %}
+                        {% if form.color.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.color.errors %}
+                            {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="card notification-card mb-4">
+                    <div class="card-header">
+                        <h6 class="mb-0">Icon Preview</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Common Font Awesome Icons:</h6>
+                                <div class="d-flex flex-wrap gap-3 mb-3">
+                                    <div class="text-center">
+                                        <i class="fas fa-bell fa-2x"></i>
+                                        <p class="small">fa-bell</p>
+                                    </div>
+                                    <div class="text-center">
+                                        <i class="fas fa-envelope fa-2x"></i>
+                                        <p class="small">fa-envelope</p>
+                                    </div>
+                                    <div class="text-center">
+                                        <i class="fas fa-calendar fa-2x"></i>
+                                        <p class="small">fa-calendar</p>
+                                    </div>
+                                    <div class="text-center">
+                                        <i class="fas fa-star fa-2x"></i>
+                                        <p class="small">fa-star</p>
+                                    </div>
+                                    <div class="text-center">
+                                        <i class="fas fa-comment fa-2x"></i>
+                                        <p class="small">fa-comment</p>
+                                    </div>
+                                    <div class="text-center">
+                                        <i class="fas fa-credit-card fa-2x"></i>
+                                        <p class="small">fa-credit-card</p>
+                                    </div>
+                                    <div class="text-center">
+                                        <i class="fas fa-user fa-2x"></i>
+                                        <p class="small">fa-user</p>
+                                    </div>
+                                    <div class="text-center">
+                                        <i class="fas fa-cog fa-2x"></i>
+                                        <p class="small">fa-cog</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Common Bootstrap Colors:</h6>
+                                <div class="d-flex flex-wrap gap-2 mb-3">
+                                    <div class="p-2 bg-primary text-white">primary</div>
+                                    <div class="p-2 bg-secondary text-white">secondary</div>
+                                    <div class="p-2 bg-success text-white">success</div>
+                                    <div class="p-2 bg-danger text-white">danger</div>
+                                    <div class="p-2 bg-warning text-dark">warning</div>
+                                    <div class="p-2 bg-info text-dark">info</div>
+                                    <div class="p-2 bg-light text-dark">light</div>
+                                    <div class="p-2 bg-dark text-white">dark</div>
+                                </div>
+                                <p class="small">You can also use hex codes like #007bff</p>
+                            </div>
+                        </div>
+
+                        <div class="mt-3">
+                            <h6>Your Icon Preview:</h6>
+                            <div class="p-3 border rounded">
+                                <div class="d-flex align-items-center">
+                                    <i id="icon-preview" class="fas fa-bell fa-2x me-3"></i>
+                                    <span id="category-name" class="h5 mb-0">Category Name</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between">
+                    <a href="{% url 'notifications_app:admin_manage_categories' %}" class="btn btn-outline-primary"><i class="fas fa-times me-1"></i> Cancel</a>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-save me-1"></i> Save Category</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block admin_extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const nameInput = document.getElementById('{{ form.name.id_for_label }}');
+        const iconInput = document.getElementById('{{ form.icon.id_for_label }}');
+        const colorInput = document.getElementById('{{ form.color.id_for_label }}');
+
+        const iconPreview = document.getElementById('icon-preview');
+        const categoryName = document.getElementById('category-name');
+
+        // Update preview when inputs change
+        nameInput.addEventListener('input', updatePreview);
+        iconInput.addEventListener('input', updatePreview);
+        colorInput.addEventListener('input', updatePreview);
+
+        // Initial preview update
+        updatePreview();
+
+        function updatePreview() {
+            // Update category name
+            categoryName.textContent = nameInput.value || 'Category Name';
+
+            // Update icon
+            if (iconInput.value) {
+                iconPreview.className = 'fas ' + iconInput.value + ' fa-2x me-3';
+            } else {
+                iconPreview.className = 'fas fa-bell fa-2x me-3';
+            }
+
+            // Update color
+            if (colorInput.value) {
+                if (colorInput.value.startsWith('#')) {
+                    iconPreview.style.color = colorInput.value;
+                } else {
+                    // Try to use as a Bootstrap color class
+                    iconPreview.style.color = '';
+                    iconPreview.classList.add('text-' + colorInput.value);
+                }
+            } else {
+                iconPreview.style.color = '';
+                iconPreview.classList.remove(Array.from(iconPreview.classList).find(cls => cls.startsWith('text-')));
+            }
+        }
+    });
+</script>
+{% endblock %}

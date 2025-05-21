@@ -1,0 +1,288 @@
+{% extends 'dashboard_app/base_dashboard.html' %}
+{% load static %}
+{% load dashboard_tags %}
+
+{% block title %}Service Performance - CozyWish{% endblock %}
+
+{% block dashboard_title %}Service Performance{% endblock %}
+
+{% block sidebar_content %}
+<!-- Main Navigation -->
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'dashboard_app:provider_dashboard' %}">
+        <i class="fas fa-home"></i> Dashboard
+    </a>
+</li>
+
+<!-- Venue Management Section -->
+<div class="sidebar-section-header">Venue Management</div>
+{% if venues %}
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'venues_app:provider_venue_detail' slug=venues.0.slug %}">
+        <i class="fas fa-edit"></i> Manage Venue
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'venues_app:service_create' %}">
+        <i class="fas fa-plus"></i> Add Service
+    </a>
+</li>
+{% else %}
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'venues_app:create_venue' %}">
+        <i class="fas fa-plus"></i> Create Venue
+    </a>
+</li>
+{% endif %}
+
+<!-- Bookings Section -->
+<div class="sidebar-section-header">Bookings</div>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'dashboard_app:provider_todays_bookings' %}">
+        <i class="fas fa-calendar"></i> Today's Bookings
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'booking_cart_app:provider_booking_list' %}">
+        <i class="fas fa-list"></i> All Bookings
+    </a>
+</li>
+
+<!-- Analytics Section -->
+<div class="sidebar-section-header">Analytics</div>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'dashboard_app:provider_revenue_reports' %}">
+        <i class="fas fa-chart-line"></i> Revenue Reports
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link active" href="{% url 'dashboard_app:provider_service_performance' %}">
+        <i class="fas fa-chart-bar"></i> Service Performance
+    </a>
+</li>
+
+<!-- Team Section -->
+<div class="sidebar-section-header">Team</div>
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'dashboard_app:provider_team_management' %}">
+        <i class="fas fa-users"></i> Team Management
+    </a>
+</li>
+{% endblock %}
+
+{% block dashboard_actions %}
+<div class="btn-group me-2">
+    <button type="button" class="btn btn-sm btn-outline-secondary" id="exportCSV">
+        <i class="fas fa-download"></i> Export CSV
+    </button>
+    <button type="button" class="btn btn-sm btn-outline-secondary" id="printReport">
+        <i class="fas fa-print"></i> Print
+    </button>
+</div>
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card dashboard-card mb-4">
+            <div class="dashboard-card-header">
+                <h5 class="mb-0">Service Performance Overview</h5>
+            </div>
+            <div class="dashboard-card-body">
+                {% if services %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Service</th>
+                                <th>Venue</th>
+                                <th>Total Bookings</th>
+                                <th>Total Revenue</th>
+                                <th>Average Price</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for service_data in sorted_services %}
+                            <tr>
+                                <td>{{ service_data.service.name }}</td>
+                                <td>{{ service_data.service.venue.name }}</td>
+                                <td>{{ service_data.total_bookings }}</td>
+                                <td>${{ service_data.total_revenue|format_currency }}</td>
+                                <td>${{ service_data.average_price|format_currency }}</td>
+                                <td>
+                                    <div class="btn-group">
+                                        <a href="{% url 'venues_app:edit_service' venue_slug=service_data.service.venue.slug service_slug=service_data.service.slug %}" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="{% url 'venues_app:service_detail' venue_slug=service_data.service.venue.slug service_slug=service_data.service.slug %}" class="btn btn-sm btn-outline-secondary">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alert alert-info mb-0">
+                    <i class="fas fa-info-circle me-2"></i>
+                    You don't have any services yet.
+                    {% if venues %}
+                    <a href="{% url 'venues_app:service_create' %}" class="alert-link">Add your first service</a> to start tracking performance.
+                    {% else %}
+                    <a href="{% url 'venues_app:create_venue' %}" class="alert-link">Create a venue</a> first, then add services to start tracking performance.
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if services %}
+<div class="row">
+    <div class="col-md-6">
+        <div class="card dashboard-card">
+            <div class="dashboard-card-header">
+                <h5 class="mb-0">Top Performing Services</h5>
+            </div>
+            <div class="dashboard-card-body">
+                <canvas id="serviceRevenueChart" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card dashboard-card">
+            <div class="dashboard-card-header">
+                <h5 class="mb-0">Booking Distribution</h5>
+            </div>
+            <div class="dashboard-card-body">
+                <canvas id="serviceBookingsChart" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block dashboard_js %}
+{% if services %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Service Revenue Chart
+        const revenueCtx = document.getElementById('serviceRevenueChart').getContext('2d');
+
+        const revenueData = {
+            labels: [{% for service_data in sorted_services|slice:":5" %}'{{ service_data.service.name }}'{% if not forloop.last %}, {% endif %}{% endfor %}],
+            datasets: [{
+                label: 'Revenue',
+                data: [{% for service_data in sorted_services|slice:":5" %}{{ service_data.total_revenue }}{% if not forloop.last %}, {% endif %}{% endfor %}],
+                backgroundColor: [
+                    'rgba(47, 22, 15, 0.7)',
+                    'rgba(75, 192, 192, 0.7)',
+                    'rgba(153, 102, 255, 0.7)',
+                    'rgba(255, 159, 64, 0.7)',
+                    'rgba(54, 162, 235, 0.7)'
+                ],
+                borderColor: [
+                    'rgba(47, 22, 15, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)',
+                    'rgba(54, 162, 235, 1)'
+                ],
+                borderWidth: 1
+            }]
+        };
+
+        const revenueChart = new Chart(revenueCtx, {
+            type: 'bar',
+            data: revenueData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '$' + value;
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return '$' + context.raw;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Service Bookings Chart
+        const bookingsCtx = document.getElementById('serviceBookingsChart').getContext('2d');
+
+        const bookingsData = {
+            labels: [{% for service_data in sorted_services %}'{{ service_data.service.name }}'{% if not forloop.last %}, {% endif %}{% endfor %}],
+            datasets: [{
+                label: 'Bookings',
+                data: [{% for service_data in sorted_services %}{{ service_data.total_bookings }}{% if not forloop.last %}, {% endif %}{% endfor %}],
+                backgroundColor: [
+                    'rgba(47, 22, 15, 0.7)',
+                    'rgba(75, 192, 192, 0.7)',
+                    'rgba(153, 102, 255, 0.7)',
+                    'rgba(255, 159, 64, 0.7)',
+                    'rgba(54, 162, 235, 0.7)',
+                    'rgba(255, 99, 132, 0.7)',
+                    'rgba(255, 205, 86, 0.7)',
+                    'rgba(201, 203, 207, 0.7)'
+                ],
+                borderColor: [
+                    'rgba(47, 22, 15, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(255, 205, 86, 1)',
+                    'rgba(201, 203, 207, 1)'
+                ],
+                borderWidth: 1
+            }]
+        };
+
+        const bookingsChart = new Chart(bookingsCtx, {
+            type: 'doughnut',
+            data: bookingsData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                    }
+                }
+            }
+        });
+
+        // Export CSV functionality
+        document.getElementById('exportCSV').addEventListener('click', function() {
+            window.location.href = window.location.pathname + '?export=csv';
+        });
+
+        // Print functionality
+        document.getElementById('printReport').addEventListener('click', function() {
+            window.print();
+        });
+    });
+</script>
+{% endif %}
+{% endblock %}

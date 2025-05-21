@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+
+{% block title %}Flagged Reviews - CozyWish Admin{% endblock %}
+
+{% block extra_css %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/review_app/review_app.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-5 radial-gradient-bg">
+    <div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="page-title"><i class="fas fa-flag me-2"></i>Flagged Reviews</h1>
+        <a href="{% url 'review_app:admin_review_list' %}" class="btn btn-outline-primary">
+            <i class="fas fa-arrow-left me-2"></i> Back to All Reviews
+        </a>
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            {% if flags %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Review</th>
+                            <th>Flagged By</th>
+                            <th>Reason</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for flag in flags %}
+                        <tr>
+                            <td>{{ flag.id }}</td>
+                            <td>
+                                <a href="{% url 'review_app:admin_review_detail' review_id=flag.review.id %}">
+                                    {{ flag.review.venue.name }} - {{ flag.review.rating }} stars
+                                </a>
+                            </td>
+                            <td>{{ flag.flagged_by.get_full_name|default:flag.flagged_by.email }}</td>
+                            <td>{{ flag.reason|truncatechars:50 }}</td>
+                            <td>{{ flag.created_at|date:"M d, Y" }}</td>
+                            <td>
+                                <div class="btn-group">
+                                    <a href="{% url 'review_app:admin_review_detail' review_id=flag.review.id %}" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-eye"></i> View
+                                    </a>
+                                    <a href="{% url 'review_app:admin_approve_flag' flag_id=flag.id %}" class="btn btn-sm btn-outline-success">
+                                        <i class="fas fa-check"></i> Approve
+                                    </a>
+                                    <a href="{% url 'review_app:admin_reject_flag' flag_id=flag.id %}" class="btn btn-sm btn-outline-danger">
+                                        <i class="fas fa-times"></i> Reject
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            {% if flags.paginator.num_pages > 1 %}
+            <nav aria-label="Flag pagination" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if flags.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page=1" aria-label="First">
+                            <span aria-hidden="true">&laquo;&laquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ flags.previous_page_number }}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" aria-label="First">
+                            <span aria-hidden="true">&laquo;&laquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    {% for i in flags.paginator.page_range %}
+                        {% if flags.number == i %}
+                        <li class="page-item active"><a class="page-link" href="#">{{ i }}</a></li>
+                        {% elif i > flags.number|add:'-3' and i < flags.number|add:'3' %}
+                        <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if flags.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ flags.next_page_number }}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ flags.paginator.num_pages }}" aria-label="Last">
+                            <span aria-hidden="true">&raquo;&raquo;</span>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" aria-label="Last">
+                            <span aria-hidden="true">&raquo;&raquo;</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+
+            {% else %}
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>
+                No flagged reviews pending review.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="card shadow">
+        <div class="card-header bg-primary-brand text-white">
+            <h5 class="mb-0">Flag Review Guidelines</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h6>When to Approve Flags</h6>
+                    <ul>
+                        <li>Review contains offensive language or hate speech</li>
+                        <li>Review contains personal attacks or harassment</li>
+                        <li>Review includes spam or promotional content</li>
+                        <li>Review contains false information that can be verified</li>
+                        <li>Review violates privacy by sharing personal information</li>
+                        <li>Review is completely unrelated to the venue or service</li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h6>When to Reject Flags</h6>
+                    <ul>
+                        <li>Review contains negative but fair criticism</li>
+                        <li>Review describes a poor customer experience</li>
+                        <li>Review mentions issues with service or quality</li>
+                        <li>Review includes subjective opinions about value</li>
+                        <li>Review compares unfavorably to competitors</li>
+                        <li>Review has a low rating but constructive feedback</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="alert alert-info mt-3 mb-0">
+                <i class="fas fa-info-circle me-2"></i>
+                <strong>Note:</strong> Approving a flag will remove the review from public view. Rejecting a flag will keep the review visible.
+            </div>
+        </div>
+    </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,375 @@
+{% extends 'admin_app/base.html' %}
+
+{% block admin_content %}
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">User Report</h1>
+    <div>
+        <a href="{% url 'admin_app:analytics_dashboard' %}" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm me-2">
+            <i class="fas fa-chart-line fa-sm text-white-50 me-1"></i> Analytics Dashboard
+        </a>
+    </div>
+</div>
+
+<!-- Date Range Form -->
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">Date Range</h6>
+    </div>
+    <div class="card-body">
+        <form method="post" class="row g-3">
+            {% csrf_token %}
+            <div class="col-md-5">
+                <label for="{{ form.start_date.id_for_label }}" class="form-label">Start Date</label>
+                {{ form.start_date }}
+                {% if form.start_date.errors %}
+                <div class="invalid-feedback d-block">
+                    {% for error in form.start_date.errors %}
+                    {{ error }}
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            <div class="col-md-5">
+                <label for="{{ form.end_date.id_for_label }}" class="form-label">End Date</label>
+                {{ form.end_date }}
+                {% if form.end_date.errors %}
+                <div class="invalid-feedback d-block">
+                    {% for error in form.end_date.errors %}
+                    {{ error }}
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">Apply</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Content Row -->
+<div class="row">
+    <!-- Total Users Card -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                            Total Users</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_users }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-users fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Users Card -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-success shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                            New Users (This Period)</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ new_users.count }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-user-plus fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Users Card -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-info shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                            Active Users (This Period)</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ active_users.count }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-user-check fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Types Card -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-warning shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                            User Types</div>
+                        <div class="mt-2">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="text-xs">Customers:</span>
+                                <span class="text-xs font-weight-bold">{{ customer_count }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="text-xs">Providers:</span>
+                                <span class="text-xs font-weight-bold">{{ provider_count }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span class="text-xs">Staff:</span>
+                                <span class="text-xs font-weight-bold">{{ staff_count }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-user-tag fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row -->
+<div class="row">
+    <!-- User Types Chart -->
+    <div class="col-xl-4 col-lg-5">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">User Types Distribution</h6>
+            </div>
+            <div class="card-body">
+                <div class="chart-pie pt-4 pb-2">
+                    <canvas id="userTypesChart"></canvas>
+                </div>
+                <div class="mt-4 text-center small">
+                    <span class="me-2">
+                        <i class="fas fa-circle text-primary"></i> Customers
+                    </span>
+                    <span class="me-2">
+                        <i class="fas fa-circle text-success"></i> Providers
+                    </span>
+                    <span class="me-2">
+                        <i class="fas fa-circle text-info"></i> Staff
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Users Chart -->
+    <div class="col-xl-8 col-lg-7">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">New Users by Day</h6>
+            </div>
+            <div class="card-body">
+                <div class="chart-area">
+                    <canvas id="newUsersChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Most Active Users -->
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">Most Active Users</h6>
+    </div>
+    <div class="card-body">
+        {% if most_active_users %}
+        <div class="table-responsive">
+            <table class="table table-bordered" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Email</th>
+                        <th>Type</th>
+                        <th>Login Count</th>
+                        <th>Last Login</th>
+                        <th>Joined</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in most_active_users %}
+                    <tr>
+                        <td>{{ user.get_full_name|default:"-" }}</td>
+                        <td>
+                            <a href="{% url 'admin_app:user_detail' user_id=user.id %}">
+                                {{ user.email }}
+                            </a>
+                        </td>
+                        <td>
+                            {% if user.is_superuser %}
+                            <span class="badge bg-danger">Superuser</span>
+                            {% elif user.is_staff %}
+                            <span class="badge bg-primary">Staff</span>
+                            {% elif user.is_service_provider %}
+                            <span class="badge bg-info">Provider</span>
+                            {% elif user.is_customer %}
+                            <span class="badge bg-success">Customer</span>
+                            {% else %}
+                            <span class="badge bg-secondary">Unknown</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ user.login_count }}</td>
+                        <td>
+                            {% if user.last_login %}
+                            {{ user.last_login|date:"M d, Y H:i" }}
+                            {% else %}
+                            <span class="text-muted">Never</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ user.date_joined|date:"M d, Y" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-4">
+            <i class="fas fa-users fa-3x text-muted mb-3"></i>
+            <p class="mb-0">No active users found for this period.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- New Users -->
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">New Users (This Period)</h6>
+    </div>
+    <div class="card-body">
+        {% if new_users %}
+        <div class="table-responsive">
+            <table class="table table-bordered" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Email</th>
+                        <th>Type</th>
+                        <th>Joined</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in new_users %}
+                    <tr>
+                        <td>{{ user.get_full_name|default:"-" }}</td>
+                        <td>
+                            <a href="{% url 'admin_app:user_detail' user_id=user.id %}">
+                                {{ user.email }}
+                            </a>
+                        </td>
+                        <td>
+                            {% if user.is_superuser %}
+                            <span class="badge bg-danger">Superuser</span>
+                            {% elif user.is_staff %}
+                            <span class="badge bg-primary">Staff</span>
+                            {% elif user.is_service_provider %}
+                            <span class="badge bg-info">Provider</span>
+                            {% elif user.is_customer %}
+                            <span class="badge bg-success">Customer</span>
+                            {% else %}
+                            <span class="badge bg-secondary">Unknown</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ user.date_joined|date:"M d, Y H:i" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-4">
+            <i class="fas fa-user-plus fa-3x text-muted mb-3"></i>
+            <p class="mb-0">No new users found for this period.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block admin_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // User Types Chart
+        const userTypesCtx = document.getElementById('userTypesChart').getContext('2d');
+        new Chart(userTypesCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Customers', 'Providers', 'Staff'],
+                datasets: [{
+                    data: [{{ customer_count }}, {{ provider_count }}, {{ staff_count }}],
+                    backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc'],
+                    hoverBackgroundColor: ['#2e59d9', '#17a673', '#2c9faf'],
+                    hoverBorderColor: "rgba(234, 236, 244, 1)",
+                }]
+            },
+            options: {
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                cutout: '70%',
+            }
+        });
+        
+        // New Users by Day Chart
+        const newUsersByDay = {{ new_users_by_day|safe }};
+        const dates = Object.keys(newUsersByDay).sort();
+        const userCounts = dates.map(date => newUsersByDay[date]);
+        
+        // Format dates for display
+        const formattedDates = dates.map(date => {
+            const d = new Date(date);
+            return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        });
+        
+        const newUsersCtx = document.getElementById('newUsersChart').getContext('2d');
+        new Chart(newUsersCtx, {
+            type: 'line',
+            data: {
+                labels: formattedDates,
+                datasets: [{
+                    label: 'New Users',
+                    data: userCounts,
+                    backgroundColor: 'rgba(78, 115, 223, 0.05)',
+                    borderColor: 'rgba(78, 115, 223, 1)',
+                    pointBackgroundColor: 'rgba(78, 115, 223, 1)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgba(78, 115, 223, 1)',
+                    borderWidth: 2,
+                    fill: true
+                }]
+            },
+            options: {
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

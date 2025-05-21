@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Add Payment Method - CozyWish{% endblock %}
+
+{% block extra_css %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/payments_app/payments_app.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-5 radial-gradient-bg">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'venues_app:home' %}">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'payments_app:payment_methods' %}">Payment Methods</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Add Payment Method</li>
+                </ol>
+            </nav>
+
+            <div class="page-header">
+                <h1 class="page-title">Add Payment Method</h1>
+                <p class="text-muted">Add a new payment method to your account for faster checkout</p>
+            </div>
+
+            <div class="card payment-form mb-4">
+                <div class="card-body">
+                    <div class="payment-form-section">
+                        <h5 class="payment-form-section-title">Payment Method Details</h5>
+                    <form method="post">
+                        {% csrf_token %}
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form.payment_type|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                {{ form.name|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                {{ form.last_four|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                {{ form.expiry_date|as_crispy_field }}
+                            </div>
+                            <div class="col-12 mb-3">
+                                {{ form.is_default|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="alert alert-info mb-4">
+                            <div class="d-flex">
+                                <div class="me-3">
+                                    <i class="fas fa-shield-alt fa-2x text-primary"></i>
+                                </div>
+                                <div>
+                                    <h6 class="alert-heading">Secure Payment Information</h6>
+                                    <p class="mb-0">For security reasons, we only store the last 4 digits of your card number. Your full card details are not stored in our system.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'payments_app:payment_methods' %}" class="btn btn-outline-primary">
+                                <i class="fas fa-arrow-left me-2"></i>Back to Payment Methods
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Save Payment Method
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

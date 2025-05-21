@@ -1,0 +1,6 @@
+user_email,first_name,last_name,gender,birth_month,birth_year,phone_number,address,city
+customer1@example.com,John,Doe,M,5,1985,+1234567890,123 Main St,New York
+customer2@example.com,Jane,Smith,F,8,1990,+1987654321,456 Oak Ave,Los Angeles
+customer3@example.com,Michael,Johnson,M,3,1982,+1122334455,789 Pine Rd,Chicago
+customer4@example.com,Emily,Williams,F,11,1995,+1555666777,101 Maple Dr,Houston
+customer5@example.com,David,Brown,M,7,1988,+1999888777,202 Cedar Ln,Phoenix

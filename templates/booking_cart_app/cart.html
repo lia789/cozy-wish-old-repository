@@ -1,0 +1,235 @@
+{% extends 'base.html' %}
+
+{% block title %}Your Cart - CozyWish{% endblock %}
+
+{% block extra_css %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/booking_cart_app/booking_cart_app.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-5 radial-gradient-bg">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="page-header text-center mb-5">
+                    <h1 class="page-title">Your Cart</h1>
+                    <p class="text-muted">Review and manage your selected services</p>
+                </div>
+
+                {% if messages %}
+                <div class="row justify-content-center mb-4">
+                    <div class="col-md-10">
+                        {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            <div class="d-flex align-items-center">
+                                {% if message.tags == 'success' %}
+                                <i class="fas fa-check-circle me-2"></i>
+                                {% elif message.tags == 'error' or message.tags == 'danger' %}
+                                <i class="fas fa-exclamation-circle me-2"></i>
+                                {% elif message.tags == 'warning' %}
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                {% elif message.tags == 'info' %}
+                                <i class="fas fa-info-circle me-2"></i>
+                                {% endif %}
+                                {{ message }}
+                            </div>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if cart_items %}
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <div class="card shadow mb-4">
+                            <div class="card-header bg-primary-brand">
+                                <h5 class="mb-0"><i class="fas fa-shopping-cart me-2"></i>Cart Items ({{ cart_items|length }})</h5>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover mb-0">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Service</th>
+                                                <th>Venue</th>
+                                                <th>Date</th>
+                                                <th>Time</th>
+                                                <th>Quantity</th>
+                                                <th>Price</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for item in cart_items %}
+                                            <tr>
+                                                <td>
+                                                    <a href="{% url 'venues_app:service_detail' venue_slug=item.service.venue.slug service_slug=item.service.slug %}" class="text-decoration-none cart-item-title">
+                                                        {{ item.service.title }}
+                                                    </a>
+                                                </td>
+                                                <td>
+                                                    <a href="{% url 'venues_app:venue_detail' slug=item.service.venue.slug %}" class="text-decoration-none cart-item-venue">
+                                                        {{ item.service.venue.name }}
+                                                    </a>
+                                                </td>
+                                                <td>{{ item.date|date:"M d, Y" }}</td>
+                                                <td>{{ item.time_slot|time:"g:i A" }}</td>
+                                                <td>{{ item.quantity }}</td>
+                                                <td>
+                                                    {% if item.service.discounted_price %}
+                                                    <div class="d-flex flex-column">
+                                                        <span class="cart-item-original-price">${{ item.service.price }}</span>
+                                                        <span class="cart-item-discounted-price">${{ item.service.discounted_price }}</span>
+                                                        <span class="badge bg-danger">{{ item.service.get_discount_percentage }}% OFF</span>
+                                                        {% with discount_info=item.get_discount_info %}
+                                                        {% if discount_info %}
+                                                        <small class="text-muted mt-1">{{ discount_info.name }}</small>
+                                                        {% endif %}
+                                                        {% endwith %}
+                                                    </div>
+                                                    {% else %}
+                                                    <span class="cart-item-price">${{ item.service.price }}</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    <div class="btn-group btn-group-sm" role="group">
+                                                        <a href="{% url 'booking_cart_app:update_cart_item' item_id=item.id %}" class="btn btn-outline-primary">
+                                                            <i class="fas fa-edit"></i>
+                                                        </a>
+                                                        <a href="#" class="btn btn-outline-danger remove-cart-item" data-item-id="{{ item.id }}" data-item-title="{{ item.service.title }}">
+                                                            <i class="fas fa-trash"></i>
+                                                        </a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4">
+                        <div class="card shadow mb-4">
+                            <div class="card-header bg-primary-brand">
+                                <h5 class="mb-0"><i class="fas fa-receipt me-2"></i>Order Summary</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between mb-3">
+                                    <span>Subtotal</span>
+                                    <span>${{ total_price }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-3">
+                                    <span>Service Fee</span>
+                                    <span>$0.00</span>
+                                </div>
+                                <hr>
+                                <div class="d-flex justify-content-between mb-3">
+                                    <span class="fw-bold">Total</span>
+                                    <span class="cart-total">${{ total_price }}</span>
+                                </div>
+                                <div class="d-grid gap-2">
+                                    <a href="{% url 'booking_cart_app:checkout' %}" class="btn btn-primary">
+                                        <i class="fas fa-credit-card me-2"></i>Proceed to Checkout
+                                    </a>
+                                    <a href="{% url 'venues_app:venue_list' %}" class="btn btn-outline-secondary">
+                                        <i class="fas fa-arrow-left me-2"></i>Continue Shopping
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card shadow mb-4">
+                            <div class="card-body">
+                                <div class="d-flex align-items-start">
+                                    <i class="fas fa-info-circle text-primary-brand me-3 mt-1"></i>
+                                    <div>
+                                        <h6 class="mb-2">Important Information</h6>
+                                        <ul class="ps-3 mb-0">
+                                            <li>Cart items will expire after 24 hours</li>
+                                            <li>Bookings can be cancelled up to 6 hours before the scheduled time</li>
+                                            <li>Payment will be processed during checkout</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="row justify-content-center">
+                    <div class="col-md-8 col-lg-6">
+                        <div class="card shadow">
+                            <div class="card-body text-center py-5">
+                                <i class="fas fa-shopping-cart fa-4x text-primary-brand mb-4"></i>
+                                <h3 class="mb-3">Your cart is empty</h3>
+                                <p class="text-muted mb-4">Looks like you haven't added any services to your cart yet.</p>
+                                <a href="{% url 'venues_app:venue_list' %}" class="btn btn-primary">
+                                    <i class="fas fa-search me-2"></i>Browse Services
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle remove cart item buttons
+        const removeButtons = document.querySelectorAll('.remove-cart-item');
+        removeButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+
+                const itemId = this.getAttribute('data-item-id');
+                const itemTitle = this.getAttribute('data-item-title');
+
+                // Create and show a Bootstrap modal for confirmation
+                const modalHtml = `
+                    <div class="modal fade" id="removeItemModal" tabindex="-1" aria-labelledby="removeItemModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="removeItemModalLabel">Confirm Removal</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>Are you sure you want to remove <strong>${itemTitle}</strong> from your cart?</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    <a href="/booking/cart/remove/${itemId}/" class="btn btn-danger">Remove Item</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // Add the modal to the DOM
+                const modalContainer = document.createElement('div');
+                modalContainer.innerHTML = modalHtml;
+                document.body.appendChild(modalContainer);
+
+                // Initialize and show the modal
+                const modal = new bootstrap.Modal(document.getElementById('removeItemModal'));
+                modal.show();
+
+                // Remove the modal from DOM after it's hidden
+                document.getElementById('removeItemModal').addEventListener('hidden.bs.modal', function() {
+                    document.body.removeChild(modalContainer);
+                });
+            });
+        });
+    });
+</script>
+{% endblock %}

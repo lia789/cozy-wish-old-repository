@@ -1,0 +1,292 @@
+{% extends 'base.html' %}
+
+{% block title %}CozyWish for Business{% endblock %}
+
+{% block extra_css %}
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <h1 class="mb-4">Grow Your Business with CozyWish</h1>
+                <p class="mb-4">Join beauty and wellness professionals who have increased their revenue by filling empty appointment slots with our off-peak booking platform.</p>
+                <a href="{% url 'accounts_app:service_provider_signup' %}" class="btn btn-outline-dark mb-5">Sign Up as a Partner</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <h2 class="text-center mb-4">Why Service Providers Choose CozyWish</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 border-0 text-center">
+                    <div class="card-body">
+                        <h3 class="card-title">85%</h3>
+                        <p class="card-text">of partners report increased bookings during off-peak hours</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 text-center">
+                    <div class="card-body">
+                        <h3 class="card-title">$1,200+</h3>
+                        <p class="card-text">average additional monthly revenue for active partners</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 text-center">
+                    <div class="card-body">
+                        <h3 class="card-title">10,000+</h3>
+                        <p class="card-text">customers actively searching for services like yours</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-4">Powerful Tools for Your Business</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-calendar-alt mb-3"></i>
+                        <h5 class="card-title">Smart Scheduling</h5>
+                        <p class="card-text">Easily manage your availability and offer discounts for specific time slots to maximize your schedule.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-chart-line mb-3"></i>
+                        <h5 class="card-title">Business Analytics</h5>
+                        <p class="card-text">Track performance with detailed reports on bookings, revenue, and customer satisfaction.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-star mb-3"></i>
+                        <h5 class="card-title">Customer Reviews</h5>
+                        <p class="card-text">Build your reputation with verified reviews from real customers who've experienced your services.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-mobile-alt mb-3"></i>
+                        <h5 class="card-title">Mobile Friendly</h5>
+                        <p class="card-text">Manage your business on the go with our responsive platform that works on any device.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-percentage mb-3"></i>
+                        <h5 class="card-title">Flexible Discounts</h5>
+                        <p class="card-text">Create custom discounts for off-peak hours to attract new customers and fill your schedule.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-bell mb-3"></i>
+                        <h5 class="card-title">Instant Notifications</h5>
+                        <p class="card-text">Get real-time alerts for new bookings, cancellations, and customer messages.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <h2 class="text-center mb-4">What Our Partners Say</h2>
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <p class="card-text">"CozyWish has transformed our business. We've seen a 40% increase in bookings during what used to be our slowest hours. The platform is intuitive and our clients love the discounts!"</p>
+                        <div class="d-flex align-items-center mt-3">
+                            <div>
+                                <h6 class="mb-0">Sarah Johnson</h6>
+                                <small class="text-muted">Serenity Spa, New York</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <p class="card-text">"Since joining CozyWish, we've attracted a whole new customer base. The analytics tools help us optimize our pricing strategy, and we've seen our revenue grow month after month."</p>
+                        <div class="d-flex align-items-center mt-3">
+                            <div>
+                                <h6 class="mb-0">Michael Chen</h6>
+                                <small class="text-muted">Zen Massage, Chicago</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <p class="card-text">"The customer support team at CozyWish is exceptional. They helped us set up our profile and optimize our services. We're now fully booked most days thanks to the platform!"</p>
+                        <div class="d-flex align-items-center mt-3">
+                            <div>
+                                <h6 class="mb-0">Jessica Martinez</h6>
+                                <small class="text-muted">Glow Beauty Salon, Los Angeles</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-4">How It Works</h2>
+        <div class="row">
+            <div class="col-lg-6 mb-4">
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="d-flex">
+                            <div class="me-3">
+                                <span class="badge bg-secondary rounded-circle p-2">1</span>
+                            </div>
+                            <div>
+                                <h5>Sign Up and Create Your Profile</h5>
+                                <p class="mb-0">Complete your business profile with services, photos, and business details.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="d-flex">
+                            <div class="me-3">
+                                <span class="badge bg-secondary rounded-circle p-2">2</span>
+                            </div>
+                            <div>
+                                <h5>Set Your Availability</h5>
+                                <p class="mb-0">Define your working hours and mark specific time slots for discounted bookings.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="d-flex">
+                            <div class="me-3">
+                                <span class="badge bg-secondary rounded-circle p-2">3</span>
+                            </div>
+                            <div>
+                                <h5>Receive and Manage Bookings</h5>
+                                <p class="mb-0">Get notified of new bookings and manage them through your dashboard.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex">
+                            <div class="me-3">
+                                <span class="badge bg-secondary rounded-circle p-2">4</span>
+                            </div>
+                            <div>
+                                <h5>Grow Your Business</h5>
+                                <p class="mb-0">Collect reviews, build your reputation, and expand your customer base.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <h2 class="text-center mb-4">Frequently Asked Questions</h2>
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="accordion" id="faqAccordion">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingOne">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                How much does it cost to join CozyWish?
+                            </button>
+                        </h2>
+                        <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Joining CozyWish is completely free. We only charge a small commission on bookings made through our platform. There are no monthly fees or hidden charges.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingTwo">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                How do I set discounts for my services?
+                            </button>
+                        </h2>
+                        <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                You have complete control over your discounts. You can set different discount percentages for specific time slots, days, or services through your dashboard. Our system makes it easy to adjust your pricing strategy based on demand.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingThree">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                How long does the approval process take?
+                            </button>
+                        </h2>
+                        <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Our team typically reviews and approves new service provider applications within 1-2 business days. We'll notify you by email once your account is approved and ready to go.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="card">
+            <div class="card-body text-center p-5">
+                <h2 class="mb-3">Ready to Grow Your Business?</h2>
+                <p class="mb-4">Join beauty and wellness professionals on CozyWish today.</p>
+                <a href="{% url 'accounts_app:service_provider_signup' %}" class="btn btn-outline-dark">Sign Up Now</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

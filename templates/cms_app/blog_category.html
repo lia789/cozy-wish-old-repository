@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ category.name }} - CozyWish Blog{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <h1 class="mb-2">{{ category.name }}</h1>
+        {% if category.description %}
+        <p class="lead mb-4">{{ category.description }}</p>
+        {% endif %}
+        
+        <div class="row">
+            {% for post in posts %}
+            <div class="col-md-6 mb-4">
+                <div class="card h-100 shadow-sm">
+                    {% if post.featured_image %}
+                    <img src="{{ post.featured_image.url }}" class="card-img-top" alt="{{ post.title }}">
+                    {% else %}
+                    <div class="card-img-top bg-light text-center py-5">
+                        <i class="fas fa-image fa-3x text-muted"></i>
+                    </div>
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ post.title }}</h5>
+                        <p class="card-text small text-muted">
+                            <i class="fas fa-calendar-alt me-1"></i> {{ post.published_at|date:"F j, Y" }}
+                            <i class="fas fa-user ms-2 me-1"></i> {{ post.author.get_full_name|default:post.author.email }}
+                        </p>
+                        <p class="card-text">{{ post.excerpt|truncatewords:20 }}</p>
+                        <a href="{% url 'cms_app:blog_detail' post.slug %}" class="btn btn-outline-primary btn-sm">Read More</a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    No blog posts found in this category.
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        {% if posts.paginator.num_pages > 1 %}
+        <nav aria-label="Blog pagination" class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% if posts.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1" aria-label="First">
+                        <span aria-hidden="true">&laquo;&laquo;</span>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ posts.previous_page_number }}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <a class="page-link" href="#" aria-label="First">
+                        <span aria-hidden="true">&laquo;&laquo;</span>
+                    </a>
+                </li>
+                <li class="page-item disabled">
+                    <a class="page-link" href="#" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                {% endif %}
+                
+                {% for i in posts.paginator.page_range %}
+                    {% if posts.number == i %}
+                    <li class="page-item active"><a class="page-link" href="#">{{ i }}</a></li>
+                    {% elif i > posts.number|add:'-3' and i < posts.number|add:'3' %}
+                    <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if posts.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ posts.next_page_number }}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ posts.paginator.num_pages }}" aria-label="Last">
+                        <span aria-hidden="true">&raquo;&raquo;</span>
+                    </a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <a class="page-link" href="#" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+                <li class="page-item disabled">
+                    <a class="page-link" href="#" aria-label="Last">
+                        <span aria-hidden="true">&raquo;&raquo;</span>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Categories</h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group">
+                    <a href="{% url 'cms_app:blog_list' %}" class="list-group-item list-group-item-action">
+                        All Categories
+                    </a>
+                    {% for cat in categories %}
+                    <a href="{% url 'cms_app:blog_category' cat.slug %}" class="list-group-item list-group-item-action {% if cat.slug == category.slug %}active{% endif %}">
+                        {{ cat.name }}
+                        <span class="badge bg-primary rounded-pill float-end">{{ cat.blog_posts.count }}</span>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        {% if announcements %}
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Announcements</h5>
+            </div>
+            <div class="card-body">
+                {% for announcement in announcements %}
+                <div class="alert alert-{{ announcement.announcement_type }} mb-3">
+                    <h6 class="alert-heading">{{ announcement.title }}</h6>
+                    <p class="mb-0">{{ announcement.content }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

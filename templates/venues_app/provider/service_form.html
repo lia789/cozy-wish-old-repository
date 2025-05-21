@@ -1,0 +1,208 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} - {{ venue.name }} - CozyWish{% endblock %}
+
+{% block extra_css %}
+{% load static %}
+{% load widget_tweaks %}
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-5 radial-gradient-bg">
+    <div class="container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="brand-text">{{ title }}</h1>
+            <p class="lead">{% if 'Edit' in title %}Update service details{% else %}Add a new service{% endif %} for {{ venue.name }}</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'dashboard_app:provider_dashboard' %}" class="text-decoration-none">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'venues_app:provider_venue_detail' slug=venue.slug %}" class="text-decoration-none">{{ venue.name }}</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ title }}</li>
+                </ol>
+            </nav>
+
+            <div class="card shadow mb-4">
+                <div class="card-header bg-primary-brand text-white">
+                    <h5 class="mb-0">Service Information</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+
+                        <div class="mb-3">
+                            <label for="{{ form.title.id_for_label }}" class="form-label">Service Title</label>
+                            <input type="text" name="{{ form.title.name }}" id="{{ form.title.id_for_label }}" class="form-control {% if form.title.errors %}is-invalid{% endif %}" value="{{ form.title.value|default:'' }}">
+                            {% if form.title.errors %}
+                            <div class="invalid-feedback">
+                                {{ form.title.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.short_description.id_for_label }}" class="form-label">Description</label>
+                            <textarea name="{{ form.short_description.name }}" id="{{ form.short_description.id_for_label }}" class="form-control {% if form.short_description.errors %}is-invalid{% endif %}" rows="4">{{ form.short_description.value|default:'' }}</textarea>
+                            {% if form.short_description.errors %}
+                            <div class="invalid-feedback">
+                                {{ form.short_description.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.price.id_for_label }}" class="form-label">Regular Price ($)</label>
+                                <input type="number" name="{{ form.price.name }}" id="{{ form.price.id_for_label }}" class="form-control {% if form.price.errors %}is-invalid{% endif %}" value="{{ form.price.value|default:'' }}" step="0.01" min="0">
+                                {% if form.price.errors %}
+                                <div class="invalid-feedback">
+                                    {{ form.price.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.discounted_price.id_for_label }}" class="form-label">Discounted Price ($) <span class="text-muted">(Optional)</span></label>
+                                <input type="number" name="{{ form.discounted_price.name }}" id="{{ form.discounted_price.id_for_label }}" class="form-control {% if form.discounted_price.errors %}is-invalid{% endif %}" value="{{ form.discounted_price.value|default:'' }}" step="0.01" min="0">
+                                {% if form.discounted_price.errors %}
+                                <div class="invalid-feedback">
+                                    {{ form.discounted_price.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.duration.id_for_label }}" class="form-label">Duration (minutes)</label>
+                            <input type="number" name="{{ form.duration.name }}" id="{{ form.duration.id_for_label }}" class="form-control {% if form.duration.errors %}is-invalid{% endif %}" value="{{ form.duration.value|default:'' }}" min="1">
+                            {% if form.duration.errors %}
+                            <div class="invalid-feedback">
+                                {{ form.duration.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" name="{{ form.is_active.name }}" id="{{ form.is_active.id_for_label }}" class="form-check-input" {% if form.is_active.value %}checked{% endif %}>
+                            <label for="{{ form.is_active.id_for_label }}" class="form-check-label">Active</label>
+                            {% if form.is_active.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.is_active.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <a href="{% url 'venues_app:provider_venue_detail' slug=venue.slug %}" class="btn btn-outline-primary">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Save Service
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card shadow mb-4">
+                <div class="card-header bg-primary-brand text-white">
+                    <h5 class="mb-0">Guidelines</h5>
+                </div>
+                <div class="card-body">
+                    <h6 class="mb-3">Service Information</h6>
+                    <ul class="list-unstyled mb-4">
+                        <li class="mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i> Provide a clear and descriptive service name
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i> Set accurate pricing and duration
+                        </li>
+                        <li>
+                            <i class="fas fa-check-circle text-success me-2"></i> Write a detailed description of what the service includes
+                        </li>
+                    </ul>
+
+                    <h6 class="mb-3">Pricing Tips</h6>
+                    <ul class="list-unstyled mb-4">
+                        <li class="mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i> Research competitor pricing in your area
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i> Consider offering discounts for new customers
+                        </li>
+                        <li>
+                            <i class="fas fa-check-circle text-success me-2"></i> Ensure your pricing reflects the quality and duration of service
+                        </li>
+                    </ul>
+
+                    <div class="alert alert-info mb-0">
+                        <i class="fas fa-info-circle me-2"></i> Services marked as "Active" will be visible to customers on your venue page.
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow mb-4">
+                <div class="card-header bg-primary-brand text-white">
+                    <h5 class="mb-0">Venue Information</h5>
+                </div>
+                <div class="card-body">
+                    <h5 class="mb-2">{{ venue.name }}</h5>
+                    <p class="mb-3">
+                        <i class="fas fa-map-marker-alt me-1"></i> {{ venue.city }}, {{ venue.state }}
+                    </p>
+                    <p class="mb-3">
+                        <i class="fas fa-spa me-1"></i> {{ venue.services.count }} services
+                    </p>
+                    <a href="{% url 'venues_app:provider_venue_detail' slug=venue.slug %}" class="btn btn-outline-primary w-100">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Venue
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Price and discount validation
+        const priceField = document.getElementById('{{ form.price.id_for_label }}');
+        const discountField = document.getElementById('{{ form.discounted_price.id_for_label }}');
+
+        if (priceField && discountField) {
+            discountField.addEventListener('change', function() {
+                const price = parseFloat(priceField.value);
+                const discount = parseFloat(this.value);
+
+                if (discount >= price) {
+                    this.setCustomValidity('Discounted price must be less than regular price');
+                } else {
+                    this.setCustomValidity('');
+                }
+            });
+
+            priceField.addEventListener('change', function() {
+                if (discountField.value) {
+                    const price = parseFloat(this.value);
+                    const discount = parseFloat(discountField.value);
+
+                    if (discount >= price) {
+                        discountField.setCustomValidity('Discounted price must be less than regular price');
+                    } else {
+                        discountField.setCustomValidity('');
+                    }
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

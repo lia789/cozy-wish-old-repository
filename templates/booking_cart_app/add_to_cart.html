@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+
+{% block title %}Add to Cart - {{ service.title }} - CozyWish{% endblock %}
+
+{% block extra_css %}
+{% load static %}
+{% load widget_tweaks %}
+<link rel="stylesheet" href="{% static 'css/booking_cart_app/booking_cart_app.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-5 radial-gradient-bg">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <!-- Breadcrumb -->
+                <nav aria-label="breadcrumb" class="mb-4">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{% url 'venues_app:home' %}" class="text-primary-brand">Home</a></li>
+                        <li class="breadcrumb-item"><a href="{% url 'venues_app:venue_detail' slug=service.venue.slug %}" class="text-primary-brand">{{ service.venue.name }}</a></li>
+                        <li class="breadcrumb-item"><a href="{% url 'venues_app:service_detail' venue_slug=service.venue.slug service_slug=service.slug %}" class="text-primary-brand">{{ service.title }}</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Add to Cart</li>
+                    </ol>
+                </nav>
+
+                {% if messages %}
+                <div class="mb-4">
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        <div class="d-flex align-items-center">
+                            {% if message.tags == 'success' %}
+                            <i class="fas fa-check-circle me-2"></i>
+                            {% elif message.tags == 'error' or message.tags == 'danger' %}
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            {% elif message.tags == 'warning' %}
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            {% elif message.tags == 'info' %}
+                            <i class="fas fa-info-circle me-2"></i>
+                            {% endif %}
+                            {{ message }}
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <div class="card shadow mb-4">
+                    <div class="card-header bg-primary-brand">
+                        <h4 class="mb-0"><i class="fas fa-shopping-cart me-2"></i>Add to Cart</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-4">
+                            <div class="col-md-8">
+                                <h5 class="text-primary-brand mb-2">{{ service.title }}</h5>
+                                <p class="text-muted mb-3">{{ service.venue.name }}</p>
+                                <p class="mb-4">{{ service.short_description }}</p>
+                                <div class="d-flex align-items-center mb-3">
+                                    <span class="me-3 fw-bold">Price:</span>
+                                    {% if service.discounted_price %}
+                                    <div>
+                                        <span class="text-decoration-line-through text-muted d-block">${{ service.price }}</span>
+                                        <span class="fw-bold text-danger">${{ service.discounted_price }}</span>
+                                        <span class="badge bg-danger ms-2">{{ service.get_discount_percentage }}% OFF</span>
+                                    </div>
+                                    {% else %}
+                                    <span class="fw-bold cart-item-price">${{ service.price }}</span>
+                                    {% endif %}
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <span class="me-3 fw-bold">Duration:</span>
+                                    <span><i class="far fa-clock me-1"></i>{{ service.duration }} minutes</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <img src="{{ service.venue.get_primary_image|default:'https://via.placeholder.com/300x200' }}" class="img-fluid rounded shadow-sm" alt="{{ service.title }}">
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <h5 class="mb-3">Select Date, Time & Quantity</h5>
+
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="{{ form.date.id_for_label }}" class="form-label"><i class="far fa-calendar-alt me-2"></i>Date</label>
+                                    {% render_field form.date class="form-control" %}
+                                    {% if form.date.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.date.errors }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="{{ form.time_slot.id_for_label }}" class="form-label"><i class="far fa-clock me-2"></i>Time</label>
+                                    {% render_field form.time_slot class="form-control" %}
+                                    {% if form.time_slot.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.time_slot.errors }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="{{ form.quantity.id_for_label }}" class="form-label"><i class="fas fa-users me-2"></i>Quantity</label>
+                                    {% render_field form.quantity class="form-control" %}
+                                    {% if form.quantity.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.quantity.errors }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            {% if form.non_field_errors %}
+                            <div class="alert alert-danger mt-3">
+                                <i class="fas fa-exclamation-circle me-2"></i>
+                                {{ form.non_field_errors }}
+                            </div>
+                            {% endif %}
+
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                                <a href="{% url 'venues_app:service_detail' venue_slug=service.venue.slug service_slug=service.slug %}" class="btn btn-outline-secondary me-md-2">
+                                    <i class="fas fa-times me-2"></i>Cancel
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-shopping-cart me-2"></i>Add to Cart
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card shadow">
+                    <div class="card-body">
+                        <div class="d-flex align-items-start">
+                            <i class="fas fa-info-circle text-primary-brand me-3 mt-1"></i>
+                            <div>
+                                <h6 class="mb-2">Important Information</h6>
+                                <ul class="ps-3 mb-0">
+                                    <li>Cart items will expire after 24 hours</li>
+                                    <li>Bookings can be cancelled up to 6 hours before the scheduled time</li>
+                                    <li>Please arrive 10-15 minutes before your appointment time</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

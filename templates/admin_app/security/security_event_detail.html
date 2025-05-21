@@ -1,0 +1,188 @@
+{% extends 'admin_app/base.html' %}
+
+{% block admin_content %}
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Security Event Details</h1>
+    <div>
+        {% if not event.is_resolved %}
+        <a href="{% url 'admin_app:security_event_resolve' event_id=event.id %}" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm me-2">
+            <i class="fas fa-check fa-sm text-white-50 me-1"></i> Resolve Event
+        </a>
+        {% endif %}
+        <a href="{% url 'admin_app:security_event_list' %}" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm">
+            <i class="fas fa-arrow-left fa-sm text-white-50 me-1"></i> Back to Security Events
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Event Information</h6>
+            </div>
+            <div class="card-body">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h6 class="font-weight-bold">Basic Information</h6>
+                        <table class="table">
+                            <tr>
+                                <th style="width: 150px;">Event ID:</th>
+                                <td>{{ event.id }}</td>
+                            </tr>
+                            <tr>
+                                <th>Event Type:</th>
+                                <td>{{ event.get_event_type_display }}</td>
+                            </tr>
+                            <tr>
+                                <th>Severity:</th>
+                                <td>
+                                    {% if event.severity == 'info' %}
+                                    <span class="badge bg-info">Info</span>
+                                    {% elif event.severity == 'warning' %}
+                                    <span class="badge bg-warning">Warning</span>
+                                    {% elif event.severity == 'critical' %}
+                                    <span class="badge bg-danger">Critical</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Timestamp:</th>
+                                <td>{{ event.timestamp|date:"F j, Y, g:i:s a" }}</td>
+                            </tr>
+                            <tr>
+                                <th>Status:</th>
+                                <td>
+                                    {% if event.is_resolved %}
+                                    <span class="badge bg-success">Resolved</span>
+                                    {% else %}
+                                    <span class="badge bg-danger">Unresolved</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="font-weight-bold">User Information</h6>
+                        <table class="table">
+                            <tr>
+                                <th style="width: 150px;">User:</th>
+                                <td>
+                                    {% if event.user %}
+                                    <a href="{% url 'admin_app:user_detail' user_id=event.user.id %}">
+                                        {{ event.user.email }}
+                                    </a>
+                                    {% else %}
+                                    <span class="text-muted">Unknown</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>IP Address:</th>
+                                <td>{{ event.ip_address|default:"Unknown" }}</td>
+                            </tr>
+                            <tr>
+                                <th>User Agent:</th>
+                                <td>
+                                    <div style="max-height: 100px; overflow-y: auto;">
+                                        {{ event.user_agent|default:"Unknown" }}
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <h6 class="font-weight-bold">Description</h6>
+                    <div class="card">
+                        <div class="card-body">
+                            {{ event.description|linebreaks }}
+                        </div>
+                    </div>
+                </div>
+                
+                {% if event.is_resolved %}
+                <div class="mb-4">
+                    <h6 class="font-weight-bold">Resolution Information</h6>
+                    <table class="table">
+                        <tr>
+                            <th style="width: 150px;">Resolved By:</th>
+                            <td>
+                                {% if event.resolved_by %}
+                                <a href="{% url 'admin_app:user_detail' user_id=event.resolved_by.id %}">
+                                    {{ event.resolved_by.email }}
+                                </a>
+                                {% else %}
+                                <span class="text-muted">Unknown</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Resolved At:</th>
+                            <td>{{ event.resolved_at|date:"F j, Y, g:i:s a" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Resolution Notes:</th>
+                            <td>{{ event.resolution_notes|linebreaks|default:"No notes provided" }}</td>
+                        </tr>
+                    </table>
+                </div>
+                {% endif %}
+                
+                {% if related_events %}
+                <div class="mb-4">
+                    <h6 class="font-weight-bold">Related Events</h6>
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Event Type</th>
+                                    <th>Severity</th>
+                                    <th>Timestamp</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for related_event in related_events %}
+                                <tr {% if related_event.id == event.id %}class="table-active"{% endif %}>
+                                    <td>{{ related_event.get_event_type_display }}</td>
+                                    <td>
+                                        {% if related_event.severity == 'info' %}
+                                        <span class="badge bg-info">Info</span>
+                                        {% elif related_event.severity == 'warning' %}
+                                        <span class="badge bg-warning">Warning</span>
+                                        {% elif related_event.severity == 'critical' %}
+                                        <span class="badge bg-danger">Critical</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ related_event.timestamp|date:"M d, Y H:i:s" }}</td>
+                                    <td>
+                                        {% if related_event.is_resolved %}
+                                        <span class="badge bg-success">Resolved</span>
+                                        {% else %}
+                                        <span class="badge bg-danger">Unresolved</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if related_event.id != event.id %}
+                                        <a href="{% url 'admin_app:security_event_detail' event_id=related_event.id %}" class="btn btn-sm btn-primary">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        {% else %}
+                                        <span class="text-muted">Current</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

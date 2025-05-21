@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+
+{% block title %}Update Cart Item - CozyWish{% endblock %}
+
+{% block extra_css %}
+{% load static %}
+{% load widget_tweaks %}
+<link rel="stylesheet" href="{% static 'css/booking_cart_app/booking_cart_app.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-5 radial-gradient-bg">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <!-- Breadcrumb -->
+                <nav aria-label="breadcrumb" class="mb-4">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{% url 'venues_app:home' %}" class="text-primary-brand">Home</a></li>
+                        <li class="breadcrumb-item"><a href="{% url 'booking_cart_app:cart' %}" class="text-primary-brand">Cart</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Update Item</li>
+                    </ol>
+                </nav>
+
+                {% if messages %}
+                <div class="mb-4">
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        <div class="d-flex align-items-center">
+                            {% if message.tags == 'success' %}
+                            <i class="fas fa-check-circle me-2"></i>
+                            {% elif message.tags == 'error' or message.tags == 'danger' %}
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            {% elif message.tags == 'warning' %}
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            {% elif message.tags == 'info' %}
+                            <i class="fas fa-info-circle me-2"></i>
+                            {% endif %}
+                            {{ message }}
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <div class="card shadow mb-4">
+                    <div class="card-header bg-primary-brand">
+                        <h4 class="mb-0"><i class="fas fa-edit me-2"></i>Update Cart Item</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-4">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <h5 class="text-primary-brand mb-2">{{ cart_item.service.title }}</h5>
+                                    <p class="text-muted mb-3">{{ cart_item.service.venue.name }}</p>
+
+                                    <div class="mb-2">
+                                        <span class="fw-bold me-2">Date:</span>
+                                        <span><i class="far fa-calendar-alt me-1"></i>{{ cart_item.date|date:"M d, Y" }}</span>
+                                    </div>
+                                    <div class="mb-2">
+                                        <span class="fw-bold me-2">Time:</span>
+                                        <span><i class="far fa-clock me-1"></i>{{ cart_item.time_slot|time:"g:i A" }}</span>
+                                    </div>
+                                    <div class="mb-3">
+                                        <span class="fw-bold me-2">Price:</span>
+                                        {% if cart_item.service.discounted_price %}
+                                        <span class="cart-item-original-price">${{ cart_item.service.price }}</span>
+                                        <span class="cart-item-discounted-price">${{ cart_item.service.discounted_price }}</span>
+                                        <span class="badge bg-danger">{{ cart_item.service.get_discount_percentage }}% OFF</span>
+                                        {% with discount_info=cart_item.get_discount_info %}
+                                        {% if discount_info %}
+                                        <small class="text-muted d-block mt-1">{{ discount_info.name }}</small>
+                                        {% endif %}
+                                        {% endwith %}
+                                        {% else %}
+                                        <span class="cart-item-price">${{ cart_item.service.price }}</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <img src="{{ cart_item.service.venue.get_primary_image|default:'https://via.placeholder.com/150' }}" class="img-fluid rounded shadow-sm" alt="{{ cart_item.service.title }}">
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label for="{{ form.quantity.id_for_label }}" class="form-label"><i class="fas fa-users me-2"></i>Quantity</label>
+                                {% render_field form.quantity class="form-control" %}
+                                <div class="form-text">Number of people for this service.</div>
+                                {% if form.quantity.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.quantity.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            {% if form.non_field_errors %}
+                            <div class="alert alert-danger mt-3">
+                                <i class="fas fa-exclamation-circle me-2"></i>
+                                {{ form.non_field_errors }}
+                            </div>
+                            {% endif %}
+
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                                <a href="{% url 'booking_cart_app:cart' %}" class="btn btn-outline-secondary me-md-2">
+                                    <i class="fas fa-times me-2"></i>Cancel
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-2"></i>Update
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

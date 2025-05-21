@@ -1,0 +1,318 @@
+{% extends 'base.html' %}
+
+{% block title %}Approve Discount - Admin Dashboard - CozyWish{% endblock %}
+
+{% block extra_css %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/discount_app/discount_app.css' %}">
+<link rel="stylesheet" href="{% static 'css/admin_app/admin_app.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-5 admin-bg">
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col-12">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{% url 'admin_app:admin_dashboard' %}">Admin Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="{% url 'discount_app:admin_discount_dashboard' %}">Discount Management</a></li>
+                        <li class="breadcrumb-item"><a href="{% url 'discount_app:admin_discount_list' discount_type=discount_type %}">{{ discount_type|title }} Discounts</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Approve Discount</li>
+                    </ol>
+                </nav>
+
+                <h1 class="page-title mb-3">
+                    <i class="fas fa-check-circle me-2"></i>Approve Discount
+                </h1>
+            </div>
+        </div>
+
+        {% if messages %}
+        <div class="messages mb-4">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-primary-brand text-white">
+                        <h5 class="card-title mb-0">Discount Details</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <h5>{{ discount.name }}</h5>
+                                <p>{{ discount.description }}</p>
+
+                                <div class="discount-value-display text-center p-3 rounded bg-light mb-3">
+                                    {% if discount.discount_type == 'percentage' %}
+                                    <span class="display-4 fw-bold text-primary-brand">{{ discount.discount_value }}%</span>
+                                    <span class="d-block">off</span>
+                                    {% else %}
+                                    <span class="display-4 fw-bold text-primary-brand">${{ discount.discount_value }}</span>
+                                    <span class="d-block">off</span>
+                                    {% endif %}
+                                </div>
+
+                                <div class="mb-3">
+                                    <h6>Discount Type</h6>
+                                    <p>
+                                        {% if discount.discount_type == 'percentage' %}
+                                        Percentage Discount
+                                        {% else %}
+                                        Fixed Amount Discount
+                                        {% endif %}
+                                    </p>
+                                </div>
+
+                                <div class="mb-3">
+                                    <h6>Valid Period</h6>
+                                    <p>
+                                        From: {{ discount.start_date|date:"M d, Y H:i" }}<br>
+                                        To: {{ discount.end_date|date:"M d, Y H:i" }}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="card mb-3">
+                                    <div class="card-header bg-light">
+                                        <h6 class="mb-0">
+                                            {% if discount_type == 'venue' %}
+                                            Venue Information
+                                            {% else %}
+                                            Service Information
+                                            {% endif %}
+                                        </h6>
+                                    </div>
+                                    <div class="card-body">
+                                        {% if discount_type == 'venue' %}
+                                        <div class="d-flex align-items-center">
+                                            {% if discount.venue.primary_image %}
+                                            <img src="{{ discount.venue.primary_image.url }}" alt="{{ discount.venue.name }}" class="img-thumbnail me-3" style="width: 80px; height: 80px; object-fit: cover;">
+                                            {% else %}
+                                            <div class="bg-light d-flex align-items-center justify-content-center me-3" style="width: 80px; height: 80px;">
+                                                <i class="fas fa-store fa-2x text-muted"></i>
+                                            </div>
+                                            {% endif %}
+                                            <div>
+                                                <h6 class="mb-1">{{ discount.venue.name }}</h6>
+                                                <p class="mb-1 text-muted">{{ discount.venue.category.name }}</p>
+                                                <p class="mb-0 small">{{ discount.venue.address }}, {{ discount.venue.city }}, {{ discount.venue.state }}</p>
+                                            </div>
+                                        </div>
+                                        {% else %}
+                                        <div class="d-flex align-items-center">
+                                            {% if discount.service.image %}
+                                            <img src="{{ discount.service.image.url }}" alt="{{ discount.service.title }}" class="img-thumbnail me-3" style="width: 80px; height: 80px; object-fit: cover;">
+                                            {% else %}
+                                            <div class="bg-light d-flex align-items-center justify-content-center me-3" style="width: 80px; height: 80px;">
+                                                <i class="fas fa-spa fa-2x text-muted"></i>
+                                            </div>
+                                            {% endif %}
+                                            <div>
+                                                <h6 class="mb-1">{{ discount.service.title }}</h6>
+                                                <p class="mb-1 text-muted">{{ discount.service.venue.name }}</p>
+                                                <p class="mb-0">
+                                                    <span class="badge bg-secondary">{{ discount.service.duration }} min</span>
+                                                    <span class="badge bg-primary-brand">${{ discount.service.price }}</span>
+                                                </p>
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <div class="card mb-3">
+                                    <div class="card-header bg-light">
+                                        <h6 class="mb-0">Provider Information</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center">
+                                            {% if provider.profile_image %}
+                                            <img src="{{ provider.profile_image.url }}" alt="{{ provider.get_full_name }}" class="img-thumbnail me-3" style="width: 60px; height: 60px; object-fit: cover; border-radius: 50%;">
+                                            {% else %}
+                                            <div class="bg-light d-flex align-items-center justify-content-center me-3" style="width: 60px; height: 60px; border-radius: 50%;">
+                                                <i class="fas fa-user fa-2x text-muted"></i>
+                                            </div>
+                                            {% endif %}
+                                            <div>
+                                                <h6 class="mb-1">{{ provider.get_full_name }}</h6>
+                                                <p class="mb-1">{{ provider.email }}</p>
+                                                <p class="mb-0 small">
+                                                    <span class="badge bg-success">{{ provider_discount_count }} Active Discounts</span>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {% if discount_type == 'venue' %}
+                                <div class="card">
+                                    <div class="card-header bg-light">
+                                        <h6 class="mb-0">Additional Settings</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <ul class="list-group list-group-flush">
+                                            <li class="list-group-item d-flex justify-content-between">
+                                                <span>Min. Booking Value:</span>
+                                                <span>
+                                                    {% if discount.min_booking_value %}
+                                                    ${{ discount.min_booking_value }}
+                                                    {% else %}
+                                                    None
+                                                    {% endif %}
+                                                </span>
+                                            </li>
+                                            <li class="list-group-item d-flex justify-content-between">
+                                                <span>Max. Discount Amount:</span>
+                                                <span>
+                                                    {% if discount.max_discount_amount %}
+                                                    ${{ discount.max_discount_amount }}
+                                                    {% else %}
+                                                    Unlimited
+                                                    {% endif %}
+                                                </span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary-brand text-white">
+                        <h5 class="card-title mb-0">Approval Decision</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="post">
+                            {% csrf_token %}
+
+                            {% if form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                {% for error in form.non_field_errors %}
+                                {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+
+                            <div class="mb-4">
+                                <label class="form-label">Decision*</label>
+                                <div class="d-flex">
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="{{ form.decision.name }}" id="decision_approve" value="approve" {% if form.decision.value == 'approve' %}checked{% endif %} required>
+                                        <label class="form-check-label" for="decision_approve">Approve</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="{{ form.decision.name }}" id="decision_reject" value="reject" {% if form.decision.value == 'reject' %}checked{% endif %} required>
+                                        <label class="form-check-label" for="decision_reject">Reject</label>
+                                    </div>
+                                </div>
+                                {% if form.decision.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.decision.errors %}
+                                    {{ error }}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="{{ form.comments.id_for_label }}" class="form-label">Comments</label>
+                                {{ form.comments }}
+                                {% if form.comments.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.comments.errors %}
+                                    {{ error }}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                                <small class="form-text text-muted">
+                                    Provide any comments or feedback about your decision. If rejecting, please explain why.
+                                </small>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="{{ form.notify_provider.id_for_label }}" class="form-check-label">
+                                    {{ form.notify_provider }}
+                                    Notify Provider
+                                </label>
+                                {% if form.notify_provider.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.notify_provider.errors %}
+                                    {{ error }}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                                <small class="form-text text-muted d-block">
+                                    Send an email notification to the provider about your decision.
+                                </small>
+                            </div>
+
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <span id="decision_info">
+                                    Approving this discount will make it available to customers according to its scheduled dates.
+                                </span>
+                            </div>
+
+                            <div class="d-flex justify-content-between mt-4">
+                                <a href="{% url 'discount_app:admin_discount_list' discount_type=discount_type %}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-arrow-left me-1"></i> Cancel
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-check me-1"></i> Submit Decision
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add Bootstrap form classes
+        const commentsTextarea = document.getElementById('{{ form.comments.id_for_label }}');
+        if (commentsTextarea) {
+            commentsTextarea.classList.add('form-control');
+            commentsTextarea.rows = 5;
+        }
+
+        // Update info text based on decision
+        const approveRadio = document.getElementById('decision_approve');
+        const rejectRadio = document.getElementById('decision_reject');
+        const decisionInfo = document.getElementById('decision_info');
+
+        function updateDecisionInfo() {
+            if (approveRadio.checked) {
+                decisionInfo.textContent = 'Approving this discount will make it available to customers according to its scheduled dates.';
+            } else if (rejectRadio.checked) {
+                decisionInfo.textContent = 'Rejecting this discount will prevent it from being shown to customers. Please provide a reason for rejection.';
+            }
+        }
+
+        if (approveRadio && rejectRadio && decisionInfo) {
+            approveRadio.addEventListener('change', updateDecisionInfo);
+            rejectRadio.addEventListener('change', updateDecisionInfo);
+            updateDecisionInfo(); // Set initial text
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,189 @@
+{% extends 'base.html' %}
+
+{% block title %}Review Venue - {{ venue.name }} - CozyWish{% endblock %}
+
+{% block extra_css %}
+{% load static %}
+{% load widget_tweaks %}
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-5 radial-gradient-bg">
+    <div class="container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="brand-text">Review Venue</h1>
+            <p class="lead">Review and approve or reject venue submission</p>
+        </div>
+    </div>
+
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'venues_app:admin_venue_list' %}" class="text-decoration-none">Venues</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'venues_app:admin_venue_detail' slug=venue.slug %}" class="text-decoration-none">{{ venue.name }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Review</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow mb-4">
+                <div class="card-header bg-primary-brand text-white">
+                    <h5 class="mb-0">Review Venue: {{ venue.name }}</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+
+                        <div class="mb-4">
+                            <h6>Venue Information</h6>
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <p class="mb-1 fw-bold">Owner</p>
+                                    <p>{{ venue.owner.email }}</p>
+                                </div>
+                                <div class="col-md-4">
+                                    <p class="mb-1 fw-bold">Category</p>
+                                    <p>{{ venue.category.name|default:"Not set" }}</p>
+                                </div>
+                                <div class="col-md-4">
+                                    <p class="mb-1 fw-bold">Venue Type</p>
+                                    <p>{{ venue.get_venue_type_display }}</p>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <p class="mb-1 fw-bold">Address</p>
+                                <p>{{ venue.get_full_address }}</p>
+                            </div>
+
+                            <div class="mb-3">
+                                <p class="mb-1 fw-bold">About</p>
+                                <p>{{ venue.about }}</p>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <h6>Decision</h6>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="radio" name="approval_status" id="approve" value="approved" checked>
+                                <label class="form-check-label" for="approve">
+                                    Approve
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="approval_status" id="reject" value="rejected">
+                                <label class="form-check-label" for="reject">
+                                    Reject
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="mb-4 rejection-reason" style="display: none;">
+                            <label for="rejection_reason" class="form-label">Rejection Reason</label>
+                            <textarea class="form-control" id="rejection_reason" name="rejection_reason" rows="4" placeholder="Please provide a reason for rejection..."></textarea>
+                            <div class="form-text">This will be sent to the venue owner.</div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Submit Decision
+                            </button>
+                            <a href="{% url 'venues_app:admin_venue_detail' slug=venue.slug %}" class="btn btn-outline-primary">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card shadow mb-4">
+                <div class="card-header bg-primary-brand text-white">
+                    <h5 class="mb-0">Services</h5>
+                </div>
+                <div class="card-body">
+                    {% if services %}
+                    <div class="list-group">
+                        {% for service in services %}
+                        <div class="list-group-item">
+                            <h6 class="mb-1">{{ service.title }}</h6>
+                            <p class="mb-1 small text-muted">{{ service.short_description|truncatechars:50 }}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="fw-bold">${{ service.price }}</span>
+                                <small class="text-muted">{{ service.duration }} min</small>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="mb-0">No services added yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card shadow mb-4">
+                <div class="card-header bg-primary-brand text-white">
+                    <h5 class="mb-0">Images</h5>
+                </div>
+                <div class="card-body">
+                    {% if images %}
+                    <div id="venueCarousel" class="carousel slide" data-bs-ride="carousel">
+                        <div class="carousel-inner">
+                            {% for image in images %}
+                            <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                                <img src="{{ image.image.url|default:'https://via.placeholder.com/400x300' }}" class="d-block w-100 rounded" alt="{{ venue.name }} - Image {{ forloop.counter }}">
+                                {% if image.caption %}
+                                <div class="carousel-caption d-none d-md-block">
+                                    <p>{{ image.caption }}</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% if images.count > 1 %}
+                        <button class="carousel-control-prev" type="button" data-bs-target="#venueCarousel" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#venueCarousel" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                        {% endif %}
+                    </div>
+                    {% else %}
+                    <p class="mb-0">No images uploaded yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const rejectRadio = document.getElementById('reject');
+        const approveRadio = document.getElementById('approve');
+        const rejectionReasonDiv = document.querySelector('.rejection-reason');
+
+        function toggleRejectionReason() {
+            if (rejectRadio.checked) {
+                rejectionReasonDiv.style.display = 'block';
+            } else {
+                rejectionReasonDiv.style.display = 'none';
+            }
+        }
+
+        rejectRadio.addEventListener('change', toggleRejectionReason);
+        approveRadio.addEventListener('change', toggleRejectionReason);
+
+        // Initial state
+        toggleRejectionReason();
+    });
+</script>
+{% endblock %}
+{% endblock %}
