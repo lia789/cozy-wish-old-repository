@@ -1,0 +1,260 @@
+🟩️🟩️ BUSINESS OVERVIEW
+CozyWish is USA based local consumer focused e-commerce marketplace for Spa and wellness services.
+It will known for dedicated marketplace for flush, off-peak, discount driven deals.
+
+
+
+
+🟩️🟩️ TECHNOLOGY OVERVIEW
+CozyWish is a modular beauty and wellness booking platform, inspired by Fresha, GoWabi, Fiverr, and Upwork. Built with Python/Django, PostgreSQL, Bootstrap 5, and hosted on AWS, it features separate Django apps for maintainability, organized by user roles: Customer, Service Provider, and Admin.
+
+
+
+
+🟩️🟩️ COMPETITOR ANALYSIS
+1. https://www.fresha.com
+2. https://www.gowabi.com/en
+
+◽️Gowabi:
+GoWabi is Thailand-based beauty and wellness marketplace
+known for its heavy focus on deals, off-peak discounts, and merchant tools.
+
+◽️ Fresha:
+Fresha is a global beauty platform that offers free SaaS to salons and spas
+while monetizing through commissions on new-client bookings and payment processing fees.
+
+
+How CozyWish Differs:
+1. Gowabi targets audience in Southeast Asia, CozyWish focuses on local USA market only.
+2. Fresha offers extensive back office features as SaaS, where CozyWish only marketplace.
+3. CozyWish is not SaaS tool, it is discounted off-peak e-commerce marketplace.
+
+
+
+
+🟩️🟩️ Revenue Model
+1. CozyWish charges small commission for every successful booking made through the platform.
+2. Service providers advertising and promotions
+
+
+
+
+🟩️🟩️ APPLICATION BUILDING TECHNOLOGY
+1. Python
+2. Django Framework
+3. postgresql Database (SQLite for local development)
+4. Bootstrap5
+5. AWS Cloud
+
+
+
+
+🟩️🟩️ COMMON-TERMS
+◽️Customer: Individuals who purchase services are typically referred to as customers.
+◽️Service Providers: Businesses offering services are commonly referred to as service providers.
+◽️Venues: This term refers to the physical location or establishment where beauty and wellness treatments are provided.
+◽️Service: This term pertains to the specific treatments or offerings provided by these venues
+
+
+
+
+🟩️🟩️ DJANGO APPS DESCRIPTIONS 
+
+
+
+✅️✅️ accounts_app
+📜️ Customer Features:
+✔️ Sign Up with Email & Password
+✔️ Secure Password Hashing (Django handles this via PBKDF2 by default)
+✔️ Login & Logout (Session-based)
+✔️ Password Recovery / Reset / Change (via email token link)
+✔️ View and edit personal profile information
+
+📜️ Service Provider Features:
+✔️ Sign up with email|password and business details
+✔️ Email Verification
+✔️ Secure Password Hashing (Django handles this via PBKDF2 by default)
+✔️ Login & Logout (Session-based)
+✔️ Password Recovery / Reset / Change (via email token link)
+✔️ View and edit personal business information
+✔️ Team|Staff managment (Add, deactive, remove team members)
+
+📜️ Admin Features:
+✔️ User Management (CRUD) View, activate, deactivate, delete and Reset passwords
+✔️ Service provider Approval Panel. View pending providers, Approve / Reject with optional comments
+✔️ User Impersonation (for support) via (django-hijack)
+✔️ Use django-user-activity-log
+✔️ Alerts on multiple failed logins
+
+
+✅️✅️ venues_app
+📜️ Customer Features:
+✔️ Search venues by keyword like venue name, category, and location (USA state, county and city name)
+✔️ Filter search result with promotions, discount high to low, pricing low to high, area, venue type (male|female only)
+✔️ View comprehensive venue information
+✔️ Access list of service offered by the venues
+
+📜️ Service Provider Features:
+✔️ Create and manage venue information and media
+✔️ Add, delete, edit and modify service information
+✔️ Apply discount on service pricing
+
+📜️ Admin Features:
+✔️ Review newly created or update venues before publishing
+✔️ Create and manage categories
+✔️ Assign or reassign venues to categories for better user search and filtering
+✔️ Remove or flag inappropriate offers
+✔️ Active or deactivate venues and Services
+
+
+
+✅️✅️ booking_cart_app:
+📜️ Customer Features:
+✔️ Add multiple services to cart
+✔️ 24-hour cart item expiration
+✔️ Real-time service availability checking
+✔️ Booking cancellation (within 6 hours of booking)
+✔️ Booking confirmation notifications
+✔️ View booking history and status
+📜️ Service Provider Features:
+✔️ Manage service availability
+✔️ View incoming bookings
+✔️ Accept/decline bookings
+✔️ Set maximum concurrent bookings (up to 10)
+✔️ Booking notification system
+📜️ Admin Features:
+✔️ Monitor booking activities
+✔️ Handle booking disputes
+✔️ View booking analytics
+✔️ Manage booking configurations
+
+
+
+✅️✅️ payments_app (MVP Version):
+📜️ Basic Features:
+✔️ Booking confirmation without actual payment
+✔️ Order confirmation messaging
+✔️ Basic transaction logging
+✔️ Dashboard booking status updates
+
+
+
+
+✅️✅️ dashboard_app:
+📜️ Customer Dashboard:
+✔️ Booking history in table format
+✔️ Active bookings status
+✔️ Favorite venues list
+✔️ Personal profile management
+✔️ Review history
+📜️ Service Provider Dashboard:
+✔️ Today's bookings overview
+✔️ Revenue reports (simple table format)
+✔️ Service performance metrics
+✔️ Discount campaign performance
+✔️ Team management interface
+📜️ Admin Dashboard:
+✔️ Platform overview metrics
+✔️ User statistics
+✔️ Booking analytics
+✔️ Revenue tracking
+✔️ System health monitoring
+
+
+
+✅️✅️ cms_app:
+📜️ Content Management:
+✔️ Static pages (About, Contact, Terms, Privacy Policy, FAQ)
+✔️ Blog system with categories
+✔️ SEO management tools
+✔️ Media library
+✔️ URL management
+📜️ Service Provider Features:
+✔️ Create and manage blog posts
+✔️ Content approval workflow
+✔️ Media upload system
+📜️ Admin Features:
+✔️ Content moderation
+✔️ SEO optimization tools
+✔️ Content analytics
+✔️ Site-wide announcement system
+
+
+✅️✅️ review_app
+📜️ Customer Features:
+✔️ After a service is completed, customers can rate the provider (typically 1-5 stars) and leave a written review.
+✔️ Customers can read reviews on each provider’s profile page
+✔️ Reviews are usually sorted by most recent
+
+📜️ Service Provider Features:
+✔️ Providers can read all reviews left for their services
+✔️ A summary (average rating and count) is displayed on their profile automatically.
+✔️ Providers have the option to publicly respond to reviews, This response will be shown below the original review.
+✔️ If a customer sees a fake or inappropriate review on a provider’s page, they can flag/report it for admin attention.
+
+📜️ Admin Features:
+✔️ Admin can edit or remove reviews that violate terms
+✔️ Admin can also investigate flagged reviews and decide outcomes (remove or let stand or disable).
+✔️ If a provider is new or has few reviews, admin might highlight “New on CozyWish” instead of showing no reviews to encourage first customers
+
+
+
+
+
+
+✅️✅️ admin_app:
+📜️ Super Admin Features:
+✔️ Complete user management
+✔️ Platform configuration
+✔️ System monitoring dashboard
+✔️ Technical performance metrics
+✔️ Audit logs for all actions
+✔️ Bulk operations (user management, content management)
+✔️ Analytics and reporting
+✔️ Security monitoring
+
+
+
+
+✅️✅️ discount_app:
+📜️ Service Provider Features:
+✔️ Create venue-wide discounts
+✔️ Set individual service discounts
+✔️ Time-based discount management
+✔️ Quantity-based discount management
+✔️ Discount performance tracking
+📜️ Customer Features:
+✔️ View active discounts
+✔️ Filter services by discount
+✔️ Sort by discount percentage
+✔️ Discount expiration notifications
+📜️ Admin Features:
+✔️ Create platform-wide promotions
+✔️ Monitor discount performance
+✔️ Manage discount categories
+✔️ Set discount rules and limitations
+✔️ Discount analytics
+
+
+
+
+✅️✅️ notifications_app:
+📜️ Service Provider Notifications:
+✔️ New booking alerts
+✔️ Cancellation notices
+✔️ Customer review notifications
+✔️ Payment received updates
+✔️ System announcements
+✔️ Unread notifications counter
+✔️ View notification history
+
+
+📜️ Customer Notifications:
+✔️ Booking confirmation alerts
+✔️ Service status updates
+✔️ Provider response notifications
+✔️ Payment confirmation alerts
+✔️ Platform announcements
+✔️ Unread notifications counter
+✔️ View notification history
+

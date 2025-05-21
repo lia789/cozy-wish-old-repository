@@ -1,0 +1,82 @@
+🔁 Design Asset
+| Design Asset    | How It's Used in Frontend                       |
+| --------------- | ----------------------------------------------- |
+| Logo SVG        | Shown in navbar, emails, footer                 |
+| Color Palette   | Used in CSS styles for buttons, backgrounds     |
+| Fonts           | Loaded via Google Fonts in HTML `<head>`        |
+| Email Templates | Styled HTML used in Django emails               |
+| Page Layouts    | Implemented using `HTML + CSS` from design plan |
+
+
+
+✅ CozyWish Graphics & UI Design Asset Checklist
+
+🎨 A. Brand Identity
+| Asset              | Description                             | Format                 | Notes                                  |
+| ------------------ | --------------------------------------- | ---------------------- | -------------------------------------- |
+| ✅ Logo (primary)   | Main CozyWish logo with name and symbol | `.svg`, `.png`         | For website, emails, marketing         |
+| ✅ Logo (icon only) | Symbol-only version                     | `.svg`, `.png`         | Use in small spaces, headers, favicons |
+| ✅ Favicon          | 16x16 or 32x32 icon                     | `.ico`, `.png`         | Browser tab icon                       |
+| ✅ Color Palette    | Primary, secondary, neutral colors      | `.png`, `.fig` (Figma) | Include hex codes and usage guide      |
+| ✅ Typography Guide | Heading and body fonts + sizes          | PDF / doc              | Include Google Fonts links             |
+
+📧 B. Email Templates
+| Asset                        | Description                  | Format           | Notes                        |
+| ---------------------------- | ---------------------------- | ---------------- | ---------------------------- |
+| ✅ Account Verification Email | Layout + CTA button          | HTML/CSS or MJML | Responsive, mobile-friendly  |
+| ✅ Booking Confirmation Email | Include summary, venue, time | HTML             | Use tables for compatibility |
+| ✅ Password Reset Email       | Simple CTA email             | HTML             | Brand color + logo included  |
+
+🖥️ C. Website UI Elements
+| Asset                        | Description                                         | Format                  | Notes                          |
+| ---------------------------- | --------------------------------------------------- | ----------------------- | ------------------------------ |
+| ✅ Homepage Hero Banner       | Graphic + tagline overlay                           | `.png`, `.svg`, `.webp` | Full width, mobile responsive  |
+| ✅ Section Icons              | Optional icons for features (e.g., booking, rating) | `.svg`                  | Simple and flat design         |
+| ✅ Venue Image Placeholders   | Sample stock or empty venue cards                   | `.webp`, `.jpg`         | Until real images are uploaded |
+| ✅ Booking Interface Elements | Calendar, price summary, service icons              | `.svg`, `.png`          | Use consistent styling         |
+
+
+📱 D. Mobile & Responsive Assets
+| Asset                         | Description     | Format         | Notes              |
+| ----------------------------- | --------------- | -------------- | ------------------ |
+| ✅ Mobile Navigation Menu Icon | Hamburger icon  | `.svg`         | Minimal design     |
+| ✅ Mobile Logo Variant         | Compact version | `.svg`, `.png` | Fits small headers |
+
+
+💻 E. Admin & Dashboard UI Elements
+| Asset                    | Description                  | Format               | Notes                   |
+| ------------------------ | ---------------------------- | -------------------- | ----------------------- |
+| ✅ Dashboard Header Icons | For user, booking, settings  | `.svg`               | Clean, monochrome style |
+| ✅ Booking Status Badges  | Approved, pending, cancelled | CSS styles or `.svg` | Consistent across UI    |
+
+
+📢 F. Marketing / Social Assets (Optional but helpful)
+| Asset                        | Description                     | Format         | Notes                         |
+| ---------------------------- | ------------------------------- | -------------- | ----------------------------- |
+| ✅ Social Media Profile Image | Logo-sized square               | `.png`         | For Instagram, Facebook, etc. |
+| ✅ Facebook/Instagram Banner  | For page cover                  | `.jpg`, `.png` | Branded promo graphic         |
+| ✅ Launch Promo Graphic       | Coming soon / deal offer banner | `.png`, `.svg` | Can use on homepage or ads    |
+
+📂 G. Asset Organization (Folder Structure)
+design-assets/
+├── logo/
+│   ├── logo-full.svg
+│   ├── logo-icon.svg
+│   └── favicon.png
+├── colors/
+│   └── cozywish-color-palette.png
+├── typography/
+│   └── font-guide.pdf
+├── email-templates/
+│   ├── verify.html
+│   ├── booking.html
+│   └── reset.html
+├── ui-components/
+│   ├── calendar.svg
+│   ├── toast-notification.svg
+│   └── service-icons/
+├── marketing/
+│   ├── instagram-cover.png
+│   └── launch-banner.png
+
+

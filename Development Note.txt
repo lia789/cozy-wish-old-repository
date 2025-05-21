@@ -1,0 +1,66 @@
+#### Git & GitHub
+# Git & GitHub setup
+$ git init
+$ git add . && git commit -m "Initial commit"
+$ git push -u origin main
+
+# Setup development branch
+$ git checkout -b main
+$ git checkout -b development
+$ git checkout development  #Selecting development branch
+$ git add . && git commit -m "Commit Message" && gith push origin development   #Work and push it on development
+
+# Merge to "main" branch
+$ git checkout main #Switch to main branch
+$ git pull origin main  #Pull latest changes just in case
+$ git merge development #Merge development into main
+$ git push origin main  #Push to GitHub
+
+# Github Action and automate test
+- Setup GitHub Actions on repository
+- Add branch protection rules on GitHub repository settings
+
+
+
+
+#### Makefile
+
+# Common Makefile commands
+- make run                  #Run Django server
+- make migrate              #Make and apply databse migrations
+- make install              #Install all packages
+- make test                 #Run all tests using Pytest
+- make clear                #Delete all __pycache__ and .pyc files
+- make collectstatic        #Collect static files for production
+
+
+
+#### Business and Payment miniumu requirements
+- LLC or Sole Proprietorship (Use Stripe Atlas, Firstbase, LegalZoom, or your Secretary of State)
+- EIN (Employer Identification Number) (Tax ID for business, Apply FREE on irs.gov)
+- Business Bank Account (Mercury, Novo, Chase)
+- Stripe Connect Setup (To handle payments, split commissions, KYC)
+- Terms of Service + Privacy Policy	
+
+
+
+#### Domain & Hosting requirements
+- AWS account
+- Domain Registration
+- DNS Configuration
+- Setup business email configuration (https://www.zoho.com/mail/)
+- Setup application email (https://sendgrid.com/)
+
+
+### Testing
+Unit Testing + Integration test are enough to ensure basic app for solo MVP launch.
+Latter do manual testing as smok test, no need Pytest playwight now.
+
+
+
+
+
+
+---------------- RAW
+
+

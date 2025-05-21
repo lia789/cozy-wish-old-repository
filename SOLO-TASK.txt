@@ -1,0 +1,185 @@
+CozyWish Implementation Plan for Solo Developer:
+V1
+----------
+### Phase 1: Project Foundation
+1.1 Git and GitHub Setup
+Initialize Git repository with main and development branches
+Configure basic .gitignore for Python and Django
+Create basic README.md file
+Set up virtual environment named 'CozyWish'
+Create requirements.txt file for dependencies
+Set up GitHub repository with branch structure
+	- main branch for production code
+	- development branch for ongoing development
+	- Configure branch protection for main branch
+	- Ensure tests pass before merging to main
+
+1.2 Project Setup
+- Create django project name "project_root"
+- Implement environment variable management with python-dotenv
+- Create Makefile for common development tasks
+
+
+
+### Phase 2: Core Application Development
+2.1 User Authentication and Authorization
+Implement custom user model with email authentication
+	- customer
+	- service provider
+	- staff
+	- admin
+Create user registration and verification flow
+Implement login, logout, and password reset functionality
+Set up role-based permissions
+Create profile management for different user types
+Create tests for authentication functionality
+Create dummy data and make command for upload it on database
+Crate Smoke manual testing checklist with supported materials
+Update README.md file
+
+2.2 Venue Management System
+Implement venue model with all required fields
+Create venue CRUD functionality
+Implement venue image uploads
+Add venue categories and tags
+Create venue search and filtering functionality
+Implement venue approval workflow for administrators
+Add venue opening hours management
+Create venue team members functionality
+Create venue FAQ management
+Create tests for venue management functionality
+Create dummy data and make command for upload it on database
+Crate Smoke manual testing checklist with supported materials
+Update README.md file
+
+2.3 Service Management:
+Implement service model with all required fields
+Create service CRUD functionality
+Add service pricing and availability management
+Implement service categorization
+Create tests for service management functionality
+Create dummy data and make command for upload it on database
+Crate Smoke manual testing checklist with supported materials
+Update README.md file
+
+### Phase 3: Booking and Payment System
+3.1 Booking and Cart System
+Implement shopping cart functionality
+Create cart item expiration mechanism
+Implement booking creation and management
+Add service availability checking
+Create booking confirmation and notification system
+Implement booking cancellation with reason tracking
+Create tests for booking system functionality
+Crate Smoke manual testing checklist with supported materials
+Update README.md file
+
+3.2 Payment System
+Implement payment method management
+Add invoice generation
+Create transaction history and reporting
+Create tests for payment system
+Crate Smoke manual testing checklist with supported materials
+Update README.md file
+
+
+### Phase 4: Additional Features
+4.1 Review and Rating System
+Implement review model with ratings
+Create review submission and moderation workflow
+Add service provider response functionality
+Create tests for review system
+Create dummy data and make command for upload it on database
+Crate Smoke manual testing checklist with supported materials
+Update README.md file
+
+4.2 Discount and Promotion System
+Implement various discount types (venue, service, platform)
+Create discount code generation and management
+Add discount usage tracking
+Create tests for discount system
+Crate Smoke manual testing checklist with supported materials
+Update README.md file
+
+4.3 Dashboard and Analytics
+Create customer dashboard with booking history and reviews
+Implement service provider dashboard with venue and service management
+Add admin dashboard with system-wide analytics
+Create tests for dashboards
+Crate Smoke manual testing checklist with supported materials
+Update README.md file
+
+4.4 Notification System
+Implement in-app notification center
+Create email notification templates and sending
+Implement notification preferences
+Create tests for notification system
+Crate Smoke manual testing checklist with supported materials
+Update README.md file
+
+
+### Phase 5: Domain and Hosting Setup
+5.1 Domain Registration and Management
+Research and select appropriate domain name
+Register domain with reputable registrar
+Configure domain settings
+Plan for domain management
+
+5.2 DNS Configuration
+Set up DNS records
+Configure subdomains
+Implement DNS security
+Test DNS configuration
+
+5.3 Email Configuration (Week 27)
+Set up business email with domain
+Configure email for application
+Document email setup
+
+
+### Phase 6: Deployment
+6.1 AWS Setup
+Set up S3 buckets for static and media files
+Configure RDS for PostgreSQL database
+Set up EC2 instance for application hosting
+Configure SSL certificate with AWS Certificate Manager
+
+6.2 Application Deployment (Week 29)
+Configure Gunicorn and Nginx for production
+Set up environment-specific settings
+Create deployment scripts
+Document deployment process
+
+
+V2
+---------
+- Convert django project settings into moduler settings structure like; base, dev, test, production
+- Configure PostgreSQL connection settings on AWS
+- Set up backup and restore procedures and other administrative task
+- Secure "django admin" and create customer user for office-work-1, office-work-2, and office-work-3 (may you name them as like)
+- Create tests for authentication functionality
+- Implement Gmail login feature for customer
+- Implement application images store toolkit and best practicess
+- Implement venue search best practice and production ready features
+- Create secure payment processing with Stripe integration test account
+- Work with application emails setup and templates
+- Setup AWS S3 for images
+- After deployment; optimization database queries & indexing, caching, static assest and other
+- Price and other best practice setup for AWS
+
+
+#### Skiped Front End task, Website content task, Marketing task, Business task and Soft luanch task.
+
+
+Note:
+- Update README.md file with user manual, easy to maintain for future and daily day to day task cheat sheet
+- I have already domain from "godaddy", I might need settings business account to implement password reet functionality
+- Every feature create unit and integration testings, latter I will do smoke testing with manualy
+
+
+-------------------
+
+Personal Note:
+- Ask questions before start implement about core feature
+
+

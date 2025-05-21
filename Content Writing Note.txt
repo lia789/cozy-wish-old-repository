@@ -1,0 +1,33 @@
+✅ CozyWish Website Content Writing
+
+📋 TASK CHECKLIST — What Content You Need to Write
+
+🟢 Core Pages
+| Page           | Purpose                                                   |
+| -------------- | --------------------------------------------------------- |
+| ✅ Homepage     | Brand pitch, how it works, call to action                 |
+| ✅ About Page   | Mission, vision, team story                               |
+| ✅ Contact Page | Email, phone, support form                                |
+| ✅ FAQs Page    | Questions about booking, cancelation, refund, login, etc. |
+
+🟨 Functional/Platform Pages
+| Page                           | Purpose                                                 |
+| ------------------------------ | ------------------------------------------------------- |
+| ✅ How It Works (for customers) | Step-by-step of using the site                          |
+| ✅ How It Works (for providers) | How providers list services, get bookings, and get paid |
+| ✅ Provider Onboarding Guide    | What’s required to register, legal rules, payout setup  |
+| ✅ Buyer/Seller Guidelines      | Rules of engagement and expectations                    |
+
+🔒 Legal and Policy Pages
+| Page                           | Purpose                                             |
+| ------------------------------ | --------------------------------------------------- |
+| ✅ Terms and Conditions         | Contract between you and all users                  |
+| ✅ Privacy Policy               | How you handle user data (GDPR/CCPA compliance)     |
+| ✅ Cookie Policy                | Notification and control over cookie usage          |
+| ✅ Refund & Cancellation Policy | Terms for refunding bookings                        |
+| ✅ Payment Terms                | Stripe-related billing rules, fees, chargebacks     |
+| ✅ User Agreement               | High-level summary of platform use and risks        |
+| ✅ Dispute Resolution Policy    | What happens if there’s a disagreement or complaint |
+
+
+
